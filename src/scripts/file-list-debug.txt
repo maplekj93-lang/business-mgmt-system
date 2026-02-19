@@ -1,0 +1,43 @@
+Files in /Users/kwang/Desktop/사업가계부통합관리시스템/docs/bank_samples:
+RAW: .DS_Store
+NFC: .DS_Store
+NFD: .DS_Store
+Includes '카카오'(NFC): false
+Includes '카카오'(NFD): false
+---
+RAW: 1월2월삼성카드.xlsx
+NFC: 1월2월삼성카드.xlsx
+NFD: 1월2월삼성카드.xlsx
+Includes '카카오'(NFC): false
+Includes '카카오'(NFD): false
+---
+RAW: Approve20260217.xls
+NFC: Approve20260217.xls
+NFD: Approve20260217.xls
+Includes '카카오'(NFC): false
+Includes '카카오'(NFD): false
+---
+RAW: hyundaicard_20260217.xls
+NFC: hyundaicard_20260217.xls
+NFD: hyundaicard_20260217.xls
+Includes '카카오'(NFC): false
+Includes '카카오'(NFD): false
+---
+RAW: 거래내역조회_입출식 예금202602171.xlsx
+NFC: 거래내역조회_입출식 예금202602171.xlsx
+NFD: 거래내역조회_입출식 예금202602171.xlsx
+Includes '카카오'(NFC): false
+Includes '카카오'(NFD): false
+---
+RAW: 카카오뱅크_거11래내역_N5410814064_2026021710402077.xlsx
+NFC: 카카오뱅크_거11래내역_N5410814064_2026021710402077.xlsx
+NFD: 카카오뱅크_거11래내역_N5410814064_2026021710402077.xlsx
+Includes '카카오'(NFC): true
+Includes '카카오'(NFD): true
+---
+RAW: 거래내역조회_입출식 예금20260217.xlsx
+NFC: 거래내역조회_입출식 예금20260217.xlsx
+NFD: 거래내역조회_입출식 예금20260217.xlsx
+Includes '카카오'(NFC): false
+Includes '카카오'(NFD): false
+---

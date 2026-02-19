@@ -1,0 +1,776 @@
+🔍 Verifying All Sample Files in: /Users/kwang/Desktop/사업가계부통합관리시스템/docs/bank_samples
+Found 6 files to test.
+
+---------------------------------------------------
+📄 Testing: 1월2월삼성카드.xlsx
+[DEBUG] Check Samsung Card: '카드번호' in '카드번호 본인가족구분 승인일자 승인시각 가맹점명 승인금액(원) 일시불할부구분 할부개월 승인번호 취소여부 사용포인트 결제일'? true
+[DEBUG] Check Samsung Card: '본인가족구분' in '카드번호 본인가족구분 승인일자 승인시각 가맹점명 승인금액(원) 일시불할부구분 할부개월 승인번호 취소여부 사용포인트 결제일'? true
+[DEBUG] Check Samsung Card: '승인번호' in '카드번호 본인가족구분 승인일자 승인시각 가맹점명 승인금액(원) 일시불할부구분 할부개월 승인번호 취소여부 사용포인트 결제일'? true
+🏦 Bank Identified: Samsung Card in sheet "■ 국내이용내역" at row 0
+[DEBUG] Bank: Samsung Card, HeaderRow: 0
+[DEBUG] ColMap: {"date":2,"time":3,"amount":5,"merchant":4,"status":9,"authCode":8}
+🧹 Net-Zero Filter: Removing pair AUTH:05945442 (Amount: -23600)
+🧹 Net-Zero Filter: Removing pair AUTH:92518151 (Amount: -19000)
+🧹 Net-Zero Filter: Removing pair AUTH:25536870 (Amount: -8400)
+🧹 Net-Zero Filter: Removing pair AUTH:25433813 (Amount: -7200)
+🧹 Net-Zero Filter: Removing pair AUTH:98377394 (Amount: -50500)
+🧹 Net-Zero Filter: Removing pair AUTH:72397366 (Amount: -5600)
+🧹 Net-Zero Filter: Removing pair AUTH:67686940 (Amount: -13300)
+✅ Success!
+   - Bank: Samsung Card
+   - Transactions: 75
+   - Filtered (NetZero): 14
+   - Sample Tx: 2026-01-01T19:15:15 | 고미정 | -147000
+---------------------------------------------------
+📄 Testing: Approve20260217.xls
+[DEBUG] Check Samsung Card: '카드번호' in '승인
+일시 승인카드 이용카드																				 승인번호 가맹점명 승인금액																				 이용구분
+(개월수) 접수
+현황 결제일 취소일자
+취소금액'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '승인
+일시 승인카드 이용카드																				 승인번호 가맹점명 승인금액																				 이용구분
+(개월수) 접수
+현황 결제일 취소일자
+취소금액'? true
+[DEBUG] Check BC/Woori Card: '가맹점명' in '승인
+일시 승인카드 이용카드																				 승인번호 가맹점명 승인금액																				 이용구분
+(개월수) 접수
+현황 결제일 취소일자
+취소금액'? true
+[DEBUG] Check BC/Woori Card: '이용금액' in '승인
+일시 승인카드 이용카드																				 승인번호 가맹점명 승인금액																				 이용구분
+(개월수) 접수
+현황 결제일 취소일자
+취소금액'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '승인
+일시 승인카드 이용카드																				 승인번호 가맹점명 승인금액																				 이용구분
+(개월수) 접수
+현황 결제일 취소일자
+취소금액'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '승인
+일시 승인카드 이용카드																				 승인번호 가맹점명 승인금액																				 이용구분
+(개월수) 접수
+현황 결제일 취소일자
+취소금액'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '승인
+일시 승인카드 이용카드																				 승인번호 가맹점명 승인금액																				 이용구분
+(개월수) 접수
+현황 결제일 취소일자
+취소금액'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.16
+16:42:27 bc 바로 에어맥스 
+(신용) a429 76746968 (주)더 숲 25400 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.16
+16:42:27 bc 바로 에어맥스 
+(신용) a429 76746968 (주)더 숲 25400 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.16
+16:42:27 bc 바로 에어맥스 
+(신용) a429 76746968 (주)더 숲 25400 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.16
+16:42:27 bc 바로 에어맥스 
+(신용) a429 76746968 (주)더 숲 25400 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.16
+16:42:27 bc 바로 에어맥스 
+(신용) a429 76746968 (주)더 숲 25400 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.15
+18:03:25 bc 바로 에어맥스 
+(신용) a429 36221744 쿠팡이츠 74300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.15
+18:03:25 bc 바로 에어맥스 
+(신용) a429 36221744 쿠팡이츠 74300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.15
+18:03:25 bc 바로 에어맥스 
+(신용) a429 36221744 쿠팡이츠 74300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.15
+18:03:25 bc 바로 에어맥스 
+(신용) a429 36221744 쿠팡이츠 74300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.15
+18:03:25 bc 바로 에어맥스 
+(신용) a429 36221744 쿠팡이츠 74300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.15
+14:47:26 bc 바로 에어맥스 
+(신용) a010 77664835 센토브 커피 20300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.15
+14:47:26 bc 바로 에어맥스 
+(신용) a010 77664835 센토브 커피 20300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.15
+14:47:26 bc 바로 에어맥스 
+(신용) a010 77664835 센토브 커피 20300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.15
+14:47:26 bc 바로 에어맥스 
+(신용) a010 77664835 센토브 커피 20300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.15
+14:47:26 bc 바로 에어맥스 
+(신용) a010 77664835 센토브 커피 20300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.15
+14:37:24 bc 바로 에어맥스 
+(신용) a429 77541805 코코부코 18800 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.15
+14:37:24 bc 바로 에어맥스 
+(신용) a429 77541805 코코부코 18800 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.15
+14:37:24 bc 바로 에어맥스 
+(신용) a429 77541805 코코부코 18800 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.15
+14:37:24 bc 바로 에어맥스 
+(신용) a429 77541805 코코부코 18800 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.15
+14:37:24 bc 바로 에어맥스 
+(신용) a429 77541805 코코부코 18800 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.15
+14:35:07 bc 바로 에어맥스 
+(신용) a429 77507556 라오삐약 34000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.15
+14:35:07 bc 바로 에어맥스 
+(신용) a429 77507556 라오삐약 34000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.15
+14:35:07 bc 바로 에어맥스 
+(신용) a429 77507556 라오삐약 34000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.15
+14:35:07 bc 바로 에어맥스 
+(신용) a429 77507556 라오삐약 34000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.15
+14:35:07 bc 바로 에어맥스 
+(신용) a429 77507556 라오삐약 34000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.14
+23:27:41 bc 바로 에어맥스 
+(신용) a429 31978317 쿠팡 39710 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.14
+23:27:41 bc 바로 에어맥스 
+(신용) a429 31978317 쿠팡 39710 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.14
+23:27:41 bc 바로 에어맥스 
+(신용) a429 31978317 쿠팡 39710 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.14
+23:27:41 bc 바로 에어맥스 
+(신용) a429 31978317 쿠팡 39710 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.14
+23:27:41 bc 바로 에어맥스 
+(신용) a429 31978317 쿠팡 39710 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.13
+18:15:24 bc 바로 에어맥스 
+(신용) a429 62930953 쿠팡이츠 33300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.13
+18:15:24 bc 바로 에어맥스 
+(신용) a429 62930953 쿠팡이츠 33300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.13
+18:15:24 bc 바로 에어맥스 
+(신용) a429 62930953 쿠팡이츠 33300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.13
+18:15:24 bc 바로 에어맥스 
+(신용) a429 62930953 쿠팡이츠 33300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.13
+18:15:24 bc 바로 에어맥스 
+(신용) a429 62930953 쿠팡이츠 33300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.13
+14:53:00 bc 바로 에어맥스 
+(신용) a010 79260082 블랑제리코팡/주식회사 블랑제리코팡 19000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.13
+14:53:00 bc 바로 에어맥스 
+(신용) a010 79260082 블랑제리코팡/주식회사 블랑제리코팡 19000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.13
+14:53:00 bc 바로 에어맥스 
+(신용) a010 79260082 블랑제리코팡/주식회사 블랑제리코팡 19000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.13
+14:53:00 bc 바로 에어맥스 
+(신용) a010 79260082 블랑제리코팡/주식회사 블랑제리코팡 19000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.13
+14:53:00 bc 바로 에어맥스 
+(신용) a010 79260082 블랑제리코팡/주식회사 블랑제리코팡 19000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.13
+11:46:07 bc 바로 에어맥스 
+(신용) a010 76522714 메가엠지씨커피 망원망리단길점 1700 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.13
+11:46:07 bc 바로 에어맥스 
+(신용) a010 76522714 메가엠지씨커피 망원망리단길점 1700 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.13
+11:46:07 bc 바로 에어맥스 
+(신용) a010 76522714 메가엠지씨커피 망원망리단길점 1700 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.13
+11:46:07 bc 바로 에어맥스 
+(신용) a010 76522714 메가엠지씨커피 망원망리단길점 1700 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.13
+11:46:07 bc 바로 에어맥스 
+(신용) a010 76522714 메가엠지씨커피 망원망리단길점 1700 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.12
+23:48:40 bc 바로 에어맥스 
+(신용) a429 57023649 쿠팡 38850 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.12
+23:48:40 bc 바로 에어맥스 
+(신용) a429 57023649 쿠팡 38850 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.12
+23:48:40 bc 바로 에어맥스 
+(신용) a429 57023649 쿠팡 38850 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.12
+23:48:40 bc 바로 에어맥스 
+(신용) a429 57023649 쿠팡 38850 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.12
+23:48:40 bc 바로 에어맥스 
+(신용) a429 57023649 쿠팡 38850 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.12
+10:16:57 bc 바로 에어맥스 
+(신용) a429 51007072 kt통신요금자동납부 46240 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.12
+10:16:57 bc 바로 에어맥스 
+(신용) a429 51007072 kt통신요금자동납부 46240 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.12
+10:16:57 bc 바로 에어맥스 
+(신용) a429 51007072 kt통신요금자동납부 46240 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.12
+10:16:57 bc 바로 에어맥스 
+(신용) a429 51007072 kt통신요금자동납부 46240 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.12
+10:16:57 bc 바로 에어맥스 
+(신용) a429 51007072 kt통신요금자동납부 46240 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.11
+21:17:36 bc 바로 에어맥스 
+(신용) a010 48118689 우아한형제들 26000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.11
+21:17:36 bc 바로 에어맥스 
+(신용) a010 48118689 우아한형제들 26000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.11
+21:17:36 bc 바로 에어맥스 
+(신용) a010 48118689 우아한형제들 26000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.11
+21:17:36 bc 바로 에어맥스 
+(신용) a010 48118689 우아한형제들 26000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.11
+21:17:36 bc 바로 에어맥스 
+(신용) a010 48118689 우아한형제들 26000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.11
+13:21:33 bc 바로 에어맥스 
+(신용) a010 70691003 시츠프로브 11400 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.11
+13:21:33 bc 바로 에어맥스 
+(신용) a010 70691003 시츠프로브 11400 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.11
+13:21:33 bc 바로 에어맥스 
+(신용) a010 70691003 시츠프로브 11400 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.11
+13:21:33 bc 바로 에어맥스 
+(신용) a010 70691003 시츠프로브 11400 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.11
+13:21:33 bc 바로 에어맥스 
+(신용) a010 70691003 시츠프로브 11400 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.11
+09:41:12 bc 바로 에어맥스 
+(신용) a010 42998098 온브릭스 14900 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.11
+09:41:12 bc 바로 에어맥스 
+(신용) a010 42998098 온브릭스 14900 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.11
+09:41:12 bc 바로 에어맥스 
+(신용) a010 42998098 온브릭스 14900 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.11
+09:41:12 bc 바로 에어맥스 
+(신용) a010 42998098 온브릭스 14900 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.11
+09:41:12 bc 바로 에어맥스 
+(신용) a010 42998098 온브릭스 14900 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.10
+19:36:22 bc 바로 에어맥스 
+(신용) a010 40265124 스타벅스_충전 10000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.10
+19:36:22 bc 바로 에어맥스 
+(신용) a010 40265124 스타벅스_충전 10000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.10
+19:36:22 bc 바로 에어맥스 
+(신용) a010 40265124 스타벅스_충전 10000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.10
+19:36:22 bc 바로 에어맥스 
+(신용) a010 40265124 스타벅스_충전 10000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.10
+19:36:22 bc 바로 에어맥스 
+(신용) a010 40265124 스타벅스_충전 10000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.10
+11:52:19 bc 바로 에어맥스 
+(신용) a010 71255933 맹그로브 6호점 제주시티 5800 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.10
+11:52:19 bc 바로 에어맥스 
+(신용) a010 71255933 맹그로브 6호점 제주시티 5800 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.10
+11:52:19 bc 바로 에어맥스 
+(신용) a010 71255933 맹그로브 6호점 제주시티 5800 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.10
+11:52:19 bc 바로 에어맥스 
+(신용) a010 71255933 맹그로브 6호점 제주시티 5800 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.10
+11:52:19 bc 바로 에어맥스 
+(신용) a010 71255933 맹그로브 6호점 제주시티 5800 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.09
+20:04:56 bc 바로 에어맥스 
+(신용) a010 30775752 gs25제주탑동점 5300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.09
+20:04:56 bc 바로 에어맥스 
+(신용) a010 30775752 gs25제주탑동점 5300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.09
+20:04:56 bc 바로 에어맥스 
+(신용) a010 30775752 gs25제주탑동점 5300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.09
+20:04:56 bc 바로 에어맥스 
+(신용) a010 30775752 gs25제주탑동점 5300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.09
+20:04:56 bc 바로 에어맥스 
+(신용) a010 30775752 gs25제주탑동점 5300 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.09
+19:56:34 bc 바로 에어맥스 
+(신용) a010 78484451 은빛식당 12000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.09
+19:56:34 bc 바로 에어맥스 
+(신용) a010 78484451 은빛식당 12000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.09
+19:56:34 bc 바로 에어맥스 
+(신용) a010 78484451 은빛식당 12000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.09
+19:56:34 bc 바로 에어맥스 
+(신용) a010 78484451 은빛식당 12000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.09
+19:56:34 bc 바로 에어맥스 
+(신용) a010 78484451 은빛식당 12000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.09
+17:34:25 bc 바로 에어맥스 
+(신용) a010 77149547 클래식문구사 8500 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.09
+17:34:25 bc 바로 에어맥스 
+(신용) a010 77149547 클래식문구사 8500 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.09
+17:34:25 bc 바로 에어맥스 
+(신용) a010 77149547 클래식문구사 8500 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.09
+17:34:25 bc 바로 에어맥스 
+(신용) a010 77149547 클래식문구사 8500 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.09
+17:34:25 bc 바로 에어맥스 
+(신용) a010 77149547 클래식문구사 8500 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.09
+16:46:33 bc 바로 에어맥스 
+(신용) a010 76638851 카페단단 11500 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.09
+16:46:33 bc 바로 에어맥스 
+(신용) a010 76638851 카페단단 11500 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.09
+16:46:33 bc 바로 에어맥스 
+(신용) a010 76638851 카페단단 11500 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.09
+16:46:33 bc 바로 에어맥스 
+(신용) a010 76638851 카페단단 11500 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.09
+16:46:33 bc 바로 에어맥스 
+(신용) a010 76638851 카페단단 11500 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.09
+13:15:35 bc 바로 에어맥스 
+(신용) a010 74375099 풀무원푸드앤컬처 김포공항베이커리 4900 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.09
+13:15:35 bc 바로 에어맥스 
+(신용) a010 74375099 풀무원푸드앤컬처 김포공항베이커리 4900 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.09
+13:15:35 bc 바로 에어맥스 
+(신용) a010 74375099 풀무원푸드앤컬처 김포공항베이커리 4900 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.09
+13:15:35 bc 바로 에어맥스 
+(신용) a010 74375099 풀무원푸드앤컬처 김포공항베이커리 4900 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.09
+13:15:35 bc 바로 에어맥스 
+(신용) a010 74375099 풀무원푸드앤컬처 김포공항베이커리 4900 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.09
+12:18:05 bc 바로 에어맥스 
+(신용) a010 73536258 홍대개미 김포공항점 15000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.09
+12:18:05 bc 바로 에어맥스 
+(신용) a010 73536258 홍대개미 김포공항점 15000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.09
+12:18:05 bc 바로 에어맥스 
+(신용) a010 73536258 홍대개미 김포공항점 15000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.09
+12:18:05 bc 바로 에어맥스 
+(신용) a010 73536258 홍대개미 김포공항점 15000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.09
+12:18:05 bc 바로 에어맥스 
+(신용) a010 73536258 홍대개미 김포공항점 15000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.09
+09:24:54 bc 바로 에어맥스 
+(신용) a010 65217135 스타벅스_충전 10000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.09
+09:24:54 bc 바로 에어맥스 
+(신용) a010 65217135 스타벅스_충전 10000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.09
+09:24:54 bc 바로 에어맥스 
+(신용) a010 65217135 스타벅스_충전 10000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.09
+09:24:54 bc 바로 에어맥스 
+(신용) a010 65217135 스타벅스_충전 10000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.09
+09:24:54 bc 바로 에어맥스 
+(신용) a010 65217135 스타벅스_충전 10000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.08
+14:33:36 bc 바로 에어맥스 
+(신용) a010 78030542 주식회사 킹스가든 9500 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.08
+14:33:36 bc 바로 에어맥스 
+(신용) a010 78030542 주식회사 킹스가든 9500 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.08
+14:33:36 bc 바로 에어맥스 
+(신용) a010 78030542 주식회사 킹스가든 9500 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.08
+14:33:36 bc 바로 에어맥스 
+(신용) a010 78030542 주식회사 킹스가든 9500 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.08
+14:33:36 bc 바로 에어맥스 
+(신용) a010 78030542 주식회사 킹스가든 9500 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.08
+09:44:15 bc 바로 에어맥스 
+(신용) a010 75807058 주식회사 킹스가든 3700 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.08
+09:44:15 bc 바로 에어맥스 
+(신용) a010 75807058 주식회사 킹스가든 3700 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.08
+09:44:15 bc 바로 에어맥스 
+(신용) a010 75807058 주식회사 킹스가든 3700 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.08
+09:44:15 bc 바로 에어맥스 
+(신용) a010 75807058 주식회사 킹스가든 3700 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.08
+09:44:15 bc 바로 에어맥스 
+(신용) a010 75807058 주식회사 킹스가든 3700 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.08
+09:43:39 bc 바로 에어맥스 
+(신용) a010 75805992 주식회사 킹스가든 7400 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.08
+09:43:39 bc 바로 에어맥스 
+(신용) a010 75805992 주식회사 킹스가든 7400 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.08
+09:43:39 bc 바로 에어맥스 
+(신용) a010 75805992 주식회사 킹스가든 7400 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.08
+09:43:39 bc 바로 에어맥스 
+(신용) a010 75805992 주식회사 킹스가든 7400 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.08
+09:43:39 bc 바로 에어맥스 
+(신용) a010 75805992 주식회사 킹스가든 7400 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.07
+20:39:28 bc 바로 에어맥스 
+(신용) a010 74599761 희망청과 9000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.07
+20:39:28 bc 바로 에어맥스 
+(신용) a010 74599761 희망청과 9000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.07
+20:39:28 bc 바로 에어맥스 
+(신용) a010 74599761 희망청과 9000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.07
+20:39:28 bc 바로 에어맥스 
+(신용) a010 74599761 희망청과 9000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.07
+20:39:28 bc 바로 에어맥스 
+(신용) a010 74599761 희망청과 9000 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.06
+17:51:26 bc 바로 에어맥스 
+(신용) a010 74881085 웜그레이테일(warmgrey tail) 113200 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.06
+17:51:26 bc 바로 에어맥스 
+(신용) a010 74881085 웜그레이테일(warmgrey tail) 113200 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.06
+17:51:26 bc 바로 에어맥스 
+(신용) a010 74881085 웜그레이테일(warmgrey tail) 113200 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.06
+17:51:26 bc 바로 에어맥스 
+(신용) a010 74881085 웜그레이테일(warmgrey tail) 113200 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.06
+17:51:26 bc 바로 에어맥스 
+(신용) a010 74881085 웜그레이테일(warmgrey tail) 113200 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026.02.06
+16:29:32 bc 바로 에어맥스 
+(신용) a429 49853512 쿠팡 22220 일시 접수 2026.03.13 -'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026.02.06
+16:29:32 bc 바로 에어맥스 
+(신용) a429 49853512 쿠팡 22220 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026.02.06
+16:29:32 bc 바로 에어맥스 
+(신용) a429 49853512 쿠팡 22220 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026.02.06
+16:29:32 bc 바로 에어맥스 
+(신용) a429 49853512 쿠팡 22220 일시 접수 2026.03.13 -'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026.02.06
+16:29:32 bc 바로 에어맥스 
+(신용) a429 49853512 쿠팡 22220 일시 접수 2026.03.13 -'? false
+❌ FAILED: Error: 유효한 거래내역을 찾을 수 없습니다. (지원되는 은행/카드 양식이거나 '가계부' 시트여야 합니다)
+    at parseExcel (/Users/kwang/Desktop/사업가계부통합관리시스템/src/features/ledger-import/model/parser.ts:75:15)
+    at async run (/Users/kwang/Desktop/사업가계부통합관리시스템/src/scripts/verify-all-samples.ts:39:28)
+   DUMPING FIRST 10 ROWS of Approve20260217.xls:
+   Row 0: ["승인\n일시","승인카드","이용카드\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t","승인번호","가맹점명","승인금액\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t","이용구분\n(개월수)","접수\n현황","결제일","취소일자\n취소금액"]
+   Row 1: ["2026.02.16\n16:42:27","BC 바로 에어맥스 \n(신용)","A429","76746968","(주)더 숲",25400,"일시","접수","2026.03.13","-"]
+   Row 2: ["2026.02.15\n18:03:25","BC 바로 에어맥스 \n(신용)","A429","36221744","쿠팡이츠",74300,"일시","접수","2026.03.13","-"]
+   Row 3: ["2026.02.15\n14:47:26","BC 바로 에어맥스 \n(신용)","A010","77664835","센토브 커피",20300,"일시","접수","2026.03.13","-"]
+   Row 4: ["2026.02.15\n14:37:24","BC 바로 에어맥스 \n(신용)","A429","77541805","코코부코",18800,"일시","접수","2026.03.13","-"]
+   Row 5: ["2026.02.15\n14:35:07","BC 바로 에어맥스 \n(신용)","A429","77507556","라오삐약",34000,"일시","접수","2026.03.13","-"]
+   Row 6: ["2026.02.14\n23:27:41","BC 바로 에어맥스 \n(신용)","A429","31978317","쿠팡",39710,"일시","접수","2026.03.13","-"]
+   Row 7: ["2026.02.13\n18:15:24","BC 바로 에어맥스 \n(신용)","A429","62930953","쿠팡이츠",33300,"일시","접수","2026.03.13","-"]
+   Row 8: ["2026.02.13\n14:53:00","BC 바로 에어맥스 \n(신용)","A010","79260082","블랑제리코팡/주식회사 블랑제리코팡",19000,"일시","접수","2026.03.13","-"]
+   Row 9: ["2026.02.13\n11:46:07","BC 바로 에어맥스 \n(신용)","A010","76522714","메가엠지씨커피 망원망리단길점",1700,"일시","접수","2026.03.13","-"]
+---------------------------------------------------
+📄 Testing: hyundaicard_20260217.xls
+[DEBUG] Check Samsung Card: '카드번호' in '실시간 이용내역'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '실시간 이용내역'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '실시간 이용내역'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '실시간 이용내역'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '실시간 이용내역'? false
+[DEBUG] Check Samsung Card: '카드번호' in '이용내역'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '이용내역'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '이용내역'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '이용내역'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '이용내역'? false
+[DEBUG] Check Samsung Card: '카드번호' in '승인일 승인시각 카드구분 카드종류 가맹점명 승인금액 이용구분 할부개월 승인번호 취소일 승인구분'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '승인일 승인시각 카드구분 카드종류 가맹점명 승인금액 이용구분 할부개월 승인번호 취소일 승인구분'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '승인일 승인시각 카드구분 카드종류 가맹점명 승인금액 이용구분 할부개월 승인번호 취소일 승인구분'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '승인일 승인시각 카드구분 카드종류 가맹점명 승인금액 이용구분 할부개월 승인번호 취소일 승인구분'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '승인일 승인시각 카드구분 카드종류 가맹점명 승인금액 이용구분 할부개월 승인번호 취소일 승인구분'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026년 02월 11일 20:21 가족 5***-****-****-890* 씨유cu미사테스타1호점 7800 일시불 0 765378 - 전표접수'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026년 02월 11일 20:21 가족 5***-****-****-890* 씨유cu미사테스타1호점 7800 일시불 0 765378 - 전표접수'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026년 02월 11일 20:21 가족 5***-****-****-890* 씨유cu미사테스타1호점 7800 일시불 0 765378 - 전표접수'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026년 02월 11일 20:21 가족 5***-****-****-890* 씨유cu미사테스타1호점 7800 일시불 0 765378 - 전표접수'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026년 02월 11일 20:21 가족 5***-****-****-890* 씨유cu미사테스타1호점 7800 일시불 0 765378 - 전표접수'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026년 02월 07일 19:31 가족 5***-****-****-890* 유튜브프리미엄 - 구글페이먼트코리아 유한회 14900 일시불 0 238528 - 전표접수'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026년 02월 07일 19:31 가족 5***-****-****-890* 유튜브프리미엄 - 구글페이먼트코리아 유한회 14900 일시불 0 238528 - 전표접수'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026년 02월 07일 19:31 가족 5***-****-****-890* 유튜브프리미엄 - 구글페이먼트코리아 유한회 14900 일시불 0 238528 - 전표접수'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026년 02월 07일 19:31 가족 5***-****-****-890* 유튜브프리미엄 - 구글페이먼트코리아 유한회 14900 일시불 0 238528 - 전표접수'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026년 02월 07일 19:31 가족 5***-****-****-890* 유튜브프리미엄 - 구글페이먼트코리아 유한회 14900 일시불 0 238528 - 전표접수'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026년 01월 13일 01:14 가족 5***-****-****-890* kt통신요금자동납부 46240 일시불 0 92177666 - 전표접수'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026년 01월 13일 01:14 가족 5***-****-****-890* kt통신요금자동납부 46240 일시불 0 92177666 - 전표접수'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026년 01월 13일 01:14 가족 5***-****-****-890* kt통신요금자동납부 46240 일시불 0 92177666 - 전표접수'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026년 01월 13일 01:14 가족 5***-****-****-890* kt통신요금자동납부 46240 일시불 0 92177666 - 전표접수'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026년 01월 13일 01:14 가족 5***-****-****-890* kt통신요금자동납부 46240 일시불 0 92177666 - 전표접수'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2026년 01월 07일 19:31 가족 5***-****-****-890* 유튜브프리미엄 - 구글페이먼트코리아 유한회 14900 일시불 0 354216 - 전표접수'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2026년 01월 07일 19:31 가족 5***-****-****-890* 유튜브프리미엄 - 구글페이먼트코리아 유한회 14900 일시불 0 354216 - 전표접수'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2026년 01월 07일 19:31 가족 5***-****-****-890* 유튜브프리미엄 - 구글페이먼트코리아 유한회 14900 일시불 0 354216 - 전표접수'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2026년 01월 07일 19:31 가족 5***-****-****-890* 유튜브프리미엄 - 구글페이먼트코리아 유한회 14900 일시불 0 354216 - 전표접수'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2026년 01월 07일 19:31 가족 5***-****-****-890* 유튜브프리미엄 - 구글페이먼트코리아 유한회 14900 일시불 0 354216 - 전표접수'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2025년 12월 30일 13:52 가족 5***-****-****-890* 킹스가든 4700 일시불 0 377768 - 전표접수'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2025년 12월 30일 13:52 가족 5***-****-****-890* 킹스가든 4700 일시불 0 377768 - 전표접수'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2025년 12월 30일 13:52 가족 5***-****-****-890* 킹스가든 4700 일시불 0 377768 - 전표접수'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2025년 12월 30일 13:52 가족 5***-****-****-890* 킹스가든 4700 일시불 0 377768 - 전표접수'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2025년 12월 30일 13:52 가족 5***-****-****-890* 킹스가든 4700 일시불 0 377768 - 전표접수'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2025년 12월 19일 15:29 가족 5***-****-****-890* 킹스가든 8500 일시불 0 257140 - 전표접수'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2025년 12월 19일 15:29 가족 5***-****-****-890* 킹스가든 8500 일시불 0 257140 - 전표접수'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2025년 12월 19일 15:29 가족 5***-****-****-890* 킹스가든 8500 일시불 0 257140 - 전표접수'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2025년 12월 19일 15:29 가족 5***-****-****-890* 킹스가든 8500 일시불 0 257140 - 전표접수'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2025년 12월 19일 15:29 가족 5***-****-****-890* 킹스가든 8500 일시불 0 257140 - 전표접수'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2025년 12월 13일 15:06 가족 5***-****-****-890* 킹스가든 7400 일시불 0 666588 - 전표접수'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2025년 12월 13일 15:06 가족 5***-****-****-890* 킹스가든 7400 일시불 0 666588 - 전표접수'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2025년 12월 13일 15:06 가족 5***-****-****-890* 킹스가든 7400 일시불 0 666588 - 전표접수'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2025년 12월 13일 15:06 가족 5***-****-****-890* 킹스가든 7400 일시불 0 666588 - 전표접수'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2025년 12월 13일 15:06 가족 5***-****-****-890* 킹스가든 7400 일시불 0 666588 - 전표접수'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2025년 12월 12일 01:12 가족 5***-****-****-890* kt통신요금자동납부 46240 일시불 0 92179198 - 전표접수'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2025년 12월 12일 01:12 가족 5***-****-****-890* kt통신요금자동납부 46240 일시불 0 92179198 - 전표접수'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2025년 12월 12일 01:12 가족 5***-****-****-890* kt통신요금자동납부 46240 일시불 0 92179198 - 전표접수'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2025년 12월 12일 01:12 가족 5***-****-****-890* kt통신요금자동납부 46240 일시불 0 92179198 - 전표접수'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2025년 12월 12일 01:12 가족 5***-****-****-890* kt통신요금자동납부 46240 일시불 0 92179198 - 전표접수'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2025년 12월 07일 19:31 가족 5***-****-****-890* 유튜브프리미엄 - 구글페이먼트코리아 유한회 14900 일시불 0 538531 - 전표접수'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2025년 12월 07일 19:31 가족 5***-****-****-890* 유튜브프리미엄 - 구글페이먼트코리아 유한회 14900 일시불 0 538531 - 전표접수'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2025년 12월 07일 19:31 가족 5***-****-****-890* 유튜브프리미엄 - 구글페이먼트코리아 유한회 14900 일시불 0 538531 - 전표접수'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2025년 12월 07일 19:31 가족 5***-****-****-890* 유튜브프리미엄 - 구글페이먼트코리아 유한회 14900 일시불 0 538531 - 전표접수'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2025년 12월 07일 19:31 가족 5***-****-****-890* 유튜브프리미엄 - 구글페이먼트코리아 유한회 14900 일시불 0 538531 - 전표접수'? false
+[DEBUG] Check Samsung Card: '카드번호' in '2025년 11월 23일 14:34 가족 5***-****-****-890* 킹스가든 18700 일시불 0 812737 - 전표접수'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '2025년 11월 23일 14:34 가족 5***-****-****-890* 킹스가든 18700 일시불 0 812737 - 전표접수'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '2025년 11월 23일 14:34 가족 5***-****-****-890* 킹스가든 18700 일시불 0 812737 - 전표접수'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '2025년 11월 23일 14:34 가족 5***-****-****-890* 킹스가든 18700 일시불 0 812737 - 전표접수'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '2025년 11월 23일 14:34 가족 5***-****-****-890* 킹스가든 18700 일시불 0 812737 - 전표접수'? false
+[DEBUG] Check Samsung Card: '카드번호' in '-    국내 일시불 소계 10건 184280'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '-    국내 일시불 소계 10건 184280'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '-    국내 일시불 소계 10건 184280'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '-    국내 일시불 소계 10건 184280'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '-    국내 일시불 소계 10건 184280'? false
+[DEBUG] Check Samsung Card: '카드번호' in '-    총 합계 소계 10건 184280'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '-    총 합계 소계 10건 184280'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '-    총 합계 소계 10건 184280'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '-    총 합계 소계 10건 184280'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '-    총 합계 소계 10건 184280'? false
+❌ FAILED: Error: 유효한 거래내역을 찾을 수 없습니다. (지원되는 은행/카드 양식이거나 '가계부' 시트여야 합니다)
+    at parseExcel (/Users/kwang/Desktop/사업가계부통합관리시스템/src/features/ledger-import/model/parser.ts:75:15)
+    at async run (/Users/kwang/Desktop/사업가계부통합관리시스템/src/scripts/verify-all-samples.ts:39:28)
+   DUMPING FIRST 10 ROWS of hyundaicard_20260217.xls:
+   Row 0: ["실시간 이용내역"]
+   Row 1: ["이용내역"]
+   Row 2: ["승인일","승인시각","카드구분","카드종류","가맹점명","승인금액","이용구분","할부개월","승인번호","취소일","승인구분"]
+   Row 3: ["2026년 02월 11일","20:21","가족","5***-****-****-890*","씨유CU미사테스타1호점",7800,"일시불",0,765378,"-","전표접수"]
+   Row 4: ["2026년 02월 07일","19:31","가족","5***-****-****-890*","유튜브프리미엄 - 구글페이먼트코리아 유한회",14900,"일시불",0,238528,"-","전표접수"]
+   Row 5: ["2026년 01월 13일","01:14","가족","5***-****-****-890*","KT통신요금자동납부",46240,"일시불",0,92177666,"-","전표접수"]
+   Row 6: ["2026년 01월 07일","19:31","가족","5***-****-****-890*","유튜브프리미엄 - 구글페이먼트코리아 유한회",14900,"일시불",0,354216,"-","전표접수"]
+   Row 7: ["2025년 12월 30일","13:52","가족","5***-****-****-890*","킹스가든",4700,"일시불",0,377768,"-","전표접수"]
+   Row 8: ["2025년 12월 19일","15:29","가족","5***-****-****-890*","킹스가든",8500,"일시불",0,257140,"-","전표접수"]
+   Row 9: ["2025년 12월 13일","15:06","가족","5***-****-****-890*","킹스가든",7400,"일시불",0,666588,"-","전표접수"]
+---------------------------------------------------
+📄 Testing: 거래내역조회_입출식 예금202602171.xlsx
+[DEBUG] Check Samsung Card: '카드번호' in '거래내역조회_입출식 예금'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '거래내역조회_입출식 예금'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '거래내역조회_입출식 예금'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '거래내역조회_입출식 예금'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '거래내역조회_입출식 예금'? false
+[DEBUG] Check Samsung Card: '카드번호' in '계좌번호:158-090378-01-011 (보통예금(ibk핸드폰결제통장))                                                                  조회기준일:2026년 02월 17일 10:42
+예금주명:정광준                                                                                          예금종류:보통예금(ibk핸드폰결제통장)
+현재잔액:55,846원                                                                                         출금가능금액:55,846원
+조회시작일자:2025-02-18                                                                                     조회종료일자:2026-02-17
+'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '계좌번호:158-090378-01-011 (보통예금(ibk핸드폰결제통장))                                                                  조회기준일:2026년 02월 17일 10:42
+예금주명:정광준                                                                                          예금종류:보통예금(ibk핸드폰결제통장)
+현재잔액:55,846원                                                                                         출금가능금액:55,846원
+조회시작일자:2025-02-18                                                                                     조회종료일자:2026-02-17
+'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '계좌번호:158-090378-01-011 (보통예금(ibk핸드폰결제통장))                                                                  조회기준일:2026년 02월 17일 10:42
+예금주명:정광준                                                                                          예금종류:보통예금(ibk핸드폰결제통장)
+현재잔액:55,846원                                                                                         출금가능금액:55,846원
+조회시작일자:2025-02-18                                                                                     조회종료일자:2026-02-17
+'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '계좌번호:158-090378-01-011 (보통예금(ibk핸드폰결제통장))                                                                  조회기준일:2026년 02월 17일 10:42
+예금주명:정광준                                                                                          예금종류:보통예금(ibk핸드폰결제통장)
+현재잔액:55,846원                                                                                         출금가능금액:55,846원
+조회시작일자:2025-02-18                                                                                     조회종료일자:2026-02-17
+'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '계좌번호:158-090378-01-011 (보통예금(ibk핸드폰결제통장))                                                                  조회기준일:2026년 02월 17일 10:42
+예금주명:정광준                                                                                          예금종류:보통예금(ibk핸드폰결제통장)
+현재잔액:55,846원                                                                                         출금가능금액:55,846원
+조회시작일자:2025-02-18                                                                                     조회종료일자:2026-02-17
+'? false
+[DEBUG] Check Samsung Card: '카드번호' in '  거래일시 출금 입금 거래후 잔액 거래내용 상대계좌번호 상대은행 메모 거래구분 수표어음금액 cms코드 상대계좌예금주명'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '  거래일시 출금 입금 거래후 잔액 거래내용 상대계좌번호 상대은행 메모 거래구분 수표어음금액 cms코드 상대계좌예금주명'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '  거래일시 출금 입금 거래후 잔액 거래내용 상대계좌번호 상대은행 메모 거래구분 수표어음금액 cms코드 상대계좌예금주명'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '  거래일시 출금 입금 거래후 잔액 거래내용 상대계좌번호 상대은행 메모 거래구분 수표어음금액 cms코드 상대계좌예금주명'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '  거래일시 출금 입금 거래후 잔액 거래내용 상대계좌번호 상대은행 메모 거래구분 수표어음금액 cms코드 상대계좌예금주명'? true
+[DEBUG] Check Standard Bank Account: '출금' in '  거래일시 출금 입금 거래후 잔액 거래내용 상대계좌번호 상대은행 메모 거래구분 수표어음금액 cms코드 상대계좌예금주명'? true
+[DEBUG] Check Standard Bank Account: '입금' in '  거래일시 출금 입금 거래후 잔액 거래내용 상대계좌번호 상대은행 메모 거래구분 수표어음금액 cms코드 상대계좌예금주명'? true
+[DEBUG] Check Standard Bank Account: '거래후 잔액' in '  거래일시 출금 입금 거래후 잔액 거래내용 상대계좌번호 상대은행 메모 거래구분 수표어음금액 cms코드 상대계좌예금주명'? true
+🏦 Bank Identified: Standard Bank Account in sheet "거래내역조회_입출식 예금" at row 2
+[DEBUG] Bank: Standard Bank Account, HeaderRow: 2
+[DEBUG] ColMap: {"date":1,"income":3,"expense":2,"balance":4,"merchant":5}
+✅ Success!
+   - Bank: Standard Bank Account
+   - Transactions: 46
+   - Filtered (NetZero): 0
+   - Sample Tx: 2025-02-27T00:00:00 | 보름달조명 | 483500
+---------------------------------------------------
+📄 Testing: 카카오뱅크_거11래내역_N5410814064_2026021710402077.xlsx
+[DEBUG] Check Samsung Card: '카드번호' in ' 카카오뱅크 거래내역'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in ' 카카오뱅크 거래내역'? false
+[DEBUG] Check Hyundai Card: '현대카드' in ' 카카오뱅크 거래내역'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in ' 카카오뱅크 거래내역'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in ' 카카오뱅크 거래내역'? false
+[DEBUG] Check Samsung Card: '카드번호' in ''? false
+[DEBUG] Check BC/Woori Card: '이용카드' in ''? false
+[DEBUG] Check Hyundai Card: '현대카드' in ''? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in ''? false
+[DEBUG] Check Standard Bank Account: '거래일시' in ''? false
+[DEBUG] Check Samsung Card: '카드번호' in ''? false
+[DEBUG] Check BC/Woori Card: '이용카드' in ''? false
+[DEBUG] Check Hyundai Card: '현대카드' in ''? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in ''? false
+[DEBUG] Check Standard Bank Account: '거래일시' in ''? false
+[DEBUG] Check Samsung Card: '카드번호' in ' 성명 정광준  조회기간 2025.02.17 - 2026.02.17'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in ' 성명 정광준  조회기간 2025.02.17 - 2026.02.17'? false
+[DEBUG] Check Hyundai Card: '현대카드' in ' 성명 정광준  조회기간 2025.02.17 - 2026.02.17'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in ' 성명 정광준  조회기간 2025.02.17 - 2026.02.17'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in ' 성명 정광준  조회기간 2025.02.17 - 2026.02.17'? false
+[DEBUG] Check Samsung Card: '카드번호' in ' 계좌번호 ****-**-***1345  요청일시 2026.02.17 10:40:20'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in ' 계좌번호 ****-**-***1345  요청일시 2026.02.17 10:40:20'? false
+[DEBUG] Check Hyundai Card: '현대카드' in ' 계좌번호 ****-**-***1345  요청일시 2026.02.17 10:40:20'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in ' 계좌번호 ****-**-***1345  요청일시 2026.02.17 10:40:20'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in ' 계좌번호 ****-**-***1345  요청일시 2026.02.17 10:40:20'? false
+[DEBUG] Check Samsung Card: '카드번호' in ''? false
+[DEBUG] Check BC/Woori Card: '이용카드' in ''? false
+[DEBUG] Check Hyundai Card: '현대카드' in ''? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in ''? false
+[DEBUG] Check Standard Bank Account: '거래일시' in ''? false
+[DEBUG] Check Samsung Card: '카드번호' in ' ※ 금액앞에 '-' 표시는 출금 금액입니다.'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in ' ※ 금액앞에 '-' 표시는 출금 금액입니다.'? false
+[DEBUG] Check Hyundai Card: '현대카드' in ' ※ 금액앞에 '-' 표시는 출금 금액입니다.'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in ' ※ 금액앞에 '-' 표시는 출금 금액입니다.'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in ' ※ 금액앞에 '-' 표시는 출금 금액입니다.'? false
+[DEBUG] Check Samsung Card: '카드번호' in ' ※ 본 거래내역은 법적효력이 없는 참고용 문서입니다. '? false
+[DEBUG] Check BC/Woori Card: '이용카드' in ' ※ 본 거래내역은 법적효력이 없는 참고용 문서입니다. '? false
+[DEBUG] Check Hyundai Card: '현대카드' in ' ※ 본 거래내역은 법적효력이 없는 참고용 문서입니다. '? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in ' ※ 본 거래내역은 법적효력이 없는 참고용 문서입니다. '? false
+[DEBUG] Check Standard Bank Account: '거래일시' in ' ※ 본 거래내역은 법적효력이 없는 참고용 문서입니다. '? false
+[DEBUG] Check Samsung Card: '카드번호' in ' ※ 제출 용도로 거래내역서를 받으시려면 [카카오뱅크앱>전체메뉴>고객센터>증명서발급] 메뉴를 이용해주시기 바랍니다.'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in ' ※ 제출 용도로 거래내역서를 받으시려면 [카카오뱅크앱>전체메뉴>고객센터>증명서발급] 메뉴를 이용해주시기 바랍니다.'? false
+[DEBUG] Check Hyundai Card: '현대카드' in ' ※ 제출 용도로 거래내역서를 받으시려면 [카카오뱅크앱>전체메뉴>고객센터>증명서발급] 메뉴를 이용해주시기 바랍니다.'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in ' ※ 제출 용도로 거래내역서를 받으시려면 [카카오뱅크앱>전체메뉴>고객센터>증명서발급] 메뉴를 이용해주시기 바랍니다.'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in ' ※ 제출 용도로 거래내역서를 받으시려면 [카카오뱅크앱>전체메뉴>고객센터>증명서발급] 메뉴를 이용해주시기 바랍니다.'? false
+[DEBUG] Check Samsung Card: '카드번호' in ''? false
+[DEBUG] Check BC/Woori Card: '이용카드' in ''? false
+[DEBUG] Check Hyundai Card: '현대카드' in ''? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in ''? false
+[DEBUG] Check Standard Bank Account: '거래일시' in ''? false
+[DEBUG] Check Samsung Card: '카드번호' in ' 거래일시 구분 거래금액 거래 후 잔액 거래구분 내용 메모'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in ' 거래일시 구분 거래금액 거래 후 잔액 거래구분 내용 메모'? false
+[DEBUG] Check Hyundai Card: '현대카드' in ' 거래일시 구분 거래금액 거래 후 잔액 거래구분 내용 메모'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in ' 거래일시 구분 거래금액 거래 후 잔액 거래구분 내용 메모'? true
+[DEBUG] Check Kakao Bank: '거래금액' in ' 거래일시 구분 거래금액 거래 후 잔액 거래구분 내용 메모'? true
+[DEBUG] Check Kakao Bank: '거래일시' in ' 거래일시 구분 거래금액 거래 후 잔액 거래구분 내용 메모'? true
+🏦 Bank Identified: Kakao Bank in sheet "카카오뱅크 거래내역" at row 10
+❌ FAILED: TypeError: Cannot read properties of undefined (reading 'includes')
+    at <anonymous> (/Users/kwang/Desktop/사업가계부통합관리시스템/src/features/ledger-import/model/parser.ts:105:61)
+    at Array.some (<anonymous>)
+    at <anonymous> (/Users/kwang/Desktop/사업가계부통합관리시스템/src/features/ledger-import/model/parser.ts:105:49)
+    at Array.findIndex (<anonymous>)
+    at parseBankSheet (/Users/kwang/Desktop/사업가계부통합관리시스템/src/features/ledger-import/model/parser.ts:105:29)
+    at parseExcel (/Users/kwang/Desktop/사업가계부통합관리시스템/src/features/ledger-import/model/parser.ts:56:29)
+    at async run (/Users/kwang/Desktop/사업가계부통합관리시스템/src/scripts/verify-all-samples.ts:39:28)
+   DUMPING FIRST 10 ROWS of 카카오뱅크_거11래내역_N5410814064_2026021710402077.xlsx:
+   Row 0: [null,"카카오뱅크 거래내역"]
+   Row 1: []
+   Row 2: []
+   Row 3: [null,"성명","정광준",null,"조회기간","2025.02.17 - 2026.02.17"]
+   Row 4: [null,"계좌번호","****-**-***1345",null,"요청일시","2026.02.17 10:40:20"]
+   Row 5: []
+   Row 6: [null,"※ 금액앞에 '-' 표시는 출금 금액입니다."]
+   Row 7: [null,"※ 본 거래내역은 법적효력이 없는 참고용 문서입니다. "]
+   Row 8: [null,"※ 제출 용도로 거래내역서를 받으시려면 [카카오뱅크앱>전체메뉴>고객센터>증명서발급] 메뉴를 이용해주시기 바랍니다."]
+   Row 9: []
+---------------------------------------------------
+📄 Testing: 거래내역조회_입출식 예금20260217.xlsx
+[DEBUG] Check Samsung Card: '카드번호' in '거래내역조회_입출식 예금'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '거래내역조회_입출식 예금'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '거래내역조회_입출식 예금'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '거래내역조회_입출식 예금'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '거래내역조회_입출식 예금'? false
+[DEBUG] Check Samsung Card: '카드번호' in '계좌번호:048-149078-01-019 (보통예금(ibk평생주거래기업통장))                                                                조회기준일:2026년 02월 17일 10:38
+예금주명:브라이트글로리                                                                                      예금종류:보통예금(ibk평생주거래기업통장)
+현재잔액:117,640원                                                                                        출금가능금액:117,640원
+조회시작일자:2025-02-18                                                                                     조회종료일자:2026-02-17
+'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '계좌번호:048-149078-01-019 (보통예금(ibk평생주거래기업통장))                                                                조회기준일:2026년 02월 17일 10:38
+예금주명:브라이트글로리                                                                                      예금종류:보통예금(ibk평생주거래기업통장)
+현재잔액:117,640원                                                                                        출금가능금액:117,640원
+조회시작일자:2025-02-18                                                                                     조회종료일자:2026-02-17
+'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '계좌번호:048-149078-01-019 (보통예금(ibk평생주거래기업통장))                                                                조회기준일:2026년 02월 17일 10:38
+예금주명:브라이트글로리                                                                                      예금종류:보통예금(ibk평생주거래기업통장)
+현재잔액:117,640원                                                                                        출금가능금액:117,640원
+조회시작일자:2025-02-18                                                                                     조회종료일자:2026-02-17
+'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '계좌번호:048-149078-01-019 (보통예금(ibk평생주거래기업통장))                                                                조회기준일:2026년 02월 17일 10:38
+예금주명:브라이트글로리                                                                                      예금종류:보통예금(ibk평생주거래기업통장)
+현재잔액:117,640원                                                                                        출금가능금액:117,640원
+조회시작일자:2025-02-18                                                                                     조회종료일자:2026-02-17
+'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '계좌번호:048-149078-01-019 (보통예금(ibk평생주거래기업통장))                                                                조회기준일:2026년 02월 17일 10:38
+예금주명:브라이트글로리                                                                                      예금종류:보통예금(ibk평생주거래기업통장)
+현재잔액:117,640원                                                                                        출금가능금액:117,640원
+조회시작일자:2025-02-18                                                                                     조회종료일자:2026-02-17
+'? false
+[DEBUG] Check Samsung Card: '카드번호' in '  거래일시 출금 입금 거래후 잔액 거래내용 상대계좌번호 상대은행 메모 거래구분 수표어음금액 cms코드 상대계좌예금주명'? false
+[DEBUG] Check BC/Woori Card: '이용카드' in '  거래일시 출금 입금 거래후 잔액 거래내용 상대계좌번호 상대은행 메모 거래구분 수표어음금액 cms코드 상대계좌예금주명'? false
+[DEBUG] Check Hyundai Card: '현대카드' in '  거래일시 출금 입금 거래후 잔액 거래내용 상대계좌번호 상대은행 메모 거래구분 수표어음금액 cms코드 상대계좌예금주명'? false
+[DEBUG] Check Kakao Bank: '거래 후 잔액' in '  거래일시 출금 입금 거래후 잔액 거래내용 상대계좌번호 상대은행 메모 거래구분 수표어음금액 cms코드 상대계좌예금주명'? false
+[DEBUG] Check Standard Bank Account: '거래일시' in '  거래일시 출금 입금 거래후 잔액 거래내용 상대계좌번호 상대은행 메모 거래구분 수표어음금액 cms코드 상대계좌예금주명'? true
+[DEBUG] Check Standard Bank Account: '출금' in '  거래일시 출금 입금 거래후 잔액 거래내용 상대계좌번호 상대은행 메모 거래구분 수표어음금액 cms코드 상대계좌예금주명'? true
+[DEBUG] Check Standard Bank Account: '입금' in '  거래일시 출금 입금 거래후 잔액 거래내용 상대계좌번호 상대은행 메모 거래구분 수표어음금액 cms코드 상대계좌예금주명'? true
+[DEBUG] Check Standard Bank Account: '거래후 잔액' in '  거래일시 출금 입금 거래후 잔액 거래내용 상대계좌번호 상대은행 메모 거래구분 수표어음금액 cms코드 상대계좌예금주명'? true
+🏦 Bank Identified: Standard Bank Account in sheet "거래내역조회_입출식 예금" at row 2
+[DEBUG] Bank: Standard Bank Account, HeaderRow: 2
+[DEBUG] ColMap: {"date":1,"income":3,"expense":2,"balance":4,"merchant":5}
+🧹 Net-Zero Filter: Removing pair WEAK:송의영:5000000 (Amount: -5000000)
+🧹 Net-Zero Filter: Removing pair WEAK:송의영:1000000 (Amount: -1000000)
+✅ Success!
+   - Bank: Standard Bank Account
+   - Transactions: 280
+   - Filtered (NetZero): 4
+   - Sample Tx: 2025-02-23T00:00:00 | 삼성카드 | -1022560

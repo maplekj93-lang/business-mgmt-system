@@ -1,0 +1,833 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!--  Delfino 테스트용 JS -->
+<script type="text/javascript">
+//<![CDATA[
+
+    
+    
+    
+    
+        var _SITE_SystemMode = "real"; //"real", "test"
+        
+  
+    var _SITE_SystemLang = "KOR"; //"KOR", "ENG", "CHN", "JPN"
+    var _SITE_SiteName = "pc";     //"pc", "mobile", "tablet"
+    var _SITE_ModuleType = "G3"; //"", "G2", "G3", "G4"
+//]]>
+</script>
+<script src="/docfiles/solution/wizvera/delfino/delfino_config.js?20210903"></script>
+<script src="/docfiles/solution/wizvera/delfino/delfino_internal.min.js?20210903"></script>
+<script src="/docfiles/solution/wizvera/delfino/delfino.js?20210903"></script>
+<script src="/docfiles/solution/wizvera/delfino/delfino_site.js?20210903"></script>
+
+
+<!-- 공인인증 처리 -->
+<script type="text/javascript" src="/docfiles/resources/pc/js/common/jquery-hc-secure2.js"></script>
+
+
+
+
+
+
+
+
+
+
+<!-- NOS 설정-->
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript" src="/docfiles/solution/pluginfree/js/nppfs-1.13.0.js?dummy=103000"></script>
+
+<script type="text/javascript">
+var initTouchEnSecu = function() {};
+jQuery(document).ready(function(){
+    jQuery("#userAgent").text(navigator.userAgent);
+	
+    
+    var useFds = (($("#fdsSvcCd").val() != "" && $("#fdsSvcCd").val() != null && $("#fdsSvcCd").val() != undefined && $("#fdsSvcCd").val() != "undefined"));
+    
+    
+    if(useFds){
+        npPfsStartup(fdsForm, true, false, true, true, "enc", "on");
+    }else{
+        // 첫번째 form 선택
+        var formList = document.getElementsByTagName("form");
+        npPfsStartup(formList[0], true, false, false, true, "enc", "on"); // 반응형은 보안키패드 강제로 띄우게 처리
+    }
+
+    // 가상운영체제 여부 확인
+    npPfsCtrl.isVirtualMachine(function(result){
+       if(result == true) {
+           alert("가상운영체제 또는 원격으로 접속하셨습니다.");
+       }
+    });
+});
+
+var fdsCnt = 0; 
+
+function fdsWait(){
+    fdsCnt++;
+    if(fdsComplete=="Y"){
+        fdsSubmit(); 
+    }else if(fdsCnt==11 && fdsComplete=="N"){ 
+        
+        npPfsCtrl.waitSubmit(function(){ fdsSubmit(); }); 
+    }else{ 
+        
+        setTimeout(fdsWait,1000);
+    }
+}
+</script>
+
+
+
+
+
+
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"xml:lang="ko" lang="ko">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>Untitled Document</title>
+<style type="text/css">
+    td, th {font-size:12px;padding: 5px 10px;}
+</style>
+</head>
+    <body>
+        <table cellspacing="0" cellpadding="0" border="1">
+            <tr>
+                <th bgcolor="#f2f2f2" colspan="11">실시간 이용내역</th>
+            </tr>
+            <tr>
+                <th colspan="11" align="left">이용내역</th>
+            </tr>
+            <tr>
+                <th bgcolor="#f2f2f2">승인일</th>
+                <th bgcolor="#f2f2f2">승인시각</th>
+                <th bgcolor="#f2f2f2">카드구분</th>
+                <th bgcolor="#f2f2f2">카드종류</th>
+                <th bgcolor="#f2f2f2">가맹점명</th>
+                <th bgcolor="#f2f2f2">승인금액</th>
+                <th bgcolor="#f2f2f2">이용구분</th>
+                <th bgcolor="#f2f2f2">할부개월</th>
+                <th bgcolor="#f2f2f2">승인번호</th>
+                <th bgcolor="#f2f2f2">취소일</th>
+                <th bgcolor="#f2f2f2">승인구분</th>
+            </tr>
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+            
+                
+                
+                
+                    
+                        
+                    
+                    
+                
+                
+                    
+                    
+                        
+                        
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                
+                
+                <tr>
+                    <td align="center">2026년 02월 11일</td>
+                    <td align="center">20:21</td>
+                    <td align="center">
+                        
+                            
+                            가족 
+                        
+                    </td>
+                    <td>5***-****-****-890*</td>
+                    <td>씨유CU미사테스타1호점</td>
+                    <td align="right">7,800</td>
+                    <td align="center">
+                        
+                           일시불
+                           
+                           
+                           
+                           
+                           
+                           
+                       
+                    </td>
+                    <td>0</td>
+                    <td style='mso-number-format:"\@";'>00765378</td>
+                    <td align="center">-</td>
+                    <td>
+                       
+                           
+                           
+                           
+                           전표접수
+                           
+                       
+                    </td>
+                </tr>
+            
+                
+                
+                
+                    
+                        
+                    
+                    
+                
+                
+                    
+                    
+                        
+                        
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                
+                
+                <tr>
+                    <td align="center">2026년 02월 07일</td>
+                    <td align="center">19:31</td>
+                    <td align="center">
+                        
+                            
+                            가족 
+                        
+                    </td>
+                    <td>5***-****-****-890*</td>
+                    <td>유튜브프리미엄 - 구글페이먼트코리아 유한회</td>
+                    <td align="right">14,900</td>
+                    <td align="center">
+                        
+                           일시불
+                           
+                           
+                           
+                           
+                           
+                           
+                       
+                    </td>
+                    <td>0</td>
+                    <td style='mso-number-format:"\@";'>00238528</td>
+                    <td align="center">-</td>
+                    <td>
+                       
+                           
+                           
+                           
+                           전표접수
+                           
+                       
+                    </td>
+                </tr>
+            
+                
+                
+                
+                    
+                        
+                    
+                    
+                
+                
+                    
+                    
+                        
+                        
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                
+                
+                <tr>
+                    <td align="center">2026년 01월 13일</td>
+                    <td align="center">01:14</td>
+                    <td align="center">
+                        
+                            
+                            가족 
+                        
+                    </td>
+                    <td>5***-****-****-890*</td>
+                    <td>KT통신요금자동납부</td>
+                    <td align="right">46,240</td>
+                    <td align="center">
+                        
+                           일시불
+                           
+                           
+                           
+                           
+                           
+                           
+                       
+                    </td>
+                    <td>0</td>
+                    <td style='mso-number-format:"\@";'>92177666</td>
+                    <td align="center">-</td>
+                    <td>
+                       
+                           
+                           
+                           
+                           전표접수
+                           
+                       
+                    </td>
+                </tr>
+            
+                
+                
+                
+                    
+                        
+                    
+                    
+                
+                
+                    
+                    
+                        
+                        
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                
+                
+                <tr>
+                    <td align="center">2026년 01월 07일</td>
+                    <td align="center">19:31</td>
+                    <td align="center">
+                        
+                            
+                            가족 
+                        
+                    </td>
+                    <td>5***-****-****-890*</td>
+                    <td>유튜브프리미엄 - 구글페이먼트코리아 유한회</td>
+                    <td align="right">14,900</td>
+                    <td align="center">
+                        
+                           일시불
+                           
+                           
+                           
+                           
+                           
+                           
+                       
+                    </td>
+                    <td>0</td>
+                    <td style='mso-number-format:"\@";'>00354216</td>
+                    <td align="center">-</td>
+                    <td>
+                       
+                           
+                           
+                           
+                           전표접수
+                           
+                       
+                    </td>
+                </tr>
+            
+                
+                
+                
+                    
+                        
+                    
+                    
+                
+                
+                    
+                    
+                        
+                        
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                
+                
+                <tr>
+                    <td align="center">2025년 12월 30일</td>
+                    <td align="center">13:52</td>
+                    <td align="center">
+                        
+                            
+                            가족 
+                        
+                    </td>
+                    <td>5***-****-****-890*</td>
+                    <td>킹스가든</td>
+                    <td align="right">4,700</td>
+                    <td align="center">
+                        
+                           일시불
+                           
+                           
+                           
+                           
+                           
+                           
+                       
+                    </td>
+                    <td>0</td>
+                    <td style='mso-number-format:"\@";'>00377768</td>
+                    <td align="center">-</td>
+                    <td>
+                       
+                           
+                           
+                           
+                           전표접수
+                           
+                       
+                    </td>
+                </tr>
+            
+                
+                
+                
+                    
+                        
+                    
+                    
+                
+                
+                    
+                    
+                        
+                        
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                
+                
+                <tr>
+                    <td align="center">2025년 12월 19일</td>
+                    <td align="center">15:29</td>
+                    <td align="center">
+                        
+                            
+                            가족 
+                        
+                    </td>
+                    <td>5***-****-****-890*</td>
+                    <td>킹스가든</td>
+                    <td align="right">8,500</td>
+                    <td align="center">
+                        
+                           일시불
+                           
+                           
+                           
+                           
+                           
+                           
+                       
+                    </td>
+                    <td>0</td>
+                    <td style='mso-number-format:"\@";'>00257140</td>
+                    <td align="center">-</td>
+                    <td>
+                       
+                           
+                           
+                           
+                           전표접수
+                           
+                       
+                    </td>
+                </tr>
+            
+                
+                
+                
+                    
+                        
+                    
+                    
+                
+                
+                    
+                    
+                        
+                        
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                
+                
+                <tr>
+                    <td align="center">2025년 12월 13일</td>
+                    <td align="center">15:06</td>
+                    <td align="center">
+                        
+                            
+                            가족 
+                        
+                    </td>
+                    <td>5***-****-****-890*</td>
+                    <td>킹스가든</td>
+                    <td align="right">7,400</td>
+                    <td align="center">
+                        
+                           일시불
+                           
+                           
+                           
+                           
+                           
+                           
+                       
+                    </td>
+                    <td>0</td>
+                    <td style='mso-number-format:"\@";'>00666588</td>
+                    <td align="center">-</td>
+                    <td>
+                       
+                           
+                           
+                           
+                           전표접수
+                           
+                       
+                    </td>
+                </tr>
+            
+                
+                
+                
+                    
+                        
+                    
+                    
+                
+                
+                    
+                    
+                        
+                        
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                
+                
+                <tr>
+                    <td align="center">2025년 12월 12일</td>
+                    <td align="center">01:12</td>
+                    <td align="center">
+                        
+                            
+                            가족 
+                        
+                    </td>
+                    <td>5***-****-****-890*</td>
+                    <td>KT통신요금자동납부</td>
+                    <td align="right">46,240</td>
+                    <td align="center">
+                        
+                           일시불
+                           
+                           
+                           
+                           
+                           
+                           
+                       
+                    </td>
+                    <td>0</td>
+                    <td style='mso-number-format:"\@";'>92179198</td>
+                    <td align="center">-</td>
+                    <td>
+                       
+                           
+                           
+                           
+                           전표접수
+                           
+                       
+                    </td>
+                </tr>
+            
+                
+                
+                
+                    
+                        
+                    
+                    
+                
+                
+                    
+                    
+                        
+                        
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                
+                
+                <tr>
+                    <td align="center">2025년 12월 07일</td>
+                    <td align="center">19:31</td>
+                    <td align="center">
+                        
+                            
+                            가족 
+                        
+                    </td>
+                    <td>5***-****-****-890*</td>
+                    <td>유튜브프리미엄 - 구글페이먼트코리아 유한회</td>
+                    <td align="right">14,900</td>
+                    <td align="center">
+                        
+                           일시불
+                           
+                           
+                           
+                           
+                           
+                           
+                       
+                    </td>
+                    <td>0</td>
+                    <td style='mso-number-format:"\@";'>00538531</td>
+                    <td align="center">-</td>
+                    <td>
+                       
+                           
+                           
+                           
+                           전표접수
+                           
+                       
+                    </td>
+                </tr>
+            
+                
+                
+                
+                    
+                        
+                    
+                    
+                
+                
+                    
+                    
+                        
+                        
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                
+                
+                <tr>
+                    <td align="center">2025년 11월 23일</td>
+                    <td align="center">14:34</td>
+                    <td align="center">
+                        
+                            
+                            가족 
+                        
+                    </td>
+                    <td>5***-****-****-890*</td>
+                    <td>킹스가든</td>
+                    <td align="right">18,700</td>
+                    <td align="center">
+                        
+                           일시불
+                           
+                           
+                           
+                           
+                           
+                           
+                       
+                    </td>
+                    <td>0</td>
+                    <td style='mso-number-format:"\@";'>00812737</td>
+                    <td align="center">-</td>
+                    <td>
+                       
+                           
+                           
+                           
+                           전표접수
+                           
+                       
+                    </td>
+                </tr>
+            
+            
+            
+                <tr>
+                    <td align="center" bgcolor="#f2f2f2">-</td>
+                    <td align="center" bgcolor="#f2f2f2"></td>
+                    <td align="right" bgcolor="#f2f2f2"></td>
+                    <td align="center" bgcolor="#f2f2f2"></td>
+                    <td bgcolor="#f2f2f2">국내 일시불 소계 10건</td>
+                    <td align="right" bgcolor="#f2f2f2">184,280</td>
+                    <td align="center" bgcolor="#f2f2f2"></td>
+                    <td align="right" bgcolor="#f2f2f2"></td>
+                    <td align="right" bgcolor="#f2f2f2"></td>
+                    <td align="right" bgcolor="#f2f2f2"></td>
+                    <td align="right" bgcolor="#f2f2f2"></td>
+                </tr>
+            
+            
+            
+            
+            
+                <tr>
+                    <td align="center" bgcolor="#f2f2f2">-</td>
+                    <td align="center" bgcolor="#f2f2f2"></td>
+                    <td align="right" bgcolor="#f2f2f2"></td>
+                    <td align="center" bgcolor="#f2f2f2"></td>
+                    <td bgcolor="#f2f2f2">총 합계 소계 10건</td>
+                    <td align="right" bgcolor="#f2f2f2">184,280</td>
+                    <td align="center" bgcolor="#f2f2f2"></td>
+                    <td align="right" bgcolor="#f2f2f2"></td>
+                    <td align="right" bgcolor="#f2f2f2"></td>
+                    <td align="right" bgcolor="#f2f2f2"></td>
+                    <td align="right" bgcolor="#f2f2f2"></td>
+                </tr>
+            
+        </table>
+    </body>
+</html>
