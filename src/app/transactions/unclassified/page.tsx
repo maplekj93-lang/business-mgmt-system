@@ -17,6 +17,14 @@ import { AlertCircle } from 'lucide-react';
 import { Header } from '@/widgets/layout/ui/header';
 import { cookies } from 'next/headers';
 
+const OWNER_OPTIONS = [
+    { value: 'kwangjun', label: '광준' },
+    { value: 'euiyoung', label: '의영' },
+    { value: 'joint', label: '공동' },
+    { value: 'business', label: '회사' },
+    { value: 'other', label: '미상/기타' }
+] as const;
+
 export default async function UnclassifiedInboxPage() {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -118,7 +126,7 @@ export default async function UnclassifiedInboxPage() {
                         <TableBody>
                             {groups.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={6} className="h-64 text-center">
+                                    <TableCell colSpan={7} className="h-64 text-center">
                                         <div className="flex flex-col items-center justify-center text-muted-foreground gap-2">
                                             <AlertCircle className="w-8 h-8 opacity-50" />
                                             <p>모든 내역이 깔끔하게 정리되었습니다! (Inbox Zero)</p>
@@ -127,9 +135,17 @@ export default async function UnclassifiedInboxPage() {
                                 </TableRow>
                             ) : (
                                 groups.map((group) => (
-                                    <TableRow key={group.rawName + group.type}>
+                                    <TableRow key={group.rawName + group.amount + group.ownerType + group.type}>
                                         <TableCell className="font-medium">
-                                            {group.rawName}
+                                            <div className="flex items-center gap-2">
+                                                <Badge variant="outline" className="font-medium text-[11px] bg-slate-100 text-slate-800 border-0 px-2 py-0.5 whitespace-nowrap">
+                                                    {OWNER_OPTIONS.find(o => o.value === group.ownerType)?.label || '미상'}
+                                                </Badge>
+                                                <span>{group.rawName}</span>
+                                            </div>
+                                        </TableCell>
+                                        <TableCell className="text-center font-mono text-xs">
+                                            {new Intl.NumberFormat('ko-KR').format(Math.abs(group.amount))}원
                                         </TableCell>
                                         <TableCell className="text-center">
                                             <Badge variant="outline" className={group.type === 'income' ? 'bg-primary/10 text-primary border-primary/20' : 'bg-destructive/10 text-destructive border-destructive/20'}>

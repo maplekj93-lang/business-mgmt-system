@@ -32,19 +32,23 @@ export async function bulkUpdateTransactions(
             updateData.allocation_status = 'personal';
         }
 
-        const { error: txError } = await (supabase
+        const { data: updatedRows, error: txError } = await (supabase
             .from('transactions') as any)
             .update(updateData)
-            .in('id', transactionIds);
+            .in('id', transactionIds)
+            .select('id');
 
         if (txError) throw txError;
+        if (!updatedRows || updatedRows.length === 0) {
+            return { success: false, message: 'No transactions were updated. (Check permissions or IDs)' };
+        }
 
         // 2. Create Rule (if requested)
         if (createRule && ruleKeyword) {
             // Check existence first or rely on UNIQUE constraint?
             // UPSERT strategy: On conflict, update category
             const { error: ruleError } = await (supabase
-                .from('mdt_allocation_rules') as any)
+                .from('mdt_allocation_rules' as any) as any)
                 .upsert({
                     user_id: user.id,
                     keyword: ruleKeyword,

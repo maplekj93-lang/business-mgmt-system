@@ -10,6 +10,9 @@ import { Briefcase } from 'lucide-react';
 import { BusinessUnit } from '@/entities/business';
 import { AllocationDialog } from '@/features/allocate-transaction';
 import { useRouter } from 'next/navigation';
+import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover';
+import { updateTransactionAction } from '@/features/refine-ledger/api/update-transaction';
+import { toast } from 'sonner';
 
 interface Transaction {
     id: string;
@@ -24,14 +27,32 @@ interface Transaction {
     category_id: number | null;
     source_raw_data?: any;
     business_unit_id?: string | null;
+    owner_type?: string | null; // [NEW] Database-driven owner type
+    asset?: { id: string; name: string; asset_type?: string; owner_type?: string } | null;
 }
+
+interface Asset {
+    id: string;
+    name: string;
+    owner_type?: string;
+    asset_type?: string;
+}
+
+const OWNER_OPTIONS = [
+    { value: 'kwangjun', label: '광준' },
+    { value: 'euiyoung', label: '의영' },
+    { value: 'joint', label: '공동' },
+    { value: 'business', label: '회사' },
+    { value: 'other', label: '미상/기타' }
+] as const;
 
 interface TransactionTableProps {
     transactions: Transaction[];
     businessUnits: BusinessUnit[];
+    assets: Asset[];
 }
 
-export function TransactionTable({ transactions, businessUnits }: TransactionTableProps) {
+export function TransactionTable({ transactions, businessUnits, assets }: TransactionTableProps) {
     const router = useRouter();
     const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
     const [isAllocationOpen, setIsAllocationOpen] = useState(false);
@@ -86,8 +107,10 @@ export function TransactionTable({ transactions, businessUnits }: TransactionTab
                                     onChange={toggleSelectAll}
                                 />
                             </TableHead>
-                            <TableHead className="w-[100px]">날짜</TableHead>
-                            <TableHead className="w-[200px]">카테고리</TableHead>
+                            <TableHead className="w-[80px]">소유자</TableHead>
+                            <TableHead className="w-[180px]">결제일시</TableHead>
+                            <TableHead className="w-[150px]">자산 (카드)</TableHead>
+                            <TableHead className="w-[180px]">카테고리</TableHead>
                             <TableHead>내용</TableHead>
                             <TableHead className="text-right">금액</TableHead>
                         </TableRow>
@@ -95,7 +118,7 @@ export function TransactionTable({ transactions, businessUnits }: TransactionTab
                     <TableBody>
                         {transactions.length === 0 ? (
                             <TableRow>
-                                <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                                <TableCell colSpan={6} className="h-24 text-center text-muted-foreground">
                                     거래 내역이 없습니다.
                                 </TableCell>
                             </TableRow>
@@ -117,8 +140,135 @@ export function TransactionTable({ transactions, businessUnits }: TransactionTab
                                             onChange={() => toggleSelect(tx.id)}
                                         />
                                     </TableCell>
-                                    <TableCell className="font-medium text-muted-foreground text-sm whitespace-nowrap">
-                                        {tx.date}
+                                    <TableCell>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <button
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="inline-flex focus:outline-none"
+                                                >
+                                                    <Badge variant="outline" className="font-medium text-[11px] bg-slate-100 text-slate-800 border-0 px-2 py-0.5 whitespace-nowrap cursor-pointer hover:bg-slate-200 transition-colors">
+                                                        {OWNER_OPTIONS.find(o => o.value === tx.owner_type)?.label || '미상'}
+                                                    </Badge>
+                                                </button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-40 p-0" align="start" onClick={(e) => e.stopPropagation()}>
+                                                <div className="p-2 border-b">
+                                                    <p className="text-xs font-medium text-muted-foreground">소유자 변경</p>
+                                                </div>
+                                                <div className="p-1">
+                                                    {OWNER_OPTIONS.map((owner) => (
+                                                        <button
+                                                            key={owner.value}
+                                                            className={cn(
+                                                                "w-full text-left px-3 py-2 text-sm rounded-md hover:bg-muted flex flex-col gap-0.5",
+                                                                tx.owner_type === owner.value && "bg-primary/5 text-primary font-medium"
+                                                            )}
+                                                            onClick={async () => {
+                                                                let applyToSimilar = false;
+                                                                if (!tx.owner_type || tx.owner_type === 'other') {
+                                                                    const desc = tx.description || tx.source_raw_data?.original_category || '';
+                                                                    if (desc) {
+                                                                        applyToSimilar = window.confirm(`"${desc}" 내역과 동일한 소유자 미지정 내역들을 모두 [${owner.label}] 소유로 일괄 변경하시겠습니까?`);
+                                                                    }
+                                                                }
+
+                                                                const res = await updateTransactionAction({
+                                                                    transactionId: tx.id,
+                                                                    ownerType: owner.value,
+                                                                });
+
+                                                                if (res.success) {
+                                                                    toast.success(applyToSimilar ? '소유자가 일괄 변경되었습니다.' : '소유자가 변경되었습니다.');
+                                                                    router.refresh();
+                                                                } else {
+                                                                    toast.error('변경 실패: ' + res.message);
+                                                                }
+                                                            }}
+                                                        >
+                                                            {owner.label}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
+                                    </TableCell>
+                                    <TableCell className="font-medium text-muted-foreground text-[13px] whitespace-nowrap">
+                                        {(() => {
+                                            let timeRaw = '';
+                                            const r = tx.source_raw_data as any;
+                                            if (r) {
+                                                if (r['승인시각']) timeRaw = r['승인시각'];
+                                                else if (r['거래일시']) timeRaw = r['거래일시'].split(' ')[1] || '';
+                                                else if (r['이용일시']) timeRaw = r['이용일시'].split(' ')[1] || '';
+                                            }
+                                            return `${tx.date}${timeRaw ? ` ${timeRaw}` : ''}`;
+                                        })()}
+                                    </TableCell>
+                                    <TableCell>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <button
+                                                    onClick={(e) => e.stopPropagation()}
+                                                    className="inline-flex focus:outline-none"
+                                                >
+                                                    <Badge
+                                                        variant="outline"
+                                                        className="font-normal text-xs bg-slate-100 text-slate-700 border-0 break-keep cursor-pointer hover:bg-slate-200 transition-colors"
+                                                    >
+                                                        {tx.asset?.name || tx.source_raw_data?._bank || '현금/기타'}
+                                                    </Badge>
+                                                </button>
+                                            </PopoverTrigger>
+                                            <PopoverContent className="w-56 p-0" align="start" onClick={(e) => e.stopPropagation()}>
+                                                <div className="p-2 border-b">
+                                                    <p className="text-xs font-medium text-muted-foreground">자산 변경 (Change Asset)</p>
+                                                </div>
+                                                <div className="max-h-60 overflow-y-auto p-1">
+                                                    {assets.length === 0 ? (
+                                                        <div className="px-3 py-4 text-center text-sm text-muted-foreground">
+                                                            등록된 자산이 없습니다.<br />
+                                                            설정창에서 자산을 추가해주세요.
+                                                        </div>
+                                                    ) : (
+                                                        assets.map((asset) => (
+                                                            <button
+                                                                key={asset.id}
+                                                                className={cn(
+                                                                    "w-full text-left px-3 py-2 text-sm rounded-md hover:bg-muted flex flex-col gap-0.5",
+                                                                    tx.asset?.id === asset.id && "bg-primary/5 text-primary font-medium"
+                                                                )}
+                                                                onClick={async () => {
+                                                                    let applyToSimilar = false;
+                                                                    // If the transaction currently has no asset assigned, suggest bulk update
+                                                                    if (!tx.asset?.id) {
+                                                                        const desc = tx.description || tx.source_raw_data?.original_category || '';
+                                                                        if (desc) {
+                                                                            applyToSimilar = window.confirm(`"${desc}" 내역과 동일한 미분류 내역들을 모두 [${asset.name}] 자산으로 일괄 변경하시겠습니까?`);
+                                                                        }
+                                                                    }
+
+                                                                    const res = await updateTransactionAction({
+                                                                        transactionId: tx.id,
+                                                                        assetId: asset.id,
+                                                                        applyToSimilarUnclassified: applyToSimilar
+                                                                    });
+
+                                                                    if (res.success) {
+                                                                        toast.success(applyToSimilar ? '동일한 내역들의 자산과 소유자가 일괄 변경되었습니다.' : '자산과 소유자가 변경되었습니다.');
+                                                                        router.refresh();
+                                                                    } else {
+                                                                        toast.error('변경 실패: ' + res.message);
+                                                                    }
+                                                                }}
+                                                            >
+                                                                <span>{asset.name}</span>
+                                                            </button>
+                                                        ))
+                                                    )}
+                                                </div>
+                                            </PopoverContent>
+                                        </Popover>
                                     </TableCell>
                                     <TableCell>
                                         <Badge

@@ -1,7 +1,5 @@
 import React from 'react';
-import { Header } from '@/widgets/layout/ui/header';
 import { createClient } from '@/shared/api/supabase/server';
-import { cookies } from 'next/headers';
 import { getCategoryTree } from '@/entities/category/api/get-categories';
 import { CategoryListItem } from '@/features/manage-categories/ui/category-list-item';
 import { CategoryFormDialog } from '@/features/manage-categories/ui/category-form-dialog';
@@ -9,18 +7,10 @@ import { Button } from '@/shared/ui/button';
 import { Plus, Settings2 } from 'lucide-react';
 
 export default async function CategoryManagementPage() {
-    const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
-
     const tree = await getCategoryTree();
 
-    const cookieStore = await cookies();
-    const defaultMode = (cookieStore.get('app-mode')?.value as 'personal' | 'business') || 'personal';
-
     return (
-        <div className="min-h-screen bg-background">
-            <Header userEmail={user?.email} defaultMode={defaultMode} />
-
+        <div>
             <main className="container max-w-4xl mx-auto p-4 md:p-8 space-y-8 animate-in fade-in slide-in-from-bottom-4">
                 <div className="flex items-center justify-between">
                     <div className="space-y-1">

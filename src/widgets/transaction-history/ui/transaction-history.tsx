@@ -7,6 +7,7 @@ import { getAllCategories } from '@/entities/category/api/get-categories';
 import { Category } from '@/entities/category/model/types';
 import { FilterBar } from '@/features/filter-transactions/ui/filter-bar';
 import { TransactionTable } from './transaction-table';
+import { getAssets } from '@/entities/asset/api/get-assets';
 
 async function TransactionHistoryWidget({
     searchParams
@@ -34,7 +35,7 @@ async function TransactionHistoryWidget({
     }
 
     // 2. Parallel Fetching with Context
-    const [transactions, businessUnits, categories] = await Promise.all([
+    const [transactions, businessUnits, categories, assets] = await Promise.all([
         getTransactions({
             page: 1,
             limit,
@@ -43,7 +44,8 @@ async function TransactionHistoryWidget({
             mode: appMode // API에 모드 전달
         }),
         getBusinessUnits(),
-        getAllCategories()
+        getAllCategories(),
+        getAssets()
     ]);
 
     // [Logic] Client-Side hydration of Category Hierarchy
@@ -76,7 +78,8 @@ async function TransactionHistoryWidget({
             ...tx,
             description: tx.description || '',
             business_unit_id: tx.business_unit_id || null,
-            category: categoryInfo
+            category: categoryInfo,
+            asset: tx.asset // [NEW] Pass through
         };
     });
 
@@ -105,6 +108,7 @@ async function TransactionHistoryWidget({
             <TransactionTable
                 transactions={hydratedTransactions}
                 businessUnits={businessUnits}
+                assets={assets}
             // currentMode={appMode} // If needed for table UI logic
             />
         </div>

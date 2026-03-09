@@ -11,6 +11,7 @@ export const samsungCardProfile: BankProfile = {
         merchant: "가맹점명",
         status: "취소여부",
         authCode: "승인번호",
+        cardNo: "카드번호",
     },
     transforms: {
         parseAmount: (val: any) => {

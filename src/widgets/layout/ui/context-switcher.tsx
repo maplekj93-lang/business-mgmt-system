@@ -1,23 +1,35 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { cn } from '@/shared/lib/utils';
 import { Briefcase, User, Layers } from 'lucide-react';
 import { setAppModeAction } from '@/features/switch-mode/set-mode';
 
 type AppMode = 'personal' | 'total' | 'business';
 
+const ROUTE_MAP: Record<AppMode, string> = {
+    personal: '/',
+    total:    '/',
+    business: '/business',
+};
+
 export function ContextSwitcher({ defaultMode }: { defaultMode: AppMode }) {
-    const router = useRouter();
-    const [mode, setMode] = React.useState<AppMode>(defaultMode);
+    const router   = useRouter();
+    const pathname = usePathname();
     const [isPending, startTransition] = React.useTransition();
 
+    // URL에서 현재 모드를 파생 — 쿠키/state 불필요
+    // (/total 라우트 추가 전까지 total은 personal로 fallback)
+    const mode = (
+        pathname.startsWith('/business') ? 'business' : 'personal'
+    ) as AppMode;
+
     const handleSwitch = (newMode: AppMode) => {
-        setMode(newMode); // Optimistic UI
+        if (newMode === mode) return;
         startTransition(async () => {
             await setAppModeAction(newMode);
-            router.refresh(); // Refresh Server Components
+            router.push(ROUTE_MAP[newMode]);
         });
     };
 

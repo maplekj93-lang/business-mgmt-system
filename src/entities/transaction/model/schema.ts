@@ -41,7 +41,29 @@ export const transactionSchema = z.object({
     // Metadata
     import_batch_id: z.string().uuid().nullable().optional(),
     source_raw_data: z.record(z.string(), z.any()).optional().nullable(), // JSONB
+
+    // [NEW] Import Sync Guide
+    import_hash: z.string().nullable().optional(),
+    source: z.enum(['MANUAL', 'EXCEL']).default('MANUAL'),
+
+    // [NEW] Owner Link
+    owner_type: z.string().optional().nullable(),
+
+    // [NEW] Asset Link
+    asset_id: z.string().uuid().nullable().optional(),
+    asset: z.object({
+        id: z.string().uuid(),
+        owner_type: z.string(),
+        asset_type: z.string(),
+        name: z.string()
+    }).optional().nullable(),
+
+    // [NEW] Project Link
+    project_id: z.string().uuid().nullable().optional(),
+    receipt_memo: z.string().nullable().optional(),
+    is_reimbursable: z.boolean().default(false).optional(),
 });
 
 export type Category = z.infer<typeof categorySchema>;
 export type Transaction = z.infer<typeof transactionSchema>;
+export type TransactionSource = 'MANUAL' | 'EXCEL'; // [NEW] Import Sync Guide

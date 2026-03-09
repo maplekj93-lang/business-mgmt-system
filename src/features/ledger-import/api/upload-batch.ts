@@ -31,10 +31,88 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
 
         // Fetch Rules
         const { data: rules } = await supabase
-            .from('mdt_allocation_rules')
+            .from('mdt_allocation_rules' as any)
             .select('keyword, category_id')
             .eq('user_id', user.id)
-            .returns<any[]>(); // Explicit cast to avoid 'never'
+            .returns<any[]>();
+
+        // [NEW] Fetch Assets with Metadata and Manual Mappings
+        const [{ data: assets }, { data: mappings }] = await Promise.all([
+            supabase
+                .from('assets')
+                .select('id, name, asset_type, owner_type, identifier_keywords')
+                .eq('user_id', user.id)
+                .returns<{ id: string, name: string, asset_type: string, owner_type: string, identifier_keywords: string[] }[]>(),
+            supabase
+                .from('mdt_import_mappings' as any)
+                .select('type, source_value, target_asset_id')
+                .eq('user_id', user.id)
+                .returns<{ type: string, source_value: string, target_asset_id: string }[]>()
+        ]);
+
+        // Helper to find asset by simplified name or card number
+        const findAssetId = (bankName?: string, cardNo?: string): string | null => {
+            if (!assets) return null;
+
+            // 1. [PRIORITY] Try Manual Settings (mdt_import_mappings)
+            if (mappings && (mappings as any[]).length > 0) {
+                // Check by Card Number (last 4 digits)
+                if (cardNo) {
+                    const last4 = String(cardNo).slice(-4);
+                    const match = (mappings as any[]).find(m => m.type === 'card_no' && m.source_value.includes(last4));
+                    if (match) return match.target_asset_id;
+                }
+
+                // Check by Bank Name
+                if (bankName) {
+                    const normalizedBank = normalize(bankName).toUpperCase();
+                    const match = (mappings as any[]).find(m => m.type === 'bank_name' && normalize(m.source_value).toUpperCase() === normalizedBank);
+                    if (match) return match.target_asset_id;
+                }
+            }
+
+            // 2. Try Card Number Match via Metadata / Name heuristic (if cardNo available)
+            if (cardNo) {
+                const last4 = String(cardNo).slice(-4);
+                const match = assets.find(a => {
+                    const identifiers = a.identifier_keywords || [];
+                    if (identifiers.some((id: string) => String(id).includes(last4))) return true;
+                    if (a.name.includes(last4)) return true;
+                    return false;
+                });
+                if (match) return match.id;
+            }
+
+            if (!bankName) return null;
+
+            // 3. Fallback: Hardcoded bank name mapping
+            const normalizedInput = normalize(bankName).toUpperCase();
+            const bankMapping: Record<string, string> = {
+                'SAMSUNGCARD': '삼성카드',
+                'KAKAOBANK': '카카오뱅크',
+                'SHINHANCARD': '신한카드',
+                'WOORIBANK': '우리은행',
+                'IBK': '기업은행',
+                'HYUNDAICARD': '현대카드',
+                'KB': '국민카드',
+                'CITI': '씨티카드',
+                'LOTTECARD': '롯데카드'
+            };
+
+            const targetKorean = bankMapping[normalizedInput] || normalizedInput;
+            const match = assets.find(a => {
+                const normName = normalize(a.name).toUpperCase();
+                if (targetKorean.includes(normName) || normName.includes(targetKorean)) return true;
+
+                // Check if any identifier matches targetKorean or vice versa
+                const identifiers = a.identifier_keywords || [];
+                return identifiers.some((id: string) => {
+                    const normId = normalize(String(id)).toUpperCase();
+                    return targetKorean.includes(normId) || normId.includes(targetKorean);
+                });
+            });
+            return match ? match.id : null;
+        };
 
         // Helper to normalize strings (remove all spaces) for loose matching
         const normalize = (s: string) => s.replace(/\s+/g, '');
@@ -129,22 +207,32 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
                 }
             }
 
-            // Legacy Bridge Hardcode fallback (if parser passed raw strings like 'Expense 6')
-            // This relies on parser.ts passing 'Expense 6' as categoryRaw.
+            // 4. [NEW] Link Account (Asset)
+            const explicitAccountHint = tx.source_raw_data?.deposit_account || tx.source_raw_data?.withdrawal_account;
+            const bankName = explicitAccountHint || tx.source_raw_data?._bank || tx.source_raw_data?.import_type; // Fallback to import type if needed
+            const cardNo = tx.source_raw_data?.card_no;
+            const accountId = findAssetId(bankName, cardNo);
 
             let finalAmount = tx.amount;
             if (tx.type === 'expense') finalAmount = -Math.abs(tx.amount);
             else if (tx.type === 'income') finalAmount = Math.abs(tx.amount);
-            else if (tx.type === 'transfer') finalAmount = -Math.abs(tx.amount);
+            else if (tx.type === 'transfer') finalAmount = Math.abs(tx.amount);
+
+            // DB schema: date = DATE only, transaction_time = TIME separately
+            const rawDate = tx.date; // e.g. "2025-01-01T18:24:11" or "2025-01-01"
+            const finalDate = rawDate.split('T')[0].split(' ')[0]; // "2025-01-01"
+            const timePart = rawDate.includes('T') ? rawDate.split('T')[1] : null; // "18:24:11" or null
 
             return {
                 user_id: user.id,
                 category_id: categoryId,
                 amount: finalAmount,
-                date: tx.date,
+                date: finalDate,
+                ...(timePart ? { transaction_time: timePart } : {}),
                 description: tx.description,
-                allocation_status: 'personal',
-                source_raw_data: { original_category: tx.categoryRaw, import_type: 'bulk_excel_2025' }
+                allocation_status: 'personal', // All imported ledger data is personal
+                asset_id: accountId,
+                source_raw_data: { original_category: tx.categoryRaw, import_type: 'bulk_excel_2025', _bank: explicitAccountHint || tx.source_raw_data?._bank },
             }
         });
 

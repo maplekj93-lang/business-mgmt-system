@@ -16,7 +16,7 @@ interface CategoryListItemProps {
 }
 
 export function CategoryListItem({ category, children, isRoot = false }: CategoryListItemProps) {
-    const [isExpanded, setIsExpanded] = useState(true);
+    const [isExpanded, setIsExpanded] = useState(false);
     const [isDeleting, setIsDeleting] = useState(false);
 
     // Color Mapping for Tailwind dynamic classes

@@ -6,11 +6,31 @@ export interface DetectedFile {
 
 export interface ValidatedTransaction {
     date: string;       // ISO Date String (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss)
-    amount: number;     // Negative for expense, Positive for income
+    amount: number;     // Negative for expense, Positive for income (항상 KRW 기준)
     description: string;
     categoryRaw: string;
     type: 'income' | 'expense' | 'transfer';
     source_raw_data?: Record<string, any>; // Store original row data + extras
+    // 해외 결제 전용 — source_raw_data에도 저장됨 (편의용 직접 접근)
+    _is_foreign_currency?: boolean;
+    _local_currency?: string;       // 실제 결제 통화 (USD / KRW / EUR 등)
+    _local_amount?: number;         // 결제 통화 기준 금액
+    _fx_rate_used?: number;         // 적용된 환율 (1 USD = ? KRW)
+    _is_fx_approximate?: boolean;   // 환율이 근사치인 경우 true
+}
+
+// [NEW] 엑셀 파싱 후 임포트 전 중간 타입
+export interface ExcelTransactionRow {
+    date: string;   // YYYY-MM-DD로 정규화된 상태
+    amount: number;
+    description: string;
+    asset_id: string;
+}
+
+/** parseExcel() 호출 시 넘기는 옵션 */
+export interface ParseOptions {
+    /** 통화 → KRW 환율 맵. e.g. { USD: 1382.5, EUR: 1540 } */
+    fxRates?: Record<string, number>;
 }
 
 export interface BankProfile {
@@ -27,10 +47,18 @@ export interface BankProfile {
         authCode?: string | string[]; // Column for Auth Code
         balance?: string | string[]; // Column for Balance
         type?: string | string[];    // Column for Type (Deposit/Withdrawal)
+        cardNo?: string | string[];  // Column for Card Number (Optional)
+        depositAccount?: string | string[]; // Column for Deposit Account
+        withdrawalAccount?: string | string[]; // Column for Withdrawal Account
+        categoryMain?: string | string[]; // Column for Main Category (대분류)
+        categorySub?: string | string[];  // Column for Sub Category (소분류)
+        // 해외 결제 전용
+        localAmount?: string | string[];   // 현지이용금액 (KRW 또는 외화)
+        localCurrency?: string | string[]; // 현지거래통화 (USD / KRW / EUR ...)
     };
     transforms?: {
         // Bank specific cleanup logic
         parseAmount?: (val: any) => number;
-        parseStatus?: (val: any) => 'approved' | 'cancelled';
+        parseStatus?: (val: any) => 'approved' | 'cancelled' | 'skip';
     }
 }

@@ -11,11 +11,11 @@ export async function getAdvancedAnalytics(
 
     if (!user) return null;
 
-    const { data, error } = await supabase.rpc<any>('get_advanced_analytics', {
+    const { data, error } = await (supabase.rpc as any)('get_advanced_analytics', {
         p_mode: params.mode,
         p_month: params.month,
         p_year: params.year
-    } as any);
+    });
 
     if (error) {
         console.error('getAdvancedAnalytics Error:', error);

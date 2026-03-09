@@ -1,7 +1,8 @@
 
 import * as XLSX from 'xlsx';
 import { identifyBank } from './bank-adapter';
-import { ValidatedTransaction, BankProfile } from './types';
+import { ValidatedTransaction, BankProfile, ParseOptions } from './types';
+import { FX_FALLBACK_RATES } from '../lib/fx-rate';
 
 type ExcelValue = string | number | boolean | null | undefined;
 type ExcelRow = ExcelValue[];
@@ -12,27 +13,65 @@ export interface ParseResult {
         totalRows: number;
         bankIdentified: string | null;
         filteredCount: number;
+        fxRatesUsed?: Record<string, number>;   // 실제 적용된 환율 (USD→KRW 등)
+        foreignCurrencyCount?: number;           // 해외 결제 건수
+        foreignCurrencyApproxKrw?: number;       // 해외 결제 근사 합계 (원)
     }
 }
 
 /**
  * Parses an Excel file for ledger data.
  * Supports Multi-Bank Format (Samsung, Hyundai, etc.) and Legacy Format.
+ * @param options - fxRates: 통화 → KRW 환율 맵. 해외결제 파일 임포트 시 전달.
  */
-export async function parseExcel(file: File): Promise<ParseResult> {
-    const arrayBuffer = await file.arrayBuffer();
+export async function parseExcel(file: File, options?: ParseOptions): Promise<ParseResult> {
+    const fxRates = options?.fxRates ?? FX_FALLBACK_RATES;
+    let arrayBuffer = await file.arrayBuffer();
+
+    // Fix CSV Encoding (EUC-KR vs UTF-8) for Korean Bank Exports
+    if (file.name.toLowerCase().endsWith('.csv')) {
+        try {
+            const utf8Decoder = new TextDecoder('utf-8', { fatal: true });
+            utf8Decoder.decode(arrayBuffer);
+        } catch (e) {
+            // If UTF-8 decode fails, it's likely EUC-KR
+            const euckrDecoder = new TextDecoder('euc-kr');
+            const text = euckrDecoder.decode(arrayBuffer);
+            arrayBuffer = new TextEncoder().encode(text).buffer;
+        }
+    }
+
     const workbook = XLSX.read(arrayBuffer, { type: 'array' });
 
     let allTransactions: ValidatedTransaction[] = [];
     let totalRowsScanned = 0;
     let identifiedBankName: string | null = null;
+    const identifiedBankNames = new Set<string>(); // Track ALL identified banks
+
+    // Detect if this is a Nelna-style workbook (contains '가계부 기록' sheet)
+    // If so, only process designated data-entry sheets to avoid importing
+    // duplicate raw card statements and formula-based report sheets.
+    const NELNA_DATA_SHEET_KEYWORDS = ['가계부 기록', '사업가계부 기록'];
+    const nelnaDataSheets = workbook.SheetNames.filter(s =>
+        NELNA_DATA_SHEET_KEYWORDS.some(k => s.includes(k))
+    );
+    const isNelnaWorkbook = nelnaDataSheets.length > 0;
+    if (isNelnaWorkbook) {
+        console.log(`📓 Nelna Workbook detected. Restricting parse to: [${nelnaDataSheets.join(', ')}]`);
+    }
 
     // 1. Iterate over all sheets to find data
     for (const sheetName of workbook.SheetNames) {
+        // For Nelna workbooks: skip report, calendar, and raw card statement sheets
+        if (isNelnaWorkbook && !nelnaDataSheets.includes(sheetName)) {
+            console.log(`⏭️ Skipping sheet "${sheetName}" (Nelna workbook - data-entry mode)`);
+            continue;
+        }
+
         const worksheet = workbook.Sheets[sheetName];
         const rows = XLSX.utils.sheet_to_json<ExcelRow>(worksheet, { header: 1 });
 
-        if (rows.length < 5) continue; // Skip empty/metadata sheets
+        if (rows.length < 2) continue; // Skip truly empty/metadata sheets (헤더+데이터 최소 2행)
 
         // 2. Identify Bank Profile
         // Scan first 30 rows for a header match (KakaoBank headers can be deep)
@@ -45,6 +84,7 @@ export async function parseExcel(file: File): Promise<ParseResult> {
             if (identified) {
                 profile = identified;
                 identifiedBankName = profile.name;
+                identifiedBankNames.add(profile.name);
                 headerRowIndex = i;
                 console.log(`🏦 Bank Identified: ${profile.name} in sheet "${sheetName}" at row ${i}`);
                 break;
@@ -53,7 +93,7 @@ export async function parseExcel(file: File): Promise<ParseResult> {
 
         if (profile) {
             // 3. Parse using Bank Profile
-            const sheetTx = parseBankSheet(rows, headerRowIndex, profile);
+            const sheetTx = parseBankSheet(rows, headerRowIndex, profile, fxRates);
             allTransactions = allTransactions.concat(sheetTx);
         } else {
             // 4. Fallback: Legacy Logic (2024-2025 format)
@@ -80,12 +120,24 @@ export async function parseExcel(file: File): Promise<ParseResult> {
 
     const filteredCount = allTransactions.length - finalTransactions.length;
 
+    // 해외 결제 통계
+    const foreignTxs = finalTransactions.filter(t => t._is_foreign_currency);
+    const foreignApproxKrw = foreignTxs.reduce((sum, t) => sum + Math.abs(t.amount), 0);
+
+    // 실제 사용된 환율 (해외 거래가 있을 때만 포함)
+    const fxRatesUsed = foreignTxs.length > 0 ? { ...fxRates } : undefined;
+
     return {
         transactions: finalTransactions,
         stats: {
             totalRows: totalRowsScanned,
-            bankIdentified: identifiedBankName || (finalTransactions.length > 0 ? 'Legacy/Generic' : null),
-            filteredCount: filteredCount
+            bankIdentified: identifiedBankNames.size > 1
+            ? Array.from(identifiedBankNames).join(' + ')
+            : (identifiedBankName || (finalTransactions.length > 0 ? 'Legacy/Generic' : null)),
+            filteredCount: filteredCount,
+            fxRatesUsed,
+            foreignCurrencyCount: foreignTxs.length || undefined,
+            foreignCurrencyApproxKrw: foreignTxs.length > 0 ? foreignApproxKrw : undefined,
         }
     };
 }
@@ -93,7 +145,12 @@ export async function parseExcel(file: File): Promise<ParseResult> {
 // ----------------------------------------------------------------------
 // Bank Profile Parser
 // ----------------------------------------------------------------------
-function parseBankSheet(rows: ExcelRow[], headerIdx: number, profile: BankProfile): ValidatedTransaction[] {
+function parseBankSheet(
+    rows: ExcelRow[],
+    headerIdx: number,
+    profile: BankProfile,
+    fxRates: Record<string, number> = FX_FALLBACK_RATES
+): ValidatedTransaction[] {
     const transactions: ValidatedTransaction[] = [];
     const headers = Array.from(rows[headerIdx] || []).map(c => String(c ?? "").trim());
 
@@ -132,6 +189,21 @@ function parseBankSheet(rows: ExcelRow[], headerIdx: number, profile: BankProfil
         const merchant = colMap['merchant'] !== undefined ? String(row[colMap['merchant']] || '') : '';
         const desc = merchant || 'Unknown';
 
+        // 2a. Extract Category (대분류 > 소분류)
+        let categoryRaw = 'Uncategorized';
+        if (colMap['categoryMain'] !== undefined) {
+            const mainCat = String(row[colMap['categoryMain']] || '').trim();
+            if (mainCat) {
+                categoryRaw = mainCat;
+                if (colMap['categorySub'] !== undefined) {
+                    const subCat = String(row[colMap['categorySub']] || '').trim();
+                    if (subCat) {
+                        categoryRaw = `${mainCat} > ${subCat}`;
+                    }
+                }
+            }
+        }
+
         // 3. Extract Amount & Type
         let amount = 0;
         let type: 'income' | 'expense' | 'transfer' = 'expense';
@@ -169,10 +241,14 @@ function parseBankSheet(rows: ExcelRow[], headerIdx: number, profile: BankProfil
             // Apply Type/Status Logic for Single Column
             if (colMap['type'] !== undefined) {
                 const typeVal = String(row[colMap['type']]);
-                if (typeVal.includes('출금')) {
+                if (typeVal.includes('이동') || typeVal.includes('이체')) {
+                    type = 'transfer';
+                    // Transfer: keep positive for internal tracking purposes
+                    amount = Math.abs(amount);
+                } else if (typeVal.includes('출금') || typeVal.includes('지출')) {
                     type = 'expense';
                     amount = Math.abs(amount) * -1;
-                } else if (typeVal.includes('입금')) {
+                } else if (typeVal.includes('입금') || typeVal.includes('수입')) {
                     type = 'income';
                     amount = Math.abs(amount);
                 }
@@ -181,7 +257,10 @@ function parseBankSheet(rows: ExcelRow[], headerIdx: number, profile: BankProfil
                 const statusVal = row[colMap['status']];
                 const status = profile.transforms?.parseStatus ? profile.transforms.parseStatus(statusVal) : 'approved';
 
-                if (status === 'cancelled') {
+                if (status === 'skip') {
+                    // 전체 취소 거래 → 임포트 제외 (없던 거래)
+                    continue;
+                } else if (status === 'cancelled') {
                     amount = Math.abs(amount); // Cancel -> Money Back (Positive)
                     type = 'income';
                 } else {
@@ -202,15 +281,75 @@ function parseBankSheet(rows: ExcelRow[], headerIdx: number, profile: BankProfil
         if (colMap['authCode'] !== undefined) sourceData.auth_code = row[colMap['authCode']];
         if (colMap['balance'] !== undefined) sourceData.balance = row[colMap['balance']];
         if (colMap['status'] !== undefined) sourceData.status = row[colMap['status']];
+        if (colMap['cardNo'] !== undefined) sourceData.card_no = row[colMap['cardNo']];
+        if (colMap['depositAccount'] !== undefined) sourceData.deposit_account = row[colMap['depositAccount']];
+        if (colMap['withdrawalAccount'] !== undefined) sourceData.withdrawal_account = row[colMap['withdrawalAccount']];
 
-        transactions.push({
+        // 5. 해외 결제 통화 처리 (localCurrency / localAmount 컬럼이 있을 때)
+        let isForeignCurrency = false;
+        let localCurrencyStr: string | undefined;
+        let localAmountVal: number | undefined;
+        let fxRateUsed: number | undefined;
+        let isFxApproximate = false;
+
+        if (colMap['localCurrency'] !== undefined && colMap['localAmount'] !== undefined) {
+            const currencyRaw = String(row[colMap['localCurrency']] || '').trim().toUpperCase();
+            const localAmtRaw = row[colMap['localAmount']];
+            const parseAmt = profile.transforms?.parseAmount ?? ((v: any) => parseAmount(v));
+
+            if (currencyRaw && currencyRaw !== '') {
+                isForeignCurrency = true;
+                localCurrencyStr = currencyRaw;
+
+                if (currencyRaw === 'KRW') {
+                    // ✅ 원화 결제 → 현지이용금액이 정확한 KRW
+                    const exactKrw = Math.abs(parseAmt(localAmtRaw));
+                    amount = exactKrw * (amount < 0 ? -1 : 1); // 방향 유지
+                    localAmountVal = exactKrw;
+                    isFxApproximate = false;
+                    sourceData._local_currency = 'KRW';
+                    sourceData._local_amount = exactKrw;
+                    sourceData._is_fx_approximate = false;
+                } else {
+                    // ✅ 외화 결제 (USD, EUR, JPY 등) → 근사치 환율 적용
+                    const originalFxAmount = Math.abs(parseAmt(localAmtRaw));
+                    const rate = fxRates[currencyRaw] ?? FX_FALLBACK_RATES[currencyRaw] ?? 1440;
+                    const approxKrw = Math.round(originalFxAmount * rate);
+
+                    amount = approxKrw * (amount < 0 ? -1 : 1); // 방향 유지
+                    localAmountVal = originalFxAmount;
+                    fxRateUsed = rate;
+                    isFxApproximate = true;
+
+                    sourceData._local_currency = currencyRaw;
+                    sourceData._local_amount = originalFxAmount;  // 원본 외화 금액
+                    sourceData._fx_rate_used = rate;
+                    sourceData._is_fx_approximate = true;
+
+                    console.log(`[FX] ${desc}: ${originalFxAmount} ${currencyRaw} × ${rate} = ₩${approxKrw.toLocaleString()}`);
+                }
+            }
+        }
+
+        const tx: ValidatedTransaction = {
             date: dateStr,
             amount: amount,
             description: desc,
-            categoryRaw: 'Uncategorized',
+            categoryRaw: categoryRaw,
             type: type,
-            source_raw_data: sourceData
-        });
+            source_raw_data: sourceData,
+        };
+
+        // 해외 결제 메타 (편의용 직접 접근)
+        if (isForeignCurrency) {
+            tx._is_foreign_currency = true;
+            tx._local_currency = localCurrencyStr;
+            tx._local_amount = localAmountVal;
+            if (fxRateUsed !== undefined) tx._fx_rate_used = fxRateUsed;
+            tx._is_fx_approximate = isFxApproximate;
+        }
+
+        transactions.push(tx);
     }
 
     return transactions;
@@ -373,7 +512,7 @@ function parseLegacySheet(rows: ExcelRow[], sheetName: string): ValidatedTransac
                 description: desc,
                 categoryRaw: 'Uncategorized',
                 type,
-                source_raw_data: { _legacy: true }
+                source_raw_data: { _legacy: true, _bank: sheetName, import_type: 'excel_legacy' }
             });
         }
     }

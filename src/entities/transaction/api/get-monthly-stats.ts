@@ -43,10 +43,9 @@ export async function getMonthlyStats(): Promise<DashboardStats | null> {
     const appMode = (cookieStore.get('app-mode')?.value as 'personal' | 'total' | 'business') || 'personal';
 
     // 1. RPC Call with Generic Type (Type Safety)
-    const { data, error } = await supabase
-        .rpc<any>('get_dashboard_stats', {
-            p_mode: appMode
-        } as any);
+    const { data, error } = await (supabase.rpc as any)('get_dashboard_stats', {
+        p_mode: appMode
+    });
 
     if (error) {
         console.error('getMonthlyStats Error detail:', error.message || error);

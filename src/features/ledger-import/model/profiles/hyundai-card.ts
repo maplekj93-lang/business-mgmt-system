@@ -11,6 +11,7 @@ export const hyundaiCardProfile: BankProfile = {
         merchant: "이용가맹점",
         status: "상태",
         authCode: "승인번호",
+        cardNo: "카드번호",
     },
     transforms: {
         parseAmount: (val: any) => {

@@ -7,18 +7,23 @@ export * from "./types";
  */
 import {
     samsungCardProfile,
+    samsungCardOverseasProfile,
     bcCardProfile,
     hyundaiCardProfile,
     kakaoBankProfile,
-    bankAccountProfile
+    bankAccountProfile,
+    nelnaProfile
 } from './profiles';
 
 export const BANK_PROFILES: BankProfile[] = [
+    // ⚠️ 해외 프로파일을 국내보다 먼저 등록 (키워드가 더 구체적이어서 선매칭 필요)
+    samsungCardOverseasProfile,
     samsungCardProfile,
     bcCardProfile,
     hyundaiCardProfile,
     kakaoBankProfile,
-    bankAccountProfile
+    bankAccountProfile,
+    nelnaProfile
 ];
 
 /**

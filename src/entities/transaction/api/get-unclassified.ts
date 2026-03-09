@@ -4,6 +4,8 @@ import { createClient } from '@/shared/api/supabase/server';
 
 export interface UnclassifiedGroup {
     rawName: string;
+    amount: number; // [NEW] Added for granular grouping
+    ownerType: string; // [NEW] Added owner type from RPC
     count: number;
     transactionIds: string[];
     sampleDate: string;
@@ -13,6 +15,8 @@ export interface UnclassifiedGroup {
 
 interface UnclassifiedRpcResponse {
     raw_name: string;
+    amount: number; // [NEW]
+    owner_type: string;
     count: number;
     transaction_ids: string[];
     sample_date: string;
@@ -27,8 +31,7 @@ export async function getUnclassifiedTransactions(): Promise<UnclassifiedGroup[]
 
     // Constitution Art 3. Database-First
     // Grouping performed in DB Layer via RPC
-    const { data, error } = await supabase
-        .rpc('get_unclassified_stats');
+    const { data, error } = await (supabase.rpc as any)('get_unclassified_stats');
 
     if (error) {
         console.error('getUnclassifiedTransactions Error:', error);
@@ -40,6 +43,8 @@ export async function getUnclassifiedTransactions(): Promise<UnclassifiedGroup[]
     // Map RPC result to UI Model
     return (data as UnclassifiedRpcResponse[]).map((row) => ({
         rawName: row.raw_name,
+        amount: Number(row.amount), // [NEW]
+        ownerType: row.owner_type,
         count: Number(row.count),
         transactionIds: row.transaction_ids, // UUID Array
         sampleDate: row.sample_date ? new Date(row.sample_date).toISOString().split('T')[0] : '',
