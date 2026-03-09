@@ -6,6 +6,8 @@ import { ValidatedTransaction } from '../model/types'
 type ImportResult = {
     success: boolean
     count: number
+    addedCount: number
+    duplicateCount: number
     errors: string[]
 }
 
@@ -15,7 +17,7 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
     // 1. Auth Check
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
-        return { success: false, count: 0, errors: ['Unauthorized: Please log in.'] }
+        return { success: false, count: 0, addedCount: 0, duplicateCount: 0, errors: ['Unauthorized: Please log in.'] }
     }
 
     try {
@@ -246,24 +248,93 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
 
         if (validPayload.length === 0) {
             console.warn("[UploadBatch] No valid transactions to insert.");
-            return { success: true, count: 0, errors: ["No valid transactions found to insert."] }
+            return { success: true, count: 0, addedCount: 0, duplicateCount: 0, errors: ["No valid transactions found to insert."] }
         }
 
-        // 4. Batch Insert
+        // 5. Create Import Batch
+        const filename = transactions[0]?.source_raw_data?._filename || 'unknown_file';
+        const { data: batch, error: batchError } = await supabase
+            .from('import_batches' as any)
+            .insert({
+                user_id: user.id,
+                filename,
+                import_type: transactions[0]?.source_raw_data?.import_type || 'bulk_excel',
+                row_count: validPayload.length,
+                metadata: { source: 'web_import_v2' }
+            })
+            .select('id')
+            .single() as { data: any, error: any };
+
+        if (batchError) {
+            console.error("[UploadBatch] Batch Creation Error:", batchError);
+            return { success: false, count: 0, addedCount: 0, duplicateCount: 0, errors: [batchError.message] };
+        }
+
+        // 6. Generate Hashes for Deduplication
+        // We use Crypto (Web Crypto API or Node crypto) or simple string concat
+        const encoder = new TextEncoder();
+        const generateHash = async (data: string) => {
+            // Using a simple but effective hash since we are in a server action
+            let hash = 0;
+            for (let i = 0; i < data.length; i++) {
+                const char = data.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            return Math.abs(hash).toString(36);
+        };
+
+        const finalPayloadWithHashes = await Promise.all(validPayload.map(async (p) => {
+            const hashSource = `${p.date}|${p.amount}|${p.description || ''}|${p.asset_id || ''}`;
+            const hash = await generateHash(hashSource);
+            return {
+                ...p,
+                import_batch_id: batch.id,
+                import_hash: hash,
+                source: 'EXCEL'
+            };
+        }));
+
+        // 7. Deduplication Check (Check if hashes already exist in DB)
+        const hashesToInsert = finalPayloadWithHashes.map(p => p.import_hash);
+        const { data: existingHashes } = await supabase
+            .from('transactions' as any)
+            .select('import_hash')
+            .eq('user_id', user.id)
+            .in('import_hash', hashesToInsert) as { data: any[] | null, error: any };
+
+        const existingHashSet = new Set(existingHashes?.map(h => h.import_hash) || []);
+        const nonDuplicatePayload = finalPayloadWithHashes.filter(p => !existingHashSet.has(p.import_hash));
+        const duplicateCount = finalPayloadWithHashes.length - nonDuplicatePayload.length;
+
+        if (nonDuplicatePayload.length === 0) {
+            // All were duplicates - Delete the empty batch for cleanliness
+            await supabase.from('import_batches' as any).delete().eq('id', batch.id);
+            return { success: true, count: validPayload.length, addedCount: 0, duplicateCount, errors: [] };
+        }
+
+        // 8. Batch Insert
         const { error } = await supabase
             .from('transactions')
-            .insert(validPayload as any)
+            .insert(nonDuplicatePayload as any)
 
         if (error) {
             console.error("[UploadBatch] Insert Error:", error)
-            return { success: false, count: 0, errors: [error.message] }
+            await supabase.from('import_batches' as any).delete().eq('id', batch.id);
+            return { success: false, count: 0, addedCount: 0, duplicateCount: 0, errors: [error.message] }
         }
 
-        console.log(`[UploadBatch] Insert Success! Count: ${validPayload.length}`);
-        return { success: true, count: validPayload.length, errors: [] }
+        console.log(`[UploadBatch] Insert Success! Added: ${nonDuplicatePayload.length}, Duplicates: ${duplicateCount}`);
+        return {
+            success: true,
+            count: validPayload.length,
+            addedCount: nonDuplicatePayload.length,
+            duplicateCount,
+            errors: []
+        }
 
     } catch (err: any) {
         console.error("Server Action Error:", err)
-        return { success: false, count: 0, errors: [err.message] }
+        return { success: false, count: 0, addedCount: 0, duplicateCount: 0, errors: [err.message] }
     }
 }

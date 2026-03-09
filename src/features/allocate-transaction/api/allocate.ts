@@ -10,7 +10,8 @@ export interface AllocateResult {
 
 export async function allocateTransactionAction(
     transactionIds: string[],
-    businessUnitId: string
+    businessUnitId: string,
+    projectId?: string | null
 ): Promise<AllocateResult> {
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
@@ -23,8 +24,7 @@ export async function allocateTransactionAction(
             .update({
                 allocation_status: 'business_allocated',
                 business_unit_id: businessUnitId,
-                // We keep category_id as is for now. 
-                // User might re-categorize it later in the Business Context.
+                project_id: projectId || null,
             })
             .in('id', transactionIds)
             .eq('user_id', user.id); // Security: Ensure ownership

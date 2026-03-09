@@ -129,13 +129,14 @@ export function LogDailyRateModal({ open, onClose, onSuccess }: Props) {
                         </Button>
 
                         {showCrew && (
-                            <div className="mt-3 space-y-3 pl-2 border-l-2 border-blue-100">
+                            <div className="mt-4 space-y-4 pl-3 border-l-2 border-primary/20">
                                 {crew.map((c, i) => (
-                                    <div key={i} className="grid grid-cols-12 gap-2 items-end bg-slate-50 p-2 rounded-md">
-                                        <div className="col-span-4 space-y-1">
-                                            <Label className="text-[10px]">이름</Label>
+                                    <div key={i} className="relative grid grid-cols-12 gap-3 items-end bg-secondary/30 p-4 rounded-xl border border-border/50 shadow-sm transition-all hover:shadow-md">
+                                        <div className="col-span-12 sm:col-span-4 space-y-1.5">
+                                            <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">이름</Label>
                                             <Input
-                                                className="h-8 text-xs"
+                                                className="h-9 text-sm bg-background/50 border-muted group-hover:border-primary/30"
+                                                placeholder="크루 이름"
                                                 value={c.crew_name}
                                                 onChange={e => {
                                                     const next = [...crew];
@@ -144,8 +145,8 @@ export function LogDailyRateModal({ open, onClose, onSuccess }: Props) {
                                                 }}
                                             />
                                         </div>
-                                        <div className="col-span-3 space-y-1">
-                                            <Label className="text-[10px]">역할</Label>
+                                        <div className="col-span-6 sm:col-span-3 space-y-1.5">
+                                            <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">역할</Label>
                                             <Select
                                                 value={c.role}
                                                 onValueChange={val => {
@@ -154,7 +155,7 @@ export function LogDailyRateModal({ open, onClose, onSuccess }: Props) {
                                                     setCrew(next);
                                                 }}
                                             >
-                                                <SelectTrigger className="h-8 text-xs">
+                                                <SelectTrigger className="h-9 text-sm bg-background/50 border-muted">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -162,24 +163,28 @@ export function LogDailyRateModal({ open, onClose, onSuccess }: Props) {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className="col-span-4 space-y-1">
-                                            <Label className="text-[10px]">세전금액</Label>
-                                            <Input
-                                                type="number"
-                                                className="h-8 text-xs"
-                                                value={c.amount_gross}
-                                                onChange={e => {
-                                                    const next = [...crew];
-                                                    next[i].amount_gross = Number(e.target.value);
-                                                    setCrew(next);
-                                                }}
-                                            />
+                                        <div className="col-span-6 sm:col-span-4 space-y-1.5">
+                                            <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">세전 금액</Label>
+                                            <div className="relative">
+                                                <Input
+                                                    type="number"
+                                                    className="h-9 text-sm pr-7 bg-background/50 border-muted"
+                                                    placeholder="0"
+                                                    value={c.amount_gross || ''}
+                                                    onChange={e => {
+                                                        const next = [...crew];
+                                                        next[i].amount_gross = Number(e.target.value);
+                                                        setCrew(next);
+                                                    }}
+                                                />
+                                                <span className="absolute right-2.5 top-2 text-[10px] text-muted-foreground">원</span>
+                                            </div>
                                         </div>
-                                        <div className="col-span-1">
+                                        <div className="col-span-12 sm:col-span-1 flex justify-end">
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-8 w-8 text-red-500"
+                                                className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                                                 onClick={() => setCrew(crew.filter((_, idx) => idx !== i))}
                                             >
                                                 <Trash2 className="h-4 w-4" />
@@ -190,10 +195,10 @@ export function LogDailyRateModal({ open, onClose, onSuccess }: Props) {
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="w-full text-xs h-7 border-dashed"
+                                    className="w-full text-xs h-9 border-dashed border-muted-foreground/30 hover:border-primary/50 hover:bg-primary/5 transition-all group"
                                     onClick={() => setCrew([...crew, { crew_name: '', role: '세컨', amount_gross: 0, withholding_rate: 3.3, paid: false }])}
                                 >
-                                    <Plus className="h-3 w-3 mr-1" /> 크루 추가
+                                    <Plus className="h-3.5 w-3.5 mr-2 group-hover:scale-110 transition-transform" /> 크루 추가
                                 </Button>
                             </div>
                         )}
@@ -215,11 +220,11 @@ export function LogDailyRateModal({ open, onClose, onSuccess }: Props) {
                         </Button>
 
                         {showExpenses && (
-                            <div className="mt-3 space-y-3 pl-2 border-l-2 border-orange-100">
+                            <div className="mt-4 space-y-4 pl-3 border-l-2 border-amber-500/20">
                                 {expenses.map((e, i) => (
-                                    <div key={i} className="grid grid-cols-12 gap-2 items-end bg-orange-50/50 p-2 rounded-md">
-                                        <div className="col-span-4 space-y-1">
-                                            <Label className="text-[10px]">항목</Label>
+                                    <div key={i} className="relative grid grid-cols-12 gap-3 items-end bg-secondary/30 p-4 rounded-xl border border-border/50 shadow-sm transition-all hover:shadow-md">
+                                        <div className="col-span-6 sm:col-span-4 space-y-1.5">
+                                            <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">항목</Label>
                                             <Select
                                                 value={e.category}
                                                 onValueChange={val => {
@@ -228,7 +233,7 @@ export function LogDailyRateModal({ open, onClose, onSuccess }: Props) {
                                                     setExpenses(next);
                                                 }}
                                             >
-                                                <SelectTrigger className="h-8 text-xs">
+                                                <SelectTrigger className="h-9 text-sm bg-background/50 border-muted">
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
@@ -236,23 +241,28 @@ export function LogDailyRateModal({ open, onClose, onSuccess }: Props) {
                                                 </SelectContent>
                                             </Select>
                                         </div>
-                                        <div className="col-span-4 space-y-1">
-                                            <Label className="text-[10px]">금액</Label>
-                                            <Input
-                                                type="number"
-                                                className="h-8 text-xs"
-                                                value={e.amount}
-                                                onChange={val => {
-                                                    const next = [...expenses];
-                                                    next[i].amount = Number(val.target.value);
-                                                    setExpenses(next);
-                                                }}
-                                            />
+                                        <div className="col-span-6 sm:col-span-4 space-y-1.5">
+                                            <Label className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider">금액</Label>
+                                            <div className="relative">
+                                                <Input
+                                                    type="number"
+                                                    className="h-9 text-sm pr-7 bg-background/50 border-muted"
+                                                    placeholder="0"
+                                                    value={e.amount || ''}
+                                                    onChange={val => {
+                                                        const next = [...expenses];
+                                                        next[i].amount = Number(val.target.value);
+                                                        setExpenses(next);
+                                                    }}
+                                                />
+                                                <span className="absolute right-2.5 top-2 text-[10px] text-muted-foreground">원</span>
+                                            </div>
                                         </div>
-                                        <div className="col-span-3 pb-1 flex items-center gap-1">
+                                        <div className="col-span-9 sm:col-span-3 pb-2 flex items-center gap-2">
                                             <input
                                                 type="checkbox"
                                                 id={`inc-${i}`}
+                                                className="w-4 h-4 rounded border-muted bg-background/50 text-amber-600 focus:ring-amber-500/30"
                                                 checked={e.included_in_invoice}
                                                 onChange={v => {
                                                     const next = [...expenses];
@@ -260,13 +270,13 @@ export function LogDailyRateModal({ open, onClose, onSuccess }: Props) {
                                                     setExpenses(next);
                                                 }}
                                             />
-                                            <Label htmlFor={`inc-${i}`} className="text-[10px] cursor-pointer">청구포함</Label>
+                                            <Label htmlFor={`inc-${i}`} className="text-xs font-medium cursor-pointer text-muted-foreground">청구 포함</Label>
                                         </div>
-                                        <div className="col-span-1">
+                                        <div className="col-span-3 sm:col-span-1 flex justify-end">
                                             <Button
                                                 variant="ghost"
                                                 size="icon"
-                                                className="h-8 w-8 text-red-500"
+                                                className="h-9 w-9 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                                                 onClick={() => setExpenses(expenses.filter((_, idx) => idx !== i))}
                                             >
                                                 <Trash2 className="h-4 w-4" />
@@ -277,10 +287,10 @@ export function LogDailyRateModal({ open, onClose, onSuccess }: Props) {
                                 <Button
                                     variant="outline"
                                     size="sm"
-                                    className="w-full text-xs h-7 border-dashed"
+                                    className="w-full text-xs h-9 border-dashed border-muted-foreground/30 hover:border-amber-500/50 hover:bg-amber-500/5 transition-all group"
                                     onClick={() => setExpenses([...expenses, { category: '주차비', amount: 0, included_in_invoice: true }])}
                                 >
-                                    <Plus className="h-3 w-3 mr-1" /> 진행비(영수증) 추가
+                                    <Plus className="h-3.5 w-3.5 mr-2 group-hover:scale-110 transition-transform" /> 진행비(영수증) 추가
                                 </Button>
                             </div>
                         )}
@@ -288,14 +298,14 @@ export function LogDailyRateModal({ open, onClose, onSuccess }: Props) {
 
                     {/* Billing Summary */}
                     {(crew.length > 0 || expenses.length > 0) && (
-                        <div className="bg-blue-600 text-white rounded-xl p-4 shadow-lg">
-                            <div className="flex justify-between items-center opacity-80 text-xs mb-1">
-                                <span>거래처 청구 예정 총액</span>
-                                <span className="bg-white/20 px-2 py-0.5 rounded">계산서 합산용</span>
+                        <div className="bg-primary text-primary-foreground rounded-2xl p-5 shadow-xl border border-primary/20 backdrop-blur-sm">
+                            <div className="flex justify-between items-center opacity-70 text-[10px] font-bold uppercase tracking-widest mb-2">
+                                <span>최종 거래처 청구 예정액</span>
+                                <span className="bg-primary-foreground/20 px-2.5 py-1 rounded-full border border-primary-foreground/10">Tax Invoice Included</span>
                             </div>
-                            <div className="text-2xl font-bold flex items-baseline gap-1">
+                            <div className="text-3xl font-black flex items-baseline gap-1.5 leading-none">
                                 {totalBilling.toLocaleString()}
-                                <span className="text-sm font-normal">원</span>
+                                <span className="text-lg font-medium opacity-60">KRW</span>
                             </div>
                         </div>
                     )}

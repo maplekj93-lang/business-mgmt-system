@@ -6,7 +6,9 @@ import { Button } from '@/shared/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 import { BusinessUnit } from '@/entities/business';
 import { allocateTransactionAction } from '../api/allocate';
-import { Loader2, Briefcase } from 'lucide-react';
+import { Loader2, Briefcase, Folder } from 'lucide-react';
+import { getProjects } from '@/entities/project/api/get-projects';
+import { Project } from '@/entities/project/model/types';
 
 interface AllocationDialogProps {
     isOpen: boolean;
@@ -24,13 +26,25 @@ export function AllocationDialog({
     businessUnits
 }: AllocationDialogProps) {
     const [selectedUnitId, setSelectedUnitId] = React.useState<string>('');
+    const [selectedProjectId, setSelectedProjectId] = React.useState<string>('none');
+    const [projects, setProjects] = React.useState<Project[]>([]);
     const [isSubmitting, setIsSubmitting] = React.useState(false);
+
+    React.useEffect(() => {
+        if (isOpen) {
+            getProjects().then(setProjects);
+        }
+    }, [isOpen]);
 
     const handleConfirm = async () => {
         if (!selectedUnitId) return;
 
         setIsSubmitting(true);
-        const result = await allocateTransactionAction(transactionIds, selectedUnitId);
+        const result = await allocateTransactionAction(
+            transactionIds,
+            selectedUnitId,
+            selectedProjectId === 'none' ? null : selectedProjectId
+        );
         setIsSubmitting(false);
 
         if (result.success) {
@@ -80,6 +94,32 @@ export function AllocationDialog({
                             </SelectContent>
                         </Select>
                     </div>
+
+                    {selectedUnit && (
+                        <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                            <label className="text-sm font-medium leading-none text-indigo-300">
+                                연결할 프로젝트 (Optional Project)
+                            </label>
+                            <Select onValueChange={setSelectedProjectId} value={selectedProjectId}>
+                                <SelectTrigger className="w-full bg-white/5 border-indigo-500/20">
+                                    <SelectValue placeholder="프로젝트를 선택하세요 (선택 사항)" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="none" className="text-muted-foreground italic">연결 안 함 (None)</SelectItem>
+                                    {projects
+                                        .filter(p => !selectedUnit.metadata.owner || p.business_owner === selectedUnit.metadata.owner)
+                                        .map((project) => (
+                                            <SelectItem key={project.id} value={project.id}>
+                                                <div className="flex flex-col items-start">
+                                                    <span className="font-medium">{project.name}</span>
+                                                    <span className="text-[10px] opacity-60">Status: {project.status}</span>
+                                                </div>
+                                            </SelectItem>
+                                        ))}
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
 
                     {selectedUnit && (
                         <div className="p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-sm">

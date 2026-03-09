@@ -6,7 +6,7 @@ import { Badge } from '@/shared/ui/badge';
 import { Button } from '@/shared/ui/button';
 import { cn } from '@/shared/lib/utils';
 import { Checkbox } from '@/shared/ui/checkbox'; // Need to ensure this exists or use standard input
-import { Briefcase } from 'lucide-react';
+import { Briefcase, Folder } from 'lucide-react';
 import { BusinessUnit } from '@/entities/business';
 import { AllocationDialog } from '@/features/allocate-transaction';
 import { useRouter } from 'next/navigation';
@@ -27,6 +27,7 @@ interface Transaction {
     category_id: number | null;
     source_raw_data?: any;
     business_unit_id?: string | null;
+    project_id?: string | null;
     owner_type?: string | null; // [NEW] Database-driven owner type
     asset?: { id: string; name: string; asset_type?: string; owner_type?: string } | null;
 }
@@ -293,9 +294,17 @@ export function TransactionTable({ transactions, businessUnits, assets }: Transa
 
                                         {/* Show Business Badge if already allocated */}
                                         {tx.business_unit_id && (
-                                            <Badge variant="secondary" className="ml-2 bg-indigo-500/20 text-indigo-300 border-0 text-[10px]">
-                                                Business
-                                            </Badge>
+                                            <div className="flex flex-col gap-1 mt-1">
+                                                <Badge variant="secondary" className="bg-indigo-500/20 text-indigo-300 border-0 text-[9px] w-fit">
+                                                    Business
+                                                </Badge>
+                                                {tx.project_id && (
+                                                    <Badge variant="outline" className="border-indigo-500/30 text-indigo-400 text-[9px] w-fit font-normal">
+                                                        <Folder className="w-2.5 h-2.5 mr-1" />
+                                                        Project Linked
+                                                    </Badge>
+                                                )}
+                                            </div>
                                         )}
                                     </TableCell>
                                     <TableCell className="text-foreground/90">{tx.description}</TableCell>

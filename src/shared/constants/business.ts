@@ -1,18 +1,31 @@
 // ─── 사업 주체 ───────────────────────────────────────────────
-export const OWNER_TYPES = ['kwangjun', 'euiyoung', 'joint'] as const;
+export const OWNER_TYPES = ['kwangjun', 'euiyoung', 'joint', 'household'] as const;
 export type OwnerType = typeof OWNER_TYPES[number];
 
 export const OWNER_LABELS: Record<OwnerType, string> = {
     kwangjun: '광준',
     euiyoung: '의영',
     joint: '공동',
+    household: '가계',
 };
 
 /** 칸반 카드 헤더 컬러 (Tailwind bg 클래스) */
 export const OWNER_COLORS: Record<OwnerType, string> = {
-    kwangjun: 'bg-blue-500',    // 🟦
-    euiyoung: 'bg-green-500',   // 🟩
-    joint: 'bg-purple-500',  // 🟪
+    kwangjun: 'bg-blue-500',      // 🟦
+    euiyoung: 'bg-green-500',     // 🟩
+    joint: 'bg-purple-500',       // 🟪
+    household: 'bg-amber-500',    // 🟨
+};
+
+/** 프로젝트 상태 */
+export const PROJECT_STATUSES = ['active', 'completed', 'cancelled', 'on_hold'] as const;
+export type ProjectStatus = typeof PROJECT_STATUSES[number];
+
+export const PROJECT_STATUS_LABELS: Record<ProjectStatus, string> = {
+    active: '진행중',
+    completed: '완료',
+    cancelled: '취소',
+    on_hold: '보류',
 };
 
 // ─── 수입 유형 ───────────────────────────────────────────────

@@ -29,7 +29,7 @@ export function ImportSyncGuide() {
 
     return (
         <section className="mb-6">
-            <Accordion type="single" collapsible defaultValue="sync-guide" className="w-full">
+            <Accordion type="single" collapsible className="w-full">
                 <AccordionItem value="sync-guide" className="border-none">
                     <AccordionTrigger className="hover:no-underline py-2">
                         <h2 className="text-sm font-semibold text-gray-600">

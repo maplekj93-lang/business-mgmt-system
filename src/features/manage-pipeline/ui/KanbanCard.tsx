@@ -5,7 +5,7 @@ import { useDraggable } from '@dnd-kit/core'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Badge } from '@/shared/ui/badge'
 import { Calendar, User, Building2 } from 'lucide-react'
-import { OWNER_LABELS, OWNER_COLORS } from '@/shared/constants/business'
+import { OWNER_LABELS, OWNER_COLORS, PIPELINE_STATUSES } from '@/shared/constants/business'
 import type { ProjectIncome } from '@/entities/project/model/types'
 import { cn } from '@/shared/lib/utils'
 
@@ -27,52 +27,95 @@ export function KanbanCard({ income }: KanbanCardProps) {
     const ownerLabel = OWNER_LABELS[owner as keyof typeof OWNER_LABELS]
     const ownerColor = OWNER_COLORS[owner as keyof typeof OWNER_COLORS]
 
+    // Calculate progress based on status index
+    const statusIndex = PIPELINE_STATUSES.indexOf(income.status as any)
+    const progress = Math.max(10, Math.min(100, ((statusIndex + 1) / PIPELINE_STATUSES.length) * 100))
+
     return (
-        <Card
+        <div
             ref={setNodeRef}
             style={style}
             {...listeners}
             {...attributes}
             className={cn(
-                "cursor-grab active:cursor-grabbing hover:shadow-md transition-shadow mb-3 border-l-4",
-                ownerColor.replace('bg-', 'border-'),
-                isDragging && "opacity-50 ring-2 ring-blue-500"
+                "group relative cursor-grab active:cursor-grabbing hover:-translate-y-1 transition-all duration-300 mb-4",
+                isDragging && "opacity-50 ring-2 ring-primary scale-105 z-50 shadow-2xl"
             )}
         >
-            <CardHeader className="p-3 pb-1">
-                <div className="flex justify-between items-start gap-2">
-                    <CardTitle className="text-sm font-bold leading-tight line-clamp-2">
-                        {income.project?.name || '제목 없음'}
-                    </CardTitle>
-                    <Badge variant="outline" className="text-[10px] px-1 h-4 shrink-0">
-                        {income.title}
-                    </Badge>
-                </div>
-            </CardHeader>
+            <Card className={cn(
+                "overflow-hidden border-white/5 bg-slate-900/60 backdrop-blur-xl shadow-sm transition-all group-hover:shadow-2xl group-hover:bg-slate-900/80 border-l-[6px]",
+                ownerColor.replace('bg-', 'border-')
+            )}>
+                <CardHeader className="p-4 pb-2">
+                    <div className="flex justify-between items-start gap-3">
+                        <CardTitle className="text-[13px] font-black leading-tight tracking-tight text-white group-hover:text-primary transition-colors line-clamp-2 uppercase">
+                            {income.project?.name || '제목 없음'}
+                        </CardTitle>
+                        <Badge variant="secondary" className="text-[9px] px-1.5 h-4.5 shrink-0 bg-white/5 font-black border-white/10 text-slate-400 uppercase">
+                            {income.title}
+                        </Badge>
+                    </div>
+                </CardHeader>
 
-            <CardContent className="p-3 pt-1 space-y-2">
-                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-                    <Building2 className="h-3 w-3" />
-                    <span className="truncate">{income.project?.client?.name || '거래처 정보 없음'}</span>
-                </div>
-
-                <div className="flex justify-between items-center mt-2">
-                    <div className="flex items-center gap-1 text-[11px] font-medium text-blue-600">
-                        <span className="text-xs">₩</span>
-                        {income.amount.toLocaleString()}
+                <CardContent className="p-4 pt-0 space-y-4">
+                    <div className="flex items-center gap-2 text-[10px] text-slate-400 font-bold">
+                        <div className="h-6 w-6 rounded-lg bg-white/5 flex items-center justify-center shrink-0 border border-white/10">
+                            <Building2 className="h-3 w-3" />
+                        </div>
+                        <span className="truncate uppercase tracking-tight">{income.project?.client?.name || 'No Client'}</span>
                     </div>
 
-                    <div className="flex items-center gap-1.5">
-                        {income.expected_date && (
-                            <div className="flex items-center gap-1 text-[10px] text-muted-foreground">
-                                <Calendar className="h-3 w-3" />
-                                {income.expected_date.split('-').slice(1).join('/')}
+                    {/* Progress Bar Section */}
+                    <div className="space-y-1.5">
+                        <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-widest">
+                            <span className="text-slate-500">Project Progress</span>
+                            <span className="text-primary">{Math.round(progress)}%</span>
+                        </div>
+                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden border border-white/5">
+                            <div
+                                className={cn("h-full transition-all duration-1000 ease-out", ownerColor)}
+                                style={{ width: `${progress}%` }}
+                            />
+                        </div>
+                    </div>
+
+                    <div className="pt-3 flex justify-between items-end border-t border-white/5">
+                        <div className="space-y-0.5">
+                            <span className="text-[9px] font-black text-slate-600 uppercase tracking-tighter">Est. Revenue</span>
+                            <div className="flex items-center gap-1.5 text-sm font-black text-white">
+                                <span className="text-[10px] text-slate-500 opacity-70">₩</span>
+                                {income.amount.toLocaleString()}
                             </div>
-                        )}
-                        <div className={cn("w-2 h-2 rounded-full", ownerColor)} title={ownerLabel} />
+                        </div>
+
+                        <div className="flex flex-col items-end gap-2">
+                            {income.expected_date && (
+                                <div className="flex items-center gap-1.5 text-[9px] font-black text-slate-400 bg-white/5 px-2 py-1 rounded-lg border border-white/10">
+                                    <Calendar className="h-3 w-3 opacity-60 text-primary" />
+                                    {income.expected_date.split('-').slice(1).join('/')}
+                                </div>
+                            )}
+                            <div className="flex items-center gap-2">
+                                <span className="text-[8px] font-black text-slate-600 uppercase">{ownerLabel}</span>
+                                <div className="relative">
+                                    <div className={cn("w-6 h-6 rounded-lg ring-2 ring-white/10 overflow-hidden", ownerColor)}>
+                                        <div className="w-full h-full bg-black/20 flex items-center justify-center">
+                                            <span className="text-[10px] font-black text-white">{ownerLabel[0]}</span>
+                                        </div>
+                                    </div>
+                                    <div className={cn("absolute -bottom-0.5 -right-0.5 w-2 h-2 rounded-full border border-slate-900", ownerColor)} />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </CardContent>
-        </Card>
+                </CardContent>
+            </Card>
+
+            {/* Hover Glow Effect */}
+            <div className={cn(
+                "absolute -inset-1 rounded-[20px] blur-xl opacity-0 group-hover:opacity-10 transition-opacity pointer-events-none -z-10",
+                ownerColor
+            )} />
+        </div>
     )
 }

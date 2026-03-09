@@ -3,7 +3,7 @@ import { createClient } from '@/shared/api/supabase/server';
 import type { Client } from '../model/types';
 
 export async function upsertClient(
-    payload: Omit<Client, 'created_at' | 'total_revenue' | 'project_count' | 'last_project_at'>
+    payload: Partial<Omit<Client, 'created_at' | 'total_revenue' | 'project_count' | 'last_project_at'>> & { name: string }
 ) {
     const supabase = await createClient();
     const { data, error } = await supabase
