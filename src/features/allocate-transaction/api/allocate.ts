@@ -25,6 +25,7 @@ export async function allocateTransactionAction(
                 allocation_status: 'business_allocated',
                 business_unit_id: businessUnitId,
                 project_id: projectId || null,
+                excluded_from_personal: true,
             })
             .in('id', transactionIds)
             .eq('user_id', user.id); // Security: Ensure ownership

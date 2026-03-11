@@ -61,7 +61,7 @@ export function QuoteTemplate({ project, profile, items }: QuoteTemplateProps) {
                     <div className="flex justify-between items-start border-b-2 border-black pb-6 mb-8">
                         <div>
                             <h1 className="text-4xl font-bold tracking-tighter mb-1">견 적 서</h1>
-                            <p className="text-sm text-gray-500 font-mono">QUOTE / ESTIMATE</p>
+                            <p className="text-sm text-muted-foreground font-mono">QUOTE / ESTIMATE</p>
                         </div>
                         <div className="text-right space-y-1">
                             <p className="text-xl font-bold">{profile.business_name || '상호명 미기재'}</p>
@@ -94,7 +94,7 @@ export function QuoteTemplate({ project, profile, items }: QuoteTemplateProps) {
                     <div className="flex-1">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="border-b-2 border-black bg-gray-50">
+                                <tr className="border-b-2 border-black bg-muted">
                                     <th className="py-3 px-2 font-bold mb-2">항목 (Description)</th>
                                     <th className="py-3 px-2 text-right font-bold w-24">수량</th>
                                     <th className="py-3 px-2 text-right font-bold w-32">단가</th>
@@ -120,7 +120,7 @@ export function QuoteTemplate({ project, profile, items }: QuoteTemplateProps) {
                             <span className="text-xl font-bold uppercase tracking-widest">합계 (Total Amount)</span>
                             <span className="text-3xl font-black">₩ {totalAmount.toLocaleString()}</span>
                         </div>
-                        <div className="mt-8 text-sm text-gray-500 italic">
+                        <div className="mt-8 text-sm text-muted-foreground italic">
                             * 본 견적은 발행일로부터 30일간 유효합니다.<br />
                             * 작업 착수 시 계약금 50%를 지불해 주셔야 합니다.
                         </div>

@@ -19,11 +19,12 @@ import {
     PopoverTrigger,
 } from '@/shared/ui/popover';
 import { Checkbox } from '@/shared/ui/checkbox';
+import { Badge } from '@/shared/ui/badge';
 import { bulkUpdateTransactions } from '../api/bulk-update';
 import { UnclassifiedGroup } from '@/entities/transaction/api/get-unclassified';
 
 import { BusinessUnit } from '@/entities/business';
-import { getRecommendationsAction, Recommendation } from '../api/get-recommendations';
+import { suggestCategory, SuggestionResult } from '../api/suggest-category';
 import { Sparkles } from 'lucide-react';
 
 interface Category {
@@ -51,11 +52,11 @@ export function BulkAssigner({ group, categories, businessUnits }: BulkAssignerP
     const [createRule, setCreateRule] = React.useState(true); // Default checked
     const [isLoading, setIsLoading] = React.useState(false);
     const [businessUnitId, setBusinessUnitId] = React.useState<string | undefined>(undefined);
-    const [recommendation, setRecommendation] = React.useState<Recommendation | null>(null);
+    const [recommendation, setRecommendation] = React.useState<SuggestionResult | null>(null);
 
     React.useEffect(() => {
         const fetchRec = async () => {
-            const rec = await getRecommendationsAction(group.rawName);
+            const rec = await suggestCategory(group.rawName);
             setRecommendation(rec);
         };
         fetchRec();
@@ -122,7 +123,7 @@ export function BulkAssigner({ group, categories, businessUnits }: BulkAssignerP
                                 Context (Allocation)
                             </label>
                             <select
-                                className="w-full text-xs bg-background border border-border/50 rounded p-1 outline-none"
+                                className="w-full text-xs bg-background rounded p-1 outline-none"
                                 value={businessUnitId || ''}
                                 onChange={(e) => setBusinessUnitId(e.target.value || undefined)}
                             >
@@ -144,13 +145,16 @@ export function BulkAssigner({ group, categories, businessUnits }: BulkAssignerP
                         {recommendation && (
                             <CommandGroup heading="✨ Smart Recommendation">
                                 <CommandItem
-                                    onSelect={() => onSelectCategory(recommendation.categoryId, recommendation.categoryName)}
+                                    onSelect={() => onSelectCategory(recommendation.category_id, recommendation.category_name)}
                                     className="bg-indigo-500/10 text-indigo-400 font-bold hover:bg-indigo-500/20"
                                 >
                                     <Sparkles className="mr-2 h-3 w-3" />
-                                    {recommendation.categoryName}
-                                    <span className="ml-auto text-[10px] opacity-60">
-                                        {Math.round(recommendation.confidence * 100)}% Match
+                                    {recommendation.category_name}
+                                    <span className="ml-auto text-[10px] opacity-60 flex items-center gap-1">
+                                        <Badge variant="outline" className="text-[9px] px-1 py-0 h-4 bg-background">
+                                            {recommendation.rule_type === 'exact' ? '일치' : recommendation.rule_type === 'keyword' ? '키워드' : '과거 패턴'}
+                                        </Badge>
+                                        {recommendation.confidence === 'high' ? '높음' : recommendation.confidence === 'medium' ? '중간' : '낮음'}
                                     </span>
                                 </CommandItem>
                             </CommandGroup>

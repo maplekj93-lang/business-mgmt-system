@@ -26,26 +26,26 @@ export function RevenueAnalysis({ data }: RevenueAnalysisProps) {
     };
 
     return (
-        <div className="glass-panel p-6 rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl h-[400px] flex flex-col">
+        <div className="tactile-panel p-6 rounded-2xl bg-background h-[400px] flex flex-col">
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h3 className="text-lg font-black tracking-tight text-white uppercase">Revenue Analysis</h3>
-                    <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">Growth & Velocity</p>
+                    <h3 className="text-lg font-black tracking-tight text-white uppercase">매출 분석</h3>
+                    <p className="text-xs text-slate-500 font-bold uppercase tracking-widest mt-1">성장성 및 유속</p>
                 </div>
-                <div className="flex bg-white/5 p-1 rounded-xl border border-white/10">
+                <div className="flex bg-white/5 p-1 rounded-xl">
                     <button
                         onClick={() => setViewMode('monthly')}
-                        className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'monthly' ? 'bg-primary text-white shadow-lg' : 'text-slate-400 hover:text-white'
+                        className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'monthly' ? 'bg-primary text-white ' : 'text-slate-400 hover:text-white'
                             }`}
                     >
-                        Monthly
+                        월간
                     </button>
                     <button
                         onClick={() => setViewMode('quarterly')}
-                        className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'quarterly' ? 'bg-primary text-white shadow-lg' : 'text-slate-400 hover:text-white'
+                        className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${viewMode === 'quarterly' ? 'bg-primary text-white ' : 'text-slate-400 hover:text-white'
                             }`}
                     >
-                        Quarterly
+                        분기별
                     </button>
                 </div>
             </div>

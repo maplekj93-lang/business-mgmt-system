@@ -9,6 +9,7 @@ import { allocateTransactionAction } from '../api/allocate';
 import { Loader2, Briefcase, Folder } from 'lucide-react';
 import { getProjects } from '@/entities/project/api/get-projects';
 import { Project } from '@/entities/project/model/types';
+import { toast } from 'sonner';
 
 interface AllocationDialogProps {
     isOpen: boolean;
@@ -48,6 +49,7 @@ export function AllocationDialog({
         setIsSubmitting(false);
 
         if (result.success) {
+            toast.info('이 지출이 가계부에서 제외되고 사업비로 이동되었습니다.');
             onSuccess?.();
             onClose();
         } else {
@@ -60,7 +62,7 @@ export function AllocationDialog({
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent className="sm:max-w-[425px] glass-panel bg-background/90 backdrop-blur-xl">
+            <DialogContent className="sm:max-w-[425px] tactile-panel bg-background/90">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2">
                         <Briefcase className="w-5 h-5 text-primary" />
@@ -77,7 +79,7 @@ export function AllocationDialog({
                             귀속될 사업 단위 (Business Unit)
                         </label>
                         <Select onValueChange={setSelectedUnitId} value={selectedUnitId}>
-                            <SelectTrigger className="w-full bg-white/5 border-white/10">
+                            <SelectTrigger className="w-full bg-white/5">
                                 <SelectValue placeholder="사업 단위를 선택하세요" />
                             </SelectTrigger>
                             <SelectContent>
@@ -122,7 +124,7 @@ export function AllocationDialog({
                     )}
 
                     {selectedUnit && (
-                        <div className="p-3 rounded-lg bg-indigo-500/10 border border-indigo-500/20 text-sm">
+                        <div className="p-3 rounded-lg bg-indigo-500/10 border-indigo-500/20 text-sm">
                             <p className="font-medium text-indigo-400">💡 {selectedUnit.name}</p>
                             <p className="text-muted-foreground mt-1">
                                 이 내역은 이제 <b>Business Context</b>에서만 보이며,
@@ -133,7 +135,7 @@ export function AllocationDialog({
                 </div>
 
                 <DialogFooter>
-                    <Button variant="outline" onClick={onClose} disabled={isSubmitting} className="border-white/10 hover:bg-white/5">
+                    <Button variant="outline" onClick={onClose} disabled={isSubmitting} className="hover:bg-white/5">
                         취소
                     </Button>
                     <Button onClick={handleConfirm} disabled={!selectedUnitId || isSubmitting}>

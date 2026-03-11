@@ -83,7 +83,8 @@
 
 ## 📜 5. 절대 규칙 (Antigravity Project Constitution)
 
-> 작업을 시작하기 전 `AI_RULES.md`를 반드시 확인하세요.
+> ⚠️ 이 섹션은 요약본입니다. 실제 규칙은 **`docs/reference/AI_RULES.md` (V7)** 이 최우선입니다.
+> 이 문서와 AI_RULES.md가 충돌할 경우 **항상 AI_RULES.md를 따르세요.**
 
 1. **Twin-Track Philosophy:**
     - Personal Joy (Ledger): '낼나' 스타일의 감성적 자산 추적
@@ -91,10 +92,10 @@
 2. **Database-First:**
     - UI/기능 개발 전에 Supabase 스키마를 설계하고 `npx supabase gen types`로 타입을 추출한 후 작업합니다.
     - 권한 제어는 DB 레벨의 RLS로 수행하며 구조적 메타데이터는 `mdt_*` 테이블을 참조합니다 (`mdt_category` 등).
-3. **UI/UX Guidelines (Prism System V2.0):**
+3. **UI/UX Guidelines (Prism System V2.1):** ← V2.1 확정 (V2.0 아님)
     - **색상 하드코딩 금지!** (ex: `bg-white` ❌ / `bg-background` ✅)
     - 투명도/블러 패널(`glass-panel`) 클래스를 활용한 Glassmorphism 도입.
     - 새로운 컴포넌트는 `src/shared/ui`의 Shadcn 기반 컴포넌트를 사용해 구성합니다.
 4. **Strict TypeScript & Safety:**
-    - `any` 및 `unknown` 타입 절대 사용 금지.
+    - `any` 타입 및 `as any` 캐스트 금지. `unknown` 타입은 타입가드와 함께 사용 시 허용.
     - 에러 처리는 Throw 대신 `{ success, data, error }` 구조를 통일하여 반환합니다.

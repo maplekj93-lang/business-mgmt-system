@@ -81,7 +81,7 @@ export function MatchIncomeDialog({ isOpen, onClose, incomeId, amount, title }: 
                 </DialogHeader>
 
                 <div className="space-y-4 py-4">
-                    <div className="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
+                    <div className="bg-indigo-50 p-3 rounded-lg border-indigo-100">
                         <p className="text-xs text-indigo-600 font-medium">매칭 대상 항목</p>
                         <div className="flex justify-between items-center mt-1">
                             <span className="font-bold">{title}</span>
@@ -108,7 +108,7 @@ export function MatchIncomeDialog({ isOpen, onClose, incomeId, amount, title }: 
                             transactions.map(tx => (
                                 <div
                                     key={tx.id}
-                                    className="flex items-center justify-between p-3 rounded-md border hover:border-indigo-500 cursor-pointer transition-colors"
+                                    className="flex items-center justify-between p-3 rounded-md hover:border-indigo-500 cursor-pointer transition-colors"
                                     onClick={() => handleMatch(tx.id)}
                                 >
                                     <div className="flex flex-col">

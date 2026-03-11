@@ -38,7 +38,7 @@ export function DailyTrendChart({ data }: DailyTrendChartProps) {
     };
 
     return (
-        <Card className="glass-panel border-border h-full">
+        <Card className="tactile-panel border- h-full">
             <CardHeader>
                 <CardTitle>일별 추이</CardTitle>
                 <CardDescription>

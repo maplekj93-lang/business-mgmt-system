@@ -88,7 +88,7 @@ export function CashflowCalendar() {
             {/* Calendar Header Area */}
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div className="flex items-center gap-6">
-                    <div className="flex items-center gap-1 bg-white/5 border border-white/10 rounded-2xl p-1 shadow-inner">
+                    <div className="flex items-center gap-1 bg-white/5 rounded-2xl p-1 shadow-inner">
                         <Button variant="ghost" size="icon" onClick={handlePrevMonth} className="h-9 w-9 rounded-xl hover:bg-white/10">
                             <ChevronLeft className="h-4 w-4 text-slate-400" />
                         </Button>
@@ -104,14 +104,14 @@ export function CashflowCalendar() {
                     <Button
                         variant="ghost"
                         onClick={handleToday}
-                        className="text-[10px] font-black uppercase tracking-widest text-primary border border-primary/20 hover:bg-primary/10 rounded-xl px-6"
+                        className="text-[10px] font-black uppercase tracking-widest text-primary border-primary/20 hover:bg-primary/10 rounded-xl px-6"
                     >
                         Today
                     </Button>
                 </div>
 
                 <div className="flex items-center gap-3">
-                    <div className="flex bg-white/5 border border-white/10 rounded-2xl p-1">
+                    <div className="flex bg-white/5 rounded-2xl p-1">
                         <Button variant="ghost" size="icon" className="h-9 w-9 rounded-xl hover:bg-white/10">
                             <Filter className="h-4 w-4 text-slate-400" />
                         </Button>
@@ -119,7 +119,7 @@ export function CashflowCalendar() {
                             <Download className="h-4 w-4 text-slate-400" />
                         </Button>
                     </div>
-                    <Button className="bg-primary hover:bg-primary/80 rounded-2xl h-11 px-8 shadow-xl shadow-primary/20 font-black uppercase text-[11px] tracking-widest">
+                    <Button className="bg-primary hover:bg-primary/80 rounded-2xl h-11 px-8 shadow-primary/20 font-black uppercase text-[11px] tracking-widest">
                         <Plus className="mr-2 h-4 w-4" /> New Plan
                     </Button>
                 </div>
@@ -129,7 +129,7 @@ export function CashflowCalendar() {
                 {/* Main Grid */}
                 <div className="flex-1 min-h-[600px] relative">
                     {isLoading && (
-                        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/40 backdrop-blur-sm rounded-2xl">
+                        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-950/40 rounded-2xl">
                             <div className="flex flex-col items-center gap-4">
                                 <div className="h-12 w-12 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
                                 <span className="text-[10px] font-black text-primary uppercase tracking-[0.3em] animate-pulse">Syncing Vault Data</span>

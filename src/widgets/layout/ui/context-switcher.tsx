@@ -34,15 +34,15 @@ export function ContextSwitcher({ defaultMode }: { defaultMode: AppMode }) {
     };
 
     return (
-        // ✅ Glassmorphism: Prism System V2.0 (glass-panel recipe)
-        <div className="glass-panel rounded-full p-1.5 w-fit mx-auto flex items-center justify-center transition-all bg-background/50 border border-border">
+        // ✅ Glassmorphism: Prism System V2.0 (tactile-panel recipe)
+        <div className="tactile-panel rounded-full p-1.5 w-fit mx-auto flex items-center justify-center transition-all bg-background/50 border-border">
             <button
                 onClick={() => handleSwitch('personal')}
                 disabled={isPending}
                 className={cn(
                     "flex items-center gap-2 px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300",
                     mode === 'personal'
-                        ? "bg-background shadow-sm text-foreground scale-105 border border-border"
+                        ? "bg-background shadow-sm text-foreground scale-105 border-border"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted/20"
                 )}
             >

@@ -101,7 +101,7 @@ export function CategoryFormDialog({ category, parent_id, trigger, open: control
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
-            <DialogContent className="sm:max-w-md glass-panel">
+            <DialogContent className="sm:max-w-md tactile-panel">
                 <DialogHeader>
                     <DialogTitle>{category ? '카테고리 수정' : '새 카테고리 추가'}</DialogTitle>
                 </DialogHeader>
@@ -161,7 +161,7 @@ export function CategoryFormDialog({ category, parent_id, trigger, open: control
                             <Select value={color} onValueChange={setColor}>
                                 <SelectTrigger>
                                     <div className="flex items-center gap-2">
-                                        <div className={cn("w-3 h-3 rounded-full border border-white/10", COLOR_MAP[color])} />
+                                        <div className={cn("w-3 h-3 rounded-full  ", COLOR_MAP[color])} />
                                         <SelectValue />
                                     </div>
                                 </SelectTrigger>
@@ -169,7 +169,7 @@ export function CategoryFormDialog({ category, parent_id, trigger, open: control
                                     {COLORS.map((c) => (
                                         <SelectItem key={c.value} value={c.value}>
                                             <div className="flex items-center gap-2">
-                                                <div className={cn("w-3 h-3 rounded-full border border-white/10", COLOR_MAP[c.value])} />
+                                                <div className={cn("w-3 h-3 rounded-full  ", COLOR_MAP[c.value])} />
                                                 {c.name}
                                             </div>
                                         </SelectItem>

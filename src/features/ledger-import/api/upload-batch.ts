@@ -25,31 +25,27 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
         // We need to map "Main > Sub" or "Main" to category_id
         const { data: categories } = await supabase
             .from('mdt_categories')
-            .select('id, name, parent_id')
-            .returns<any[]>() // Explicit cast
+            .select('id, name, parent_id');
 
         // 3. Transform Data
         console.log(`[UploadBatch] Processing ${transactions.length} transactions for user ${user.id}`);
 
         // Fetch Rules
         const { data: rules } = await supabase
-            .from('mdt_allocation_rules' as any)
+            .from('mdt_allocation_rules')
             .select('keyword, category_id')
-            .eq('user_id', user.id)
-            .returns<any[]>();
+            .eq('user_id', user.id);
 
         // [NEW] Fetch Assets with Metadata and Manual Mappings
         const [{ data: assets }, { data: mappings }] = await Promise.all([
             supabase
                 .from('assets')
                 .select('id, name, asset_type, owner_type, identifier_keywords')
-                .eq('user_id', user.id)
-                .returns<{ id: string, name: string, asset_type: string, owner_type: string, identifier_keywords: string[] }[]>(),
+                .eq('user_id', user.id),
             supabase
-                .from('mdt_import_mappings' as any)
+                .from('mdt_import_mappings')
                 .select('type, source_value, target_asset_id')
                 .eq('user_id', user.id)
-                .returns<{ type: string, source_value: string, target_asset_id: string }[]>()
         ]);
 
         // Helper to find asset by simplified name or card number
@@ -57,18 +53,18 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
             if (!assets) return null;
 
             // 1. [PRIORITY] Try Manual Settings (mdt_import_mappings)
-            if (mappings && (mappings as any[]).length > 0) {
+            if (mappings && mappings.length > 0) {
                 // Check by Card Number (last 4 digits)
                 if (cardNo) {
                     const last4 = String(cardNo).slice(-4);
-                    const match = (mappings as any[]).find(m => m.type === 'card_no' && m.source_value.includes(last4));
+                    const match = mappings.find(m => m.type === 'card_no' && m.source_value.includes(last4));
                     if (match) return match.target_asset_id;
                 }
 
                 // Check by Bank Name
                 if (bankName) {
                     const normalizedBank = normalize(bankName).toUpperCase();
-                    const match = (mappings as any[]).find(m => m.type === 'bank_name' && normalize(m.source_value).toUpperCase() === normalizedBank);
+                    const match = mappings.find(m => m.type === 'bank_name' && normalize(m.source_value).toUpperCase() === normalizedBank);
                     if (match) return match.target_asset_id;
                 }
             }
@@ -109,7 +105,7 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
                 // Check if any identifier matches targetKorean or vice versa
                 const identifiers = a.identifier_keywords || [];
                 return identifiers.some((id: string) => {
-                    const normId = normalize(String(id)).toUpperCase();
+                    const normId = normalize(id).toUpperCase();
                     return targetKorean.includes(normId) || normId.includes(targetKorean);
                 });
             });
@@ -120,7 +116,11 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
         const normalize = (s: string) => s.replace(/\s+/g, '');
 
         const ruleMap = new Map<string, number>();
-        rules?.forEach(r => ruleMap.set(normalize(r.keyword), r.category_id));
+        rules?.forEach(r => {
+            if (r.category_id !== null) {
+                ruleMap.set(normalize(r.keyword), r.category_id);
+            }
+        });
 
         const categoryMap = new Map<string, number>(); // Strict Name -> ID
         const normalizedCatMap = new Map<string, number>(); // Normalized Name -> ID
@@ -151,14 +151,13 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
                 .lt('amount', 0) // Look for expenses
                 .not('category_id', 'is', null)
                 .order('date', { ascending: false }) // Prefer recent
-                .limit(500) // Guard against too much data
-                .returns<any[]>(); // Explicit cast
+                .limit(500); // Guard against too much data
 
             if (history) {
                 history.forEach(h => {
                     // Key: "Merchant:Abs(Amount)"
                     // If we find an expense of -10000 for "Starbucks", and we have a refund of +10000 for "Starbucks"
-                    const key = `${normalize(h.description)}:${Math.abs(h.amount)}`;
+                    const key = `${normalize(h.description!)}:${Math.abs(h.amount)}`;
                     if (!refundMap.has(key)) {
                         refundMap.set(key, h.category_id!);
                     }
@@ -238,8 +237,13 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
             }
         });
 
-        // Filter out any invalid entries that might violate DB constraints
-        const validPayload = payload.filter(p => !isNaN(p.amount) && p.amount !== null && p.amount !== undefined);
+        // Filter out any invalid entries that might violate DB constraints OR are 0 (useless data)
+        const validPayload = payload.filter(p => 
+            !isNaN(p.amount) && 
+            p.amount !== null && 
+            p.amount !== undefined &&
+            p.amount !== 0
+        );
 
         console.log(`[UploadBatch] Valid Payload: ${validPayload.length} / ${payload.length}`);
         if (validPayload.length > 0) {
@@ -254,16 +258,16 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
         // 5. Create Import Batch
         const filename = transactions[0]?.source_raw_data?._filename || 'unknown_file';
         const { data: batch, error: batchError } = await supabase
-            .from('import_batches' as any)
+            .from('import_batches')
             .insert({
                 user_id: user.id,
                 filename,
                 import_type: transactions[0]?.source_raw_data?.import_type || 'bulk_excel',
                 row_count: validPayload.length,
                 metadata: { source: 'web_import_v2' }
-            })
+            } as any)
             .select('id')
-            .single() as { data: any, error: any };
+            .single();
 
         if (batchError) {
             console.error("[UploadBatch] Batch Creation Error:", batchError);
@@ -298,10 +302,10 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
         // 7. Deduplication Check (Check if hashes already exist in DB)
         const hashesToInsert = finalPayloadWithHashes.map(p => p.import_hash);
         const { data: existingHashes } = await supabase
-            .from('transactions' as any)
+            .from('transactions')
             .select('import_hash')
             .eq('user_id', user.id)
-            .in('import_hash', hashesToInsert) as { data: any[] | null, error: any };
+            .in('import_hash', hashesToInsert);
 
         const existingHashSet = new Set(existingHashes?.map(h => h.import_hash) || []);
         const nonDuplicatePayload = finalPayloadWithHashes.filter(p => !existingHashSet.has(p.import_hash));
@@ -316,11 +320,11 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
         // 8. Batch Insert
         const { error } = await supabase
             .from('transactions')
-            .insert(nonDuplicatePayload as any)
+            .insert(nonDuplicatePayload);
 
         if (error) {
             console.error("[UploadBatch] Insert Error:", error)
-            await supabase.from('import_batches' as any).delete().eq('id', batch.id);
+            await supabase.from('import_batches').delete().eq('id', batch!.id);
             return { success: false, count: 0, addedCount: 0, duplicateCount: 0, errors: [error.message] }
         }
 

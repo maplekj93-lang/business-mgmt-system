@@ -63,7 +63,7 @@ function ProjectCard({ project, onSelect }: { project: Project; onSelect: () => 
     return (
         <div
             onClick={onSelect}
-            className="bg-white border rounded-xl p-4 hover:shadow-md hover:border-blue-200 cursor-pointer transition-all space-y-3 group"
+            className="bg-white rounded-xl p-4 hover:shadow-md hover:border-blue-200 cursor-pointer transition-all space-y-3 group"
         >
             {/* 헤더: 오너 색상 바 + 이름 */}
             <div className="flex items-start gap-3">
@@ -234,9 +234,9 @@ function CreateProjectModal({ open, onClose, onCreated }: {
                                     key={c}
                                     onClick={() => toggleCategory(c)}
                                     className={cn(
-                                        'text-xs px-2 py-1 rounded-full border transition-colors',
+                                        'text-xs px-2 py-1 rounded-full  transition-colors',
                                         selectedCategories.includes(c)
-                                            ? 'bg-blue-600 text-white border-blue-600'
+                                            ? 'bg-primary text-white border-blue-600'
                                             : 'bg-white text-slate-600 border-slate-200 hover:border-blue-300'
                                     )}
                                 >{c}</button>
@@ -247,7 +247,7 @@ function CreateProjectModal({ open, onClose, onCreated }: {
                     <div className="grid gap-1.5">
                         <Label>메모</Label>
                         <textarea
-                            className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none h-20 focus:outline-none focus:ring-2 focus:ring-ring"
+                            className="w-full rounded-md border-input bg-background px-3 py-2 text-sm resize-none h-20 focus:outline-none focus:ring-2 focus:ring-ring"
                             placeholder="특이사항, 담당자 연락처 등"
                             value={memo}
                             onChange={e => setMemo(e.target.value)}
@@ -257,7 +257,7 @@ function CreateProjectModal({ open, onClose, onCreated }: {
 
                 <DialogFooter>
                     <Button variant="outline" onClick={onClose} disabled={isSubmitting}>취소</Button>
-                    <Button onClick={handleSubmit} disabled={isSubmitting || !name.trim()} className="bg-blue-600 hover:bg-blue-700">
+                    <Button onClick={handleSubmit} disabled={isSubmitting || !name.trim()} className="bg-primary hover:bg-blue-700">
                         {isSubmitting ? '생성 중...' : '프로젝트 생성'}
                     </Button>
                 </DialogFooter>
@@ -450,6 +450,59 @@ function ProjectDetailModal({ project: initial, profiles, open, onClose, onUpdat
                         />
                     )}
 
+                    {/* 입금 일정 / 리드타임 */}
+                    <div className="space-y-3 p-4 bg-slate-50/50 rounded-xl border border-slate-100">
+                        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide flex items-center gap-2">
+                             📅 입금 일정 및 리드타임
+                        </p>
+                        <div className="grid grid-cols-2 gap-4">
+                            <div className="grid gap-1.5">
+                                <Label className="text-[11px] text-slate-500 font-bold">세금계산서 발행일</Label>
+                                <Input
+                                    type="date"
+                                    className="h-9 text-xs bg-white"
+                                    value={project.invoice_sent_date ?? ''}
+                                    onChange={e => setProject(p => ({ ...p, invoice_sent_date: e.target.value }))}
+                                    onBlur={e => save({ invoice_sent_date: e.target.value || null })}
+                                />
+                            </div>
+                            <div className="grid gap-1.5">
+                                <Label className="text-[11px] text-slate-500 font-bold">입금 예정일</Label>
+                                <Input
+                                    type="date"
+                                    className="h-9 text-xs bg-white"
+                                    value={project.expected_payment_date ?? ''}
+                                    onChange={e => setProject(p => ({ ...p, expected_payment_date: e.target.value }))}
+                                    onBlur={e => save({ expected_payment_date: e.target.value || null })}
+                                />
+                            </div>
+                        </div>
+
+                        {project.actual_payment_date && (
+                            <div className="pt-2 mt-2 border-t border-slate-200/60 grid grid-cols-2 gap-4">
+                                <div>
+                                    <Label className="text-[11px] text-emerald-600 font-bold">실제 입금일</Label>
+                                    <div className="text-sm font-bold text-emerald-700 mt-1 flex items-center gap-1">
+                                        <Check className="h-4 w-4" /> {project.actual_payment_date}
+                                    </div>
+                                </div>
+                                {project.invoice_sent_date && (
+                                    <div>
+                                        <Label className="text-[11px] text-blue-600 font-bold">회수 소요일 (리드타임)</Label>
+                                        <div className="text-sm font-bold text-blue-700 mt-1">
+                                            {(() => {
+                                                const start = new Date(project.invoice_sent_date);
+                                                const end = new Date(project.actual_payment_date);
+                                                const diff = Math.ceil(Math.abs(end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
+                                                return `${diff}일`;
+                                            })()}
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+                    </div>
+
                     {/* 체크리스트 */}
                     <div className="space-y-2">
                         <div className="flex items-center justify-between">
@@ -512,7 +565,7 @@ function ProjectDetailModal({ project: initial, profiles, open, onClose, onUpdat
                         </button>
                         {showMemo && (
                             <textarea
-                                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-ring"
+                                className="w-full rounded-md border-input bg-background px-3 py-2 text-sm resize-none h-24 focus:outline-none focus:ring-2 focus:ring-ring"
                                 placeholder="특이사항, 담당자 정보, 계약 조건 등..."
                                 value={project.memo ?? ''}
                                 onChange={e => setProject(p => ({ ...p, memo: e.target.value }))}
@@ -602,7 +655,7 @@ export default function ProjectsPage() {
                         <p className="text-sm text-muted-foreground">총 {projects.length}개 프로젝트</p>
                     </div>
                 </div>
-                <Button onClick={() => setIsCreateOpen(true)} className="bg-blue-600 hover:bg-blue-700">
+                <Button onClick={() => setIsCreateOpen(true)} className="bg-primary hover:bg-blue-700">
                     <Plus className="mr-2 h-4 w-4" /> 새 프로젝트
                 </Button>
             </div>
@@ -633,7 +686,7 @@ export default function ProjectsPage() {
                             key={s}
                             onClick={() => setStatusFilter(s)}
                             className={cn(
-                                'text-xs px-3 py-1.5 rounded-full border transition-colors',
+                                'text-xs px-3 py-1.5 rounded-full  transition-colors',
                                 statusFilter === s
                                     ? 'bg-slate-800 text-white border-slate-800'
                                     : 'bg-white text-slate-600 border-slate-200 hover:border-slate-400'

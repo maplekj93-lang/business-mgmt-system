@@ -78,7 +78,7 @@ export function FileDropzone({ onFileSelect, isProcessing }: FileDropzoneProps) 
             {!selectedFile ? (
                 <div
                     className={cn(
-                        "relative flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-3xl transition-all duration-200 ease-in-out cursor-pointer overflow-hidden group",
+                        "relative flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-[2rem] transition-all duration-200 ease-in-out cursor-pointer overflow-hidden group",
                         isDragActive
                             ? "border-primary bg-primary/5 scale-[1.02]"
                             : "border-border/40 bg-background/50 hover:bg-muted/30",
@@ -117,7 +117,7 @@ export function FileDropzone({ onFileSelect, isProcessing }: FileDropzoneProps) 
                     </div>
                 </div>
             ) : (
-                <div className="relative flex items-center gap-4 p-4 bg-background/50 border rounded-2xl backdrop-blur-sm animate-in fade-in zoom-in-95">
+                <div className="relative flex items-center gap-4 p-4 bg-background/50 rounded-2xl animate-in fade-in zoom-in-95">
                     <div className="p-3 bg-green-100 dark:bg-green-900/30 rounded-xl">
                         <FileSpreadsheet className="w-6 h-6 text-green-600 dark:text-green-400" />
                     </div>

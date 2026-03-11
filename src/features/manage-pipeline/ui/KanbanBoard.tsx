@@ -94,10 +94,10 @@ export function KanbanBoard({ initialIncomes }: KanbanBoardProps) {
             <div className="space-y-8 h-full flex flex-col">
                 {/* Stats Section */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div className="glass-panel p-6 rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl relative overflow-hidden group">
+                    <div className="tactile-panel p-6 rounded-2xl bg-background relative overflow-hidden group">
                         <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/10 blur-2xl transition-all group-hover:bg-primary/20" />
                         <div className="flex justify-between items-start mb-4">
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Pipeline Value</p>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">총 파이프라인 가치</p>
                             <div className="bg-primary/10 p-2 rounded-lg text-primary shadow-sm ring-1 ring-primary/20">
                                 <DollarSign className="h-4 w-4" />
                             </div>
@@ -105,14 +105,14 @@ export function KanbanBoard({ initialIncomes }: KanbanBoardProps) {
                         <p className="text-3xl font-black tracking-tighter text-white">₩{totalPipelineValue.toLocaleString()}</p>
                         <div className="flex items-center gap-1.5 mt-2">
                             <TrendingUp className="h-3 w-3 text-emerald-400" />
-                            <p className="text-emerald-400 text-[10px] font-bold">+12.4% vs last month</p>
+                            <p className="text-emerald-400 text-[10px] font-bold">지난달 대비 +12.4%</p>
                         </div>
                     </div>
 
-                    <div className="glass-panel p-6 rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl relative overflow-hidden group">
+                    <div className="tactile-panel p-6 rounded-2xl bg-background relative overflow-hidden group">
                         <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-emerald-500/10 blur-2xl transition-all group-hover:bg-emerald-500/20" />
                         <div className="flex justify-between items-start mb-4">
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Revenue Realized</p>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">정산 완료 매출</p>
                             <div className="bg-emerald-400/10 p-2 rounded-lg text-emerald-400 shadow-sm ring-1 ring-emerald-400/20">
                                 <CheckCircle2 className="h-4 w-4" />
                             </div>
@@ -120,22 +120,22 @@ export function KanbanBoard({ initialIncomes }: KanbanBoardProps) {
                         <p className="text-3xl font-black tracking-tighter text-white">₩{realizedRevenue.toLocaleString()}</p>
                         <div className="flex items-center gap-1.5 mt-2">
                             <TrendingDown className="h-3 w-3 text-rose-400" />
-                            <p className="text-rose-400 text-[10px] font-bold">-5.2% vs last month</p>
+                            <p className="text-rose-400 text-[10px] font-bold">지난달 대비 -5.2%</p>
                         </div>
                     </div>
 
-                    <div className="glass-panel p-6 rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl relative overflow-hidden group">
+                    <div className="tactile-panel p-6 rounded-2xl bg-background relative overflow-hidden group">
                         <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-amber-500/10 blur-2xl transition-all group-hover:bg-amber-500/20" />
                         <div className="flex justify-between items-start mb-4">
-                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">Avg Project Speed</p>
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">평균 프로젝트 속도</p>
                             <div className="bg-amber-500/10 p-2 rounded-lg text-amber-500 shadow-sm ring-1 ring-amber-500/20">
                                 <Zap className="h-4 w-4" />
                             </div>
                         </div>
-                        <p className="text-3xl font-black tracking-tighter text-white">{avgProjectSpeed} Days</p>
+                        <p className="text-3xl font-black tracking-tighter text-white">{avgProjectSpeed} 일</p>
                         <div className="flex items-center gap-1.5 mt-2">
                             <TrendingUp className="h-3 w-3 text-emerald-400" />
-                            <p className="text-emerald-400 text-[10px] font-bold">+2.1% faster</p>
+                            <p className="text-emerald-400 text-[10px] font-bold">전주 대비 2.1% 단축</p>
                         </div>
                     </div>
                 </div>

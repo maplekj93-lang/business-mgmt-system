@@ -13,20 +13,20 @@ export function SummaryCards({ data }: { data: SummaryStats }) {
     return (
         <div className="grid gap-4 md:grid-cols-3">
             {/* Total Income */}
-            <div className="glass-panel p-6 flex flex-col justify-between space-y-4">
+            <div className="tactile-panel p-6 flex flex-col justify-between space-y-4">
                 <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-muted-foreground">총 수입</span>
                     <div className="h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
-                        <ArrowUpRight className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        <ArrowUpRight className="h-4 w-4 text-primary dark:text-blue-400" />
                     </div>
                 </div>
-                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                <div className="text-2xl font-bold text-primary dark:text-blue-400">
                     {formatCurrency(data.totalIncome)}
                 </div>
             </div>
 
             {/* Total Expense */}
-            <div className="glass-panel p-6 flex flex-col justify-between space-y-4">
+            <div className="tactile-panel p-6 flex flex-col justify-between space-y-4">
                 <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-muted-foreground">총 지출</span>
                     <div className="h-8 w-8 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
@@ -39,7 +39,7 @@ export function SummaryCards({ data }: { data: SummaryStats }) {
             </div>
 
             {/* Net Profit */}
-            <div className="glass-panel p-6 flex flex-col justify-between space-y-4">
+            <div className="tactile-panel p-6 flex flex-col justify-between space-y-4">
                 <div className="flex items-center justify-between">
                     <span className="text-sm font-medium text-muted-foreground">순수익</span>
                     <div className="h-8 w-8 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center">

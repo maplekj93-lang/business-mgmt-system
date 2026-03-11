@@ -31,7 +31,7 @@ export async function getUnclassifiedTransactions(): Promise<UnclassifiedGroup[]
 
     // Constitution Art 3. Database-First
     // Grouping performed in DB Layer via RPC
-    const { data, error } = await (supabase.rpc as any)('get_unclassified_stats');
+    const { data, error } = await supabase.rpc('get_unclassified_stats');
 
     if (error) {
         console.error('getUnclassifiedTransactions Error:', error);

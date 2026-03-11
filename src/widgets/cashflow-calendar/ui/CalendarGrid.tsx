@@ -32,11 +32,11 @@ export function CalendarGrid({ currentMonth, data, selectedDate, onDateSelect }:
     });
 
     return (
-        <div className="flex-1 overflow-hidden flex flex-col glass-panel rounded-2xl border border-white/10 bg-slate-900/40 backdrop-blur-xl">
+        <div className="flex-1 overflow-hidden flex flex-col tactile-panel rounded-2xl bg-background">
             {/* Header: Days of Week */}
-            <div className="grid grid-cols-7 border-b border-white/5 bg-white/[0.02]">
+            <div className="grid grid-cols-7 border-b bg-white/[0.02]">
                 {DAYS_OF_WEEK.map((day) => (
-                    <div key={day} className="py-3 text-center border-r last:border-r-0 border-white/5">
+                    <div key={day} className="py-3 text-center border-r last:border-r-0">
                         <span className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500">
                             {day}
                         </span>

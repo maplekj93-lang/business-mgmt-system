@@ -111,7 +111,7 @@ export function LedgerImportWidget() {
     const hasForeignTx = (parseResult?.stats.foreignCurrencyCount ?? 0) > 0
 
     return (
-        <div className="w-full max-w-4xl mx-auto space-y-8 glass-panel p-8 relative">
+        <div className="w-full max-w-4xl mx-auto space-y-8 tactile-panel p-8 relative">
             <button
                 onClick={handleReset}
                 className="absolute top-4 right-4 text-xs text-red-400 hover:text-red-600 underline"
@@ -141,7 +141,7 @@ export function LedgerImportWidget() {
             <FileDropzone onFileSelect={handleFileSelect} isProcessing={isProcessing} />
 
             {file && !parseResult && (
-                <div className="flex justify-end pt-4 border-t border-border/50">
+                <div className="flex justify-end pt-4 border-t">
                     <Button
                         size="lg"
                         onClick={handleParse}
@@ -154,18 +154,18 @@ export function LedgerImportWidget() {
             )}
 
             {parseResult && (
-                <div className="flex flex-col items-center gap-4 pt-4 border-t border-border/50 animate-in fade-in slide-in-from-bottom-4">
+                <div className="flex flex-col items-center gap-4 pt-4 border-t animate-in fade-in slide-in-from-bottom-4">
                     {/* 기본 통계 */}
                     <div className="grid grid-cols-3 gap-4 w-full max-w-2xl mb-2">
-                        <div className="bg-card p-4 rounded-lg border text-center">
+                        <div className="bg-card p-4 rounded-lg text-center">
                             <div className="text-xs text-muted-foreground uppercase">Format</div>
                             <div className="font-bold text-primary">{parseResult.stats.bankIdentified || 'Unknown'}</div>
                         </div>
-                        <div className="bg-card p-4 rounded-lg border text-center">
+                        <div className="bg-card p-4 rounded-lg text-center">
                             <div className="text-xs text-muted-foreground uppercase">Found</div>
                             <div className="font-bold text-green-500">{parseResult.transactions.length}건</div>
                         </div>
-                        <div className="bg-card p-4 rounded-lg border text-center">
+                        <div className="bg-card p-4 rounded-lg text-center">
                             <div className="text-xs text-muted-foreground uppercase">Filtered (Net-Zero)</div>
                             <div className="font-bold text-orange-500">{parseResult.stats.filteredCount}건</div>
                         </div>
@@ -173,7 +173,7 @@ export function LedgerImportWidget() {
 
                     {/* 해외 결제 알림 배너 */}
                     {hasForeignTx && (
-                        <div className="w-full max-w-2xl rounded-lg bg-amber-50 border border-amber-200 px-4 py-3 text-sm text-amber-800">
+                        <div className="w-full max-w-2xl rounded-lg bg-amber-50 border-amber-200 px-4 py-3 text-sm text-amber-800">
                             <div className="flex items-start gap-2">
                                 <span className="text-lg leading-none">🌐</span>
                                 <div>

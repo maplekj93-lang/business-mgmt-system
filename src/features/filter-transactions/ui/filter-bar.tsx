@@ -30,11 +30,11 @@ export function FilterBar() {
     }
 
     return (
-        <div className="flex gap-4 p-4 mb-4 glass-panel rounded-lg items-center">
+        <div className="flex gap-4 p-4 mb-4 tactile-panel rounded-lg items-center">
             <div className="flex items-center gap-2">
                 <label className="text-sm font-medium text-muted-foreground">연도</label>
                 <select
-                    className="h-9 w-[100px] rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    className="h-9 w-[100px] rounded-md border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                     value={currentYear}
                     onChange={handleYearChange}
                 >
@@ -48,7 +48,7 @@ export function FilterBar() {
             <div className="flex items-center gap-2">
                 <label className="text-sm font-medium text-muted-foreground">월</label>
                 <select
-                    className="h-9 w-[100px] rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    className="h-9 w-[100px] rounded-md border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                     value={searchParams.get('month') || 'all'}
                     onChange={handleMonthChange}
                 >

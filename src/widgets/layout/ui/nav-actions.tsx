@@ -12,7 +12,7 @@ export function NavActions() {
     return (
         <div className="flex items-center gap-3">
             <ModeToggle />
-            <div className="flex items-center gap-2 pr-2 border-r border-white/10 mr-2 h-8">
+            <div className="flex items-center gap-2 pr-2 border-r mr-2 h-8">
                 <Link href="/analytics">
                     <Button variant="ghost" size="icon" className="text-muted-foreground hover:text-foreground" title="대시보드">
                         <BarChart3 className="w-5 h-5" />
@@ -31,7 +31,7 @@ export function NavActions() {
                             <Settings className="w-5 h-5" />
                         </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-56 p-2 bg-zinc-950/95 border-white/10 backdrop-blur-xl shadow-2xl" align="end">
+                    <PopoverContent className="w-56 p-2 bg-zinc-950/95" align="end">
                         <div className="flex flex-col gap-1">
                             <p className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">설정</p>
 
@@ -74,7 +74,7 @@ export function NavActions() {
                     className="h-8 w-8 text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors"
                 >
                     <LogOut className="w-4 h-4" />
-                    <span className="sr-only">Logout</span>
+                    <span className="sr-only">로그아웃</span>
                 </Button>
             </form>
         </div>

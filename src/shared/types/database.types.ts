@@ -14,78 +14,24 @@ export type Database = {
   }
   public: {
     Tables: {
-      business_profiles: {
+      app_settings: {
         Row: {
-          id: string
-          owner_type: string
-          business_name: string
-          representative_name: string
-          business_number: string | null
-          address: string | null
-          bank_name: string | null
-          account_number: string | null
-          portfolio_url: string | null
-          intro_document_url: string | null
-          include_portfolio: boolean
-          is_default: boolean
-          created_at: string
+          key: string
+          updated_at: string | null
+          updated_by: string | null
+          value: Json
         }
         Insert: {
-          id?: string
-          owner_type: string
-          business_name: string
-          representative_name: string
-          business_number?: string | null
-          address?: string | null
-          bank_name?: string | null
-          account_number?: string | null
-          portfolio_url?: string | null
-          intro_document_url?: string | null
-          include_portfolio?: boolean
-          is_default?: boolean
-          created_at?: string
+          key: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value: Json
         }
         Update: {
-          id?: string
-          owner_type?: string
-          business_name?: string
-          representative_name?: string
-          business_number?: string | null
-          address?: string | null
-          bank_name?: string | null
-          account_number?: string | null
-          portfolio_url?: string | null
-          intro_document_url?: string | null
-          include_portfolio?: boolean
-          is_default?: boolean
-          created_at?: string
-        }
-        Relationships: []
-      }
-      clients: {
-        Row: {
-          id: string
-          name: string
-          business_number: string | null
-          files: Json
-          contacts: Json
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          name: string
-          business_number?: string | null
-          files?: Json
-          contacts?: Json
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          name?: string
-          business_number?: string | null
-          files?: Json
-          contacts?: Json
-          created_at?: string
+          key?: string
+          updated_at?: string | null
+          updated_by?: string | null
+          value?: Json
         }
         Relationships: []
       }
@@ -93,29 +39,95 @@ export type Database = {
         Row: {
           asset_type: string
           created_at: string | null
+          current_balance: number | null
           id: string
           identifier_keywords: string[] | null
+          is_hidden: boolean
+          is_safety_net: boolean | null
+          last_synced_at: string | null
+          memo: string | null
           name: string
           owner_type: string
+          updated_at: string | null
           user_id: string | null
         }
         Insert: {
           asset_type: string
           created_at?: string | null
+          current_balance?: number | null
           id?: string
           identifier_keywords?: string[] | null
+          is_hidden?: boolean
+          is_safety_net?: boolean | null
+          last_synced_at?: string | null
+          memo?: string | null
           name: string
           owner_type: string
+          updated_at?: string | null
           user_id?: string | null
         }
         Update: {
           asset_type?: string
           created_at?: string | null
+          current_balance?: number | null
           id?: string
           identifier_keywords?: string[] | null
+          is_hidden?: boolean
+          is_safety_net?: boolean | null
+          last_synced_at?: string | null
+          memo?: string | null
           name?: string
           owner_type?: string
+          updated_at?: string | null
           user_id?: string | null
+        }
+        Relationships: []
+      }
+      business_profiles: {
+        Row: {
+          account_number: string | null
+          address: string | null
+          bank_name: string | null
+          business_name: string
+          business_number: string | null
+          created_at: string | null
+          id: string
+          include_portfolio: boolean | null
+          intro_document_url: string | null
+          is_default: boolean | null
+          owner_type: string
+          portfolio_url: string | null
+          representative_name: string
+        }
+        Insert: {
+          account_number?: string | null
+          address?: string | null
+          bank_name?: string | null
+          business_name: string
+          business_number?: string | null
+          created_at?: string | null
+          id?: string
+          include_portfolio?: boolean | null
+          intro_document_url?: string | null
+          is_default?: boolean | null
+          owner_type: string
+          portfolio_url?: string | null
+          representative_name: string
+        }
+        Update: {
+          account_number?: string | null
+          address?: string | null
+          bank_name?: string | null
+          business_name?: string
+          business_number?: string | null
+          created_at?: string | null
+          id?: string
+          include_portfolio?: boolean | null
+          intro_document_url?: string | null
+          is_default?: boolean | null
+          owner_type?: string
+          portfolio_url?: string | null
+          representative_name?: string
         }
         Relationships: []
       }
@@ -143,26 +155,252 @@ export type Database = {
         }
         Relationships: []
       }
-      mdt_allocation_rules: {
+      clients: {
         Row: {
-          category_id: number | null
+          avg_payment_lead_days: number | null
+          business_number: string | null
+          contacts: Json | null
           created_at: string | null
-          id: number
-          keyword: string
+          files: Json | null
+          id: string
+          name: string
+          total_projects_count: number | null
+          total_revenue: number | null
+        }
+        Insert: {
+          avg_payment_lead_days?: number | null
+          business_number?: string | null
+          contacts?: Json | null
+          created_at?: string | null
+          files?: Json | null
+          id?: string
+          name: string
+          total_projects_count?: number | null
+          total_revenue?: number | null
+        }
+        Update: {
+          avg_payment_lead_days?: number | null
+          business_number?: string | null
+          contacts?: Json | null
+          created_at?: string | null
+          files?: Json | null
+          id?: string
+          name?: string
+          total_projects_count?: number | null
+          total_revenue?: number | null
+        }
+        Relationships: []
+      }
+      crew_payments: {
+        Row: {
+          account_info: string | null
+          amount_gross: number
+          amount_net: number | null
+          bank_verified: boolean | null
+          crew_name: string
+          daily_rate_log_id: string
+          id: string
+          paid: boolean | null
+          paid_date: string | null
+          role: string | null
+          verified_at: string | null
+          withholding_rate: number | null
+        }
+        Insert: {
+          account_info?: string | null
+          amount_gross: number
+          amount_net?: number | null
+          bank_verified?: boolean | null
+          crew_name: string
+          daily_rate_log_id: string
+          id?: string
+          paid?: boolean | null
+          paid_date?: string | null
+          role?: string | null
+          verified_at?: string | null
+          withholding_rate?: number | null
+        }
+        Update: {
+          account_info?: string | null
+          amount_gross?: number
+          amount_net?: number | null
+          bank_verified?: boolean | null
+          crew_name?: string
+          daily_rate_log_id?: string
+          id?: string
+          paid?: boolean | null
+          paid_date?: string | null
+          role?: string | null
+          verified_at?: string | null
+          withholding_rate?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "crew_payments_daily_rate_log_id_fkey"
+            columns: ["daily_rate_log_id"]
+            isOneToOne: false
+            referencedRelation: "daily_rate_logs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      crew_profiles: {
+        Row: {
+          account_info: string | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          notes: string | null
+          phone: string | null
+          role: string | null
+          updated_at: string | null
+          user_id: string
+          withholding_rate: number
+        }
+        Insert: {
+          account_info?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          notes?: string | null
+          phone?: string | null
+          role?: string | null
+          updated_at?: string | null
+          user_id: string
+          withholding_rate?: number
+        }
+        Update: {
+          account_info?: string | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          role?: string | null
+          updated_at?: string | null
+          user_id?: string
+          withholding_rate?: number
+        }
+        Relationships: []
+      }
+      daily_rate_logs: {
+        Row: {
+          amount_gross: number
+          amount_net: number | null
+          client_id: string | null
+          created_at: string | null
+          id: string
+          matched_transaction_id: string | null
+          payment_date: string | null
+          payment_status: string | null
+          site_name: string
+          user_id: string | null
+          withholding_rate: number | null
+          work_date: string
+        }
+        Insert: {
+          amount_gross: number
+          amount_net?: number | null
+          client_id?: string | null
+          created_at?: string | null
+          id?: string
+          matched_transaction_id?: string | null
+          payment_date?: string | null
+          payment_status?: string | null
+          site_name: string
+          user_id?: string | null
+          withholding_rate?: number | null
+          work_date: string
+        }
+        Update: {
+          amount_gross?: number
+          amount_net?: number | null
+          client_id?: string | null
+          created_at?: string | null
+          id?: string
+          matched_transaction_id?: string | null
+          payment_date?: string | null
+          payment_status?: string | null
+          site_name?: string
+          user_id?: string | null
+          withholding_rate?: number | null
+          work_date?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "daily_rate_logs_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      import_batches: {
+        Row: {
+          created_at: string | null
+          filename: string | null
+          id: string
+          import_type: string | null
+          metadata: Json | null
+          row_count: number | null
           user_id: string | null
         }
         Insert: {
-          category_id?: number | null
           created_at?: string | null
-          id?: number
-          keyword: string
+          filename?: string | null
+          id?: string
+          import_type?: string | null
+          metadata?: Json | null
+          row_count?: number | null
           user_id?: string | null
         }
         Update: {
+          created_at?: string | null
+          filename?: string | null
+          id?: string
+          import_type?: string | null
+          metadata?: Json | null
+          row_count?: number | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      mdt_allocation_rules: {
+        Row: {
+          business_tag: string | null
+          category_id: number | null
+          created_at: string | null
+          id: number
+          is_business: boolean | null
+          keyword: string
+          match_type: string | null
+          priority: number | null
+          user_id: string | null
+        }
+        Insert: {
+          business_tag?: string | null
           category_id?: number | null
           created_at?: string | null
           id?: number
+          is_business?: boolean | null
+          keyword: string
+          match_type?: string | null
+          priority?: number | null
+          user_id?: string | null
+        }
+        Update: {
+          business_tag?: string | null
+          category_id?: number | null
+          created_at?: string | null
+          id?: number
+          is_business?: boolean | null
           keyword?: string
+          match_type?: string | null
+          priority?: number | null
           user_id?: string | null
         }
         Relationships: [
@@ -298,86 +536,36 @@ export type Database = {
         }
         Relationships: []
       }
-      projects: {
-        Row: {
-          id: string
-          name: string
-          client_id: string | null
-          business_owner: string
-          income_type: string
-          categories: string[]
-          status: string
-          duration_days: number | null
-          start_date: string | null
-          end_date: string | null
-          created_at: string
-        }
-        Insert: {
-          id?: string
-          name: string
-          client_id?: string | null
-          business_owner: string
-          income_type: string
-          categories?: string[]
-          status?: string
-          duration_days?: number | null
-          start_date?: string | null
-          end_date?: string | null
-          created_at?: string
-        }
-        Update: {
-          id?: string
-          name?: string
-          client_id?: string | null
-          business_owner?: string
-          income_type?: string
-          categories?: string[]
-          status?: string
-          duration_days?: number | null
-          start_date?: string | null
-          end_date?: string | null
-          created_at?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "projects_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "clients"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       project_incomes: {
         Row: {
-          id: string
-          project_id: string
-          title: string
           amount: number
+          created_at: string | null
           expected_date: string | null
-          status: string
+          id: string
           matched_transaction_id: string | null
-          created_at: string
+          project_id: string
+          status: string
+          title: string
         }
         Insert: {
-          id?: string
-          project_id: string
-          title: string
           amount?: number
+          created_at?: string | null
           expected_date?: string | null
-          status?: string
+          id?: string
           matched_transaction_id?: string | null
-          created_at?: string
+          project_id: string
+          status?: string
+          title: string
         }
         Update: {
-          id?: string
-          project_id?: string
-          title?: string
           amount?: number
+          created_at?: string | null
           expected_date?: string | null
-          status?: string
+          id?: string
           matched_transaction_id?: string | null
-          created_at?: string
+          project_id?: string
+          status?: string
+          title?: string
         }
         Relationships: [
           {
@@ -389,52 +577,70 @@ export type Database = {
           },
         ]
       }
-      daily_rate_logs: {
+      projects: {
         Row: {
-          id: string
-          user_id: string | null
+          actual_payment_date: string | null
+          business_owner: string
+          categories: string[] | null
+          checklist: Json | null
           client_id: string | null
-          work_date: string
-          site_name: string
-          amount_gross: number
-          withholding_rate: number
-          amount_net: number
-          payment_status: string
-          payment_date: string | null
-          matched_transaction_id: string | null
-          created_at: string
+          created_at: string | null
+          deadline: string | null
+          duration_days: number | null
+          end_date: string | null
+          expected_payment_date: string | null
+          id: string
+          income_type: string
+          invoice_sent_date: string | null
+          memo: string | null
+          name: string
+          start_date: string | null
+          status: string
+          user_id: string | null
         }
         Insert: {
-          id?: string
-          user_id?: string | null
+          actual_payment_date?: string | null
+          business_owner: string
+          categories?: string[] | null
+          checklist?: Json | null
           client_id?: string | null
-          work_date: string
-          site_name: string
-          amount_gross: number
-          withholding_rate?: number
-          amount_net?: number
-          payment_status?: string
-          payment_date?: string | null
-          matched_transaction_id?: string | null
-          created_at?: string
+          created_at?: string | null
+          deadline?: string | null
+          duration_days?: number | null
+          end_date?: string | null
+          expected_payment_date?: string | null
+          id?: string
+          income_type: string
+          invoice_sent_date?: string | null
+          memo?: string | null
+          name: string
+          start_date?: string | null
+          status?: string
+          user_id?: string | null
         }
         Update: {
-          id?: string
-          user_id?: string | null
+          actual_payment_date?: string | null
+          business_owner?: string
+          categories?: string[] | null
+          checklist?: Json | null
           client_id?: string | null
-          work_date?: string
-          site_name?: string
-          amount_gross?: number
-          withholding_rate?: number
-          amount_net?: number
-          payment_status?: string
-          payment_date?: string | null
-          matched_transaction_id?: string | null
-          created_at?: string
+          created_at?: string | null
+          deadline?: string | null
+          duration_days?: number | null
+          end_date?: string | null
+          expected_payment_date?: string | null
+          id?: string
+          income_type?: string
+          invoice_sent_date?: string | null
+          memo?: string | null
+          name?: string
+          start_date?: string | null
+          status?: string
+          user_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "daily_rate_logs_client_id_fkey"
+            foreignKeyName: "projects_client_id_fkey"
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
@@ -442,80 +648,111 @@ export type Database = {
           },
         ]
       }
-      crew_payments: {
+      recurring_expenses: {
         Row: {
+          allocation_status: string | null
+          amount: number
+          category_id: number | null
+          created_at: string | null
+          description: string | null
+          due_day_of_month: number | null
+          frequency: string
           id: string
-          daily_rate_log_id: string
-          crew_name: string
-          role: string | null
-          amount_gross: number
-          withholding_rate: number
-          amount_net: number
-          account_info: string | null
-          paid: boolean
-          paid_date: string | null
+          is_auto_record: boolean | null
+          is_business: boolean | null
+          last_matched_transaction_id: string | null
+          last_recorded_date: string | null
+          name: string
+          next_due_date: string | null
+          owner_type: string | null
+          status: string | null
+          updated_at: string | null
+          user_id: string
         }
         Insert: {
+          allocation_status?: string | null
+          amount: number
+          category_id?: number | null
+          created_at?: string | null
+          description?: string | null
+          due_day_of_month?: number | null
+          frequency: string
           id?: string
-          daily_rate_log_id: string
-          crew_name: string
-          role?: string | null
-          amount_gross: number
-          withholding_rate?: number
-          amount_net?: number
-          account_info?: string | null
-          paid?: boolean
-          paid_date?: string | null
+          is_auto_record?: boolean | null
+          is_business?: boolean | null
+          last_matched_transaction_id?: string | null
+          last_recorded_date?: string | null
+          name: string
+          next_due_date?: string | null
+          owner_type?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id: string
         }
         Update: {
+          allocation_status?: string | null
+          amount?: number
+          category_id?: number | null
+          created_at?: string | null
+          description?: string | null
+          due_day_of_month?: number | null
+          frequency?: string
           id?: string
-          daily_rate_log_id?: string
-          crew_name?: string
-          role?: string | null
-          amount_gross?: number
-          withholding_rate?: number
-          amount_net?: number
-          account_info?: string | null
-          paid?: boolean
-          paid_date?: string | null
+          is_auto_record?: boolean | null
+          is_business?: boolean | null
+          last_matched_transaction_id?: string | null
+          last_recorded_date?: string | null
+          name?: string
+          next_due_date?: string | null
+          owner_type?: string | null
+          status?: string | null
+          updated_at?: string | null
+          user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "crew_payments_daily_rate_log_id_fkey"
-            columns: ["daily_rate_log_id"]
+            foreignKeyName: "recurring_expenses_category_id_fkey"
+            columns: ["category_id"]
             isOneToOne: false
-            referencedRelation: "daily_rate_logs"
+            referencedRelation: "mdt_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "recurring_expenses_last_matched_transaction_id_fkey"
+            columns: ["last_matched_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
             referencedColumns: ["id"]
           },
         ]
       }
       site_expenses: {
         Row: {
-          id: string
-          daily_rate_log_id: string
-          category: string
           amount: number
+          category: string
+          daily_rate_log_id: string
+          id: string
+          included_in_invoice: boolean | null
           memo: string | null
           receipt_url: string | null
-          included_in_invoice: boolean
         }
         Insert: {
-          id?: string
-          daily_rate_log_id: string
-          category: string
           amount: number
+          category: string
+          daily_rate_log_id: string
+          id?: string
+          included_in_invoice?: boolean | null
           memo?: string | null
           receipt_url?: string | null
-          included_in_invoice?: boolean
         }
         Update: {
-          id?: string
-          daily_rate_log_id?: string
-          category?: string
           amount?: number
+          category?: string
+          daily_rate_log_id?: string
+          id?: string
+          included_in_invoice?: boolean | null
           memo?: string | null
           receipt_url?: string | null
-          included_in_invoice?: boolean
         }
         Relationships: [
           {
@@ -536,13 +773,18 @@ export type Database = {
           category_id: number | null
           date: string
           description: string | null
+          excluded_from_personal: boolean | null
           id: string
           import_batch_id: string | null
+          import_hash: string | null
           is_reimbursable: boolean | null
+          is_virtual_salary: boolean | null
           original_currency: string | null
           owner: string | null
+          owner_type: string | null
           project_id: string | null
           receipt_memo: string | null
+          source: string
           source_raw_data: Json | null
           transaction_time: string | null
           user_id: string | null
@@ -555,13 +797,18 @@ export type Database = {
           category_id?: number | null
           date: string
           description?: string | null
+          excluded_from_personal?: boolean | null
           id?: string
           import_batch_id?: string | null
+          import_hash?: string | null
           is_reimbursable?: boolean | null
+          is_virtual_salary?: boolean | null
           original_currency?: string | null
           owner?: string | null
+          owner_type?: string | null
           project_id?: string | null
           receipt_memo?: string | null
+          source?: string
           source_raw_data?: Json | null
           transaction_time?: string | null
           user_id?: string | null
@@ -574,13 +821,18 @@ export type Database = {
           category_id?: number | null
           date?: string
           description?: string | null
+          excluded_from_personal?: boolean | null
           id?: string
           import_batch_id?: string | null
+          import_hash?: string | null
           is_reimbursable?: boolean | null
+          is_virtual_salary?: boolean | null
           original_currency?: string | null
           owner?: string | null
+          owner_type?: string | null
           project_id?: string | null
           receipt_memo?: string | null
+          source?: string
           source_raw_data?: Json | null
           transaction_time?: string | null
           user_id?: string | null
@@ -623,11 +875,90 @@ export type Database = {
           },
         ]
       }
+      user_settings: {
+        Row: {
+          buffer_warning_pct: number | null
+          created_at: string | null
+          id: string
+          income_tax_rate: number | null
+          monthly_living_expense: number | null
+          updated_at: string | null
+          user_id: string
+          virtual_salary_amount: number | null
+          virtual_salary_day: number | null
+        }
+        Insert: {
+          buffer_warning_pct?: number | null
+          created_at?: string | null
+          id?: string
+          income_tax_rate?: number | null
+          monthly_living_expense?: number | null
+          updated_at?: string | null
+          user_id: string
+          virtual_salary_amount?: number | null
+          virtual_salary_day?: number | null
+        }
+        Update: {
+          buffer_warning_pct?: number | null
+          created_at?: string | null
+          id?: string
+          income_tax_rate?: number | null
+          monthly_living_expense?: number | null
+          updated_at?: string | null
+          user_id?: string
+          virtual_salary_amount?: number | null
+          virtual_salary_day?: number | null
+        }
+        Relationships: []
+      }
+      vat_reserves: {
+        Row: {
+          created_at: string | null
+          id: string
+          status: string | null
+          total_income: number | null
+          updated_at: string | null
+          user_id: string
+          vat_10_percent: number | null
+          vat_paid_date: string | null
+          year_month: string
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          total_income?: number | null
+          updated_at?: string | null
+          user_id: string
+          vat_10_percent?: number | null
+          vat_paid_date?: string | null
+          year_month: string
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          status?: string | null
+          total_income?: number | null
+          updated_at?: string | null
+          user_id?: string
+          vat_10_percent?: number | null
+          vat_paid_date?: string | null
+          year_month?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
+      cleanup_transaction_duplicates: {
+        Args: never
+        Returns: {
+          deleted_count: number
+          updated_count: number
+        }[]
+      }
       get_advanced_analytics: {
         Args: { p_mode: string; p_month: number; p_year: number }
         Returns: {
@@ -636,26 +967,37 @@ export type Database = {
           summary: Json
         }[]
       }
+      get_asset_sync_guide: {
+        Args: never
+        Returns: {
+          asset_id: string
+          asset_name: string
+          asset_type: string
+          last_synced_at: string
+          last_transaction_date: string
+          recommended_start_date: string
+        }[]
+      }
       get_dashboard_stats:
-      | {
-        Args: { p_mode: string }
-        Returns: {
-          net_profit: number
-          total_expense: number
-          total_income: number
-          trend: Json
-          unit_breakdown: Json
-        }[]
-      }
-      | {
-        Args: { p_mode: string; p_user_id: string }
-        Returns: {
-          net_profit: number
-          total_expense: number
-          total_income: number
-          trend: Json
-        }[]
-      }
+        | {
+            Args: { p_mode: string }
+            Returns: {
+              net_profit: number
+              total_expense: number
+              total_income: number
+              trend: Json
+              unit_breakdown: Json
+            }[]
+          }
+        | {
+            Args: { p_mode: string; p_user_id: string }
+            Returns: {
+              net_profit: number
+              total_expense: number
+              total_income: number
+              trend: Json
+            }[]
+          }
       get_filtered_transactions: {
         Args: {
           p_limit?: number
@@ -686,6 +1028,7 @@ export type Database = {
           project_name: string
           receipt_memo: string
           source_raw_data: Json
+          tx_owner_type: string
         }[]
       }
       get_unclassified_stats: {
@@ -693,6 +1036,20 @@ export type Database = {
         Returns: {
           amount: number
           count: number
+          owner_type: string
+          raw_name: string
+          sample_date: string
+          total_amount: number
+          transaction_ids: string[]
+          type: string
+        }[]
+      }
+      get_unclassified_stats_test: {
+        Args: never
+        Returns: {
+          amount: number
+          count: number
+          owner_type: string
           raw_name: string
           sample_date: string
           total_amount: number
@@ -716,116 +1073,116 @@ type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-  | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-    DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
-  : never = never,
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-    DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
       Row: infer R
     }
-  ? R
-  : never
+    ? R
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-    DefaultSchema["Views"])
-  ? (DefaultSchema["Tables"] &
-    DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
-      Row: infer R
-    }
-  ? R
-  : never
-  : never
+        DefaultSchema["Views"])
+    ? (DefaultSchema["Tables"] &
+        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+        Row: infer R
+      }
+      ? R
+      : never
+    : never
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-  | keyof DefaultSchema["Tables"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Insert: infer I
-  }
-  ? I
-  : never
+      Insert: infer I
+    }
+    ? I
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-    Insert: infer I
-  }
-  ? I
-  : never
-  : never
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Insert: infer I
+      }
+      ? I
+      : never
+    : never
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-  | keyof DefaultSchema["Tables"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Tables"]
+    | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
-    Update: infer U
-  }
-  ? U
-  : never
+      Update: infer U
+    }
+    ? U
+    : never
   : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-  ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
-    Update: infer U
-  }
-  ? U
-  : never
-  : never
+    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+        Update: infer U
+      }
+      ? U
+      : never
+    : never
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-  | keyof DefaultSchema["Enums"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["Enums"]
+    | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
   : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-  ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
-  : never
+    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+    : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-  | keyof DefaultSchema["CompositeTypes"]
-  | { schema: keyof DatabaseWithoutInternals },
+    | keyof DefaultSchema["CompositeTypes"]
+    | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-  ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
-  : never = never,
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
   ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
   : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-  ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
-  : never
+    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+    : never
 
 export const Constants = {
   public: {

@@ -11,7 +11,7 @@ interface UnitBreakdownProps {
 export function UnitBreakdown({ data }: UnitBreakdownProps) {
     if (!data.unitBreakdown || data.unitBreakdown.length === 0) {
         return (
-            <Card className="glass-panel">
+            <Card className="tactile-panel">
                 <CardHeader>
                     <CardTitle className="text-sm font-medium">Business Unit Breakdown</CardTitle>
                 </CardHeader>
@@ -26,7 +26,7 @@ export function UnitBreakdown({ data }: UnitBreakdownProps) {
     const totalBusinessNet = data.unitBreakdown.reduce((acc, curr) => acc + curr.net, 0);
 
     return (
-        <Card className="glass-panel">
+        <Card className="tactile-panel">
             <CardHeader>
                 <CardTitle className="text-sm font-medium">Business Unit Breakdown</CardTitle>
             </CardHeader>

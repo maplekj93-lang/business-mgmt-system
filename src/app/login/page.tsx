@@ -36,7 +36,7 @@ export default function LoginPage() {
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-background p-4">
-            <Card className="w-full max-w-md glass-panel">
+            <Card className="w-full max-w-md tactile-panel">
                 <CardHeader className="text-center">
                     <CardTitle className="text-2xl">Antigravity ERP</CardTitle>
                     <CardDescription>Enter your credentials to access the system</CardDescription>

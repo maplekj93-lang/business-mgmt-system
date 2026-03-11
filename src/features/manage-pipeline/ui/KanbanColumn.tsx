@@ -39,7 +39,7 @@ export function KanbanColumn({ status, incomes }: KanbanColumnProps) {
         <div
             ref={setNodeRef}
             className={cn(
-                "flex flex-col w-80 min-w-[20rem] bg-slate-900/40 backdrop-blur-xl rounded-2xl p-4 border border-white/5 h-full transition-all relative overflow-hidden",
+                "flex flex-col w-80 min-w-[20rem] bg-background  rounded-2xl p-4   h-full transition-all relative overflow-hidden",
                 isOver && "bg-primary/5 border-primary/30 ring-1 ring-primary/20",
                 status === '작업중' && "ring-1 ring-primary/20 bg-primary/5"
             )}
@@ -50,7 +50,7 @@ export function KanbanColumn({ status, incomes }: KanbanColumnProps) {
                         <h3 className={cn("font-black text-[11px] tracking-widest uppercase italic", statusColor)}>
                             {status}
                         </h3>
-                        <span className="text-[10px] font-black text-white bg-white/5 px-2 py-0.5 rounded-full border border-white/10">
+                        <span className="text-[10px] font-black text-white bg-white/5 px-2 py-0.5 rounded-full">
                             {incomes.length}
                         </span>
                     </div>
@@ -58,7 +58,7 @@ export function KanbanColumn({ status, incomes }: KanbanColumnProps) {
                         ₩{columnTotal.toLocaleString()}
                     </p>
                 </div>
-                <button className="h-6 w-6 rounded-lg bg-white/5 flex items-center justify-center border border-white/10 hover:bg-white/10 transition-colors">
+                <button className="h-6 w-6 rounded-lg bg-white/5 flex items-center justify-center hover:bg-white/10 transition-colors">
                     <Plus className="h-3 w-3 text-slate-400" />
                 </button>
             </div>
@@ -68,11 +68,11 @@ export function KanbanColumn({ status, incomes }: KanbanColumnProps) {
                     <KanbanCard key={income.id} income={income} />
                 ))}
                 {incomes.length === 0 && !isOver && (
-                    <div className="h-32 border-2 border-dashed border-white/5 rounded-2xl flex flex-col items-center justify-center text-[11px] text-slate-600 bg-white/[0.02] gap-2 transition-all hover:bg-white/[0.04]">
-                        <div className="h-8 w-8 rounded-xl bg-white/5 flex items-center justify-center border border-white/10">
+                    <div className="h-32 border-2 border-dashed rounded-2xl flex flex-col items-center justify-center text-[11px] text-slate-600 bg-white/[0.02] gap-2 transition-all hover:bg-white/[0.04]">
+                        <div className="h-8 w-8 rounded-xl bg-white/5 flex items-center justify-center">
                             <Plus className="h-4 w-4 opacity-40" />
                         </div>
-                        <span className="font-bold uppercase tracking-widest opacity-40">Empty Queue</span>
+                        <span className="font-bold uppercase tracking-widest opacity-40">비어 있음</span>
                     </div>
                 )}
             </div>

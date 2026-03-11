@@ -10,7 +10,7 @@ export async function createProject(input: CreateProjectInput): Promise<Project>
 
     const { data, error } = await supabase
         .from('projects')
-        .insert({ ...input, user_id: user?.id, checklist: input.checklist ?? [] })
+        .insert({ ...input, user_id: user?.id, checklist: (input.checklist ?? []) as any })
         .select('*, client:clients(id, name)')
         .single();
 

@@ -60,8 +60,8 @@ export function CategoryListItem({ category, children, isRoot = false }: Categor
     };
 
     return (
-        <div className={cn("space-y-1", isRoot ? "mb-4" : "ml-6 border-l border-white/5 pl-4 py-1")}>
-            <div className="group flex items-center justify-between p-2 rounded-lg hover:bg-white/5 transition-all glass-panel border-white/5">
+        <div className={cn("space-y-1", isRoot ? "mb-4" : "ml-6 border-l  pl-4 py-1")}>
+            <div className="group flex items-center justify-between p-2 rounded-lg hover:bg-white/5 transition-all tactile-panel">
                 <div className="flex items-center gap-3">
                     {children && (
                         <Button
@@ -83,7 +83,7 @@ export function CategoryListItem({ category, children, isRoot = false }: Categor
                         <div className="flex items-center gap-2">
                             <span className="text-[10px] uppercase text-muted-foreground tracking-wider">{category.type}</span>
                             {category.is_business_only && (
-                                <span className="text-[10px] bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded border border-blue-500/20">BUSINESS</span>
+                                <span className="text-[10px] bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded border-blue-500/20">BUSINESS</span>
                             )}
                         </div>
                     </div>

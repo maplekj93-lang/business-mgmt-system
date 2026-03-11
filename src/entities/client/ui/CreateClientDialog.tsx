@@ -197,7 +197,7 @@ export function CreateClientDialog({
                         <Button type="button" variant="ghost" onClick={handleClose} disabled={isLoading}>
                             취소
                         </Button>
-                        <Button type="submit" className="bg-blue-600 hover:bg-blue-700" disabled={isLoading || !name.trim()}>
+                        <Button type="submit" className="bg-primary hover:bg-blue-700" disabled={isLoading || !name.trim()}>
                             {isLoading ? (
                                 <>
                                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />

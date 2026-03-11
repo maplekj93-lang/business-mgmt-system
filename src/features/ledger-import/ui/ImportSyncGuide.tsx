@@ -37,12 +37,12 @@ export function ImportSyncGuide() {
                         </h2>
                     </AccordionTrigger>
                     <AccordionContent>
-                        <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm mt-2">
+                        <div className="rounded-xl border-gray-200 bg-white overflow-hidden shadow-sm mt-2">
                             <table className="w-full text-sm">
                                 <thead>
-                                    <tr className="border-b border-gray-100 bg-gray-50">
-                                        <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-500 w-[30%]">자산</th>
-                                        <th className="text-left px-4 py-2.5 text-xs font-medium text-gray-500">권장 다운로드 구간</th>
+                                    <tr className="border-b border-gray-100 bg-muted">
+                                        <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground w-[30%]">자산</th>
+                                        <th className="text-left px-4 py-2.5 text-xs font-medium text-muted-foreground">권장 다운로드 구간</th>
                                         <th className="w-10 py-2.5" />
                                         <th className="w-10 py-2.5" />
                                     </tr>
@@ -66,7 +66,7 @@ function AssetRow({ asset }: { asset: AssetSyncInfo }) {
     const isCard = asset.asset_type === 'card';
 
     return (
-        <tr className="hover:bg-gray-50/60 transition-colors">
+        <tr className="hover:bg-muted/60 transition-colors">
             {/* 자산명 + 유형 뱃지 */}
             <td className="px-4 py-3">
                 <div className="flex items-center gap-2">
@@ -90,7 +90,7 @@ function AssetRow({ asset }: { asset: AssetSyncInfo }) {
             <td className="pr-1 py-3">
                 <div className="relative group flex justify-center">
                     <button
-                        className="p-1 rounded text-gray-300 hover:text-gray-500 transition-colors"
+                        className="p-1 rounded text-gray-300 hover:text-muted-foreground transition-colors"
                         aria-label="상세 정보"
                     >
                         <Info className="w-3.5 h-3.5" />
@@ -98,13 +98,7 @@ function AssetRow({ asset }: { asset: AssetSyncInfo }) {
 
                     {/* 호버 툴팁 */}
                     <div
-                        className="
-                            absolute z-20 hidden group-hover:block
-                            right-0 top-8
-                            w-56 rounded-xl bg-gray-900 text-white shadow-2xl
-                            text-xs p-3 space-y-2
-                            pointer-events-none
-                        "
+                        className="absolute z-20 hidden group-hover:block right-0 top-8 w-56 rounded-xl bg-gray-900 text-white text-xs p-3 space-y-2 pointer-events-none"
                     >
                         <div className="flex justify-between gap-2">
                             <span className="text-gray-400 shrink-0">마지막 거래일</span>
@@ -164,8 +158,8 @@ function AssetTypeBadge({ type }: { type: string }) {
 
 function SyncGuideSkeleton() {
     return (
-        <div className="mb-6 rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm">
-            <div className="h-9 bg-gray-50 border-b border-gray-100" />
+        <div className="mb-6 rounded-xl border-gray-200 bg-white overflow-hidden shadow-sm">
+            <div className="h-9 bg-muted border-b border-gray-100" />
             {[...Array(3)].map((_, i) => (
                 <div key={i} className="h-12 px-4 flex items-center gap-3 border-b border-gray-50 last:border-0">
                     <div className="w-10 h-5 bg-gray-100 rounded animate-pulse" />
@@ -179,7 +173,7 @@ function SyncGuideSkeleton() {
 
 function SyncGuideError() {
     return (
-        <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+        <div className="mb-6 rounded-xl border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
             동기화 정보를 불러오지 못했습니다. 새로고침 해주세요.
         </div>
     );

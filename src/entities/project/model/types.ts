@@ -21,6 +21,11 @@ export interface Project {
     memo?: string;
     checklist: ChecklistItem[];
     created_at: string;
+    // 리드타임 추적
+    invoice_sent_date?: string | null;
+    expected_payment_date?: string | null;
+    actual_payment_date?: string | null;
+    payment_lead_days?: number; // (Front-computed or DB View)
     // 조인
     client?: { id: string; name: string };
     project_incomes?: ProjectIncome[];

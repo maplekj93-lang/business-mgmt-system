@@ -30,6 +30,7 @@ interface Transaction {
     project_id?: string | null;
     owner_type?: string | null; // [NEW] Database-driven owner type
     asset?: { id: string; name: string; asset_type?: string; owner_type?: string } | null;
+    excluded_from_personal?: boolean;
 }
 
 interface Asset {
@@ -81,7 +82,7 @@ export function TransactionTable({ transactions, businessUnits, assets }: Transa
         <div className="space-y-4">
             {/* Action Bar */}
             {selectedIds.size > 0 && (
-                <div className="flex items-center gap-4 p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-lg animate-in fade-in slide-in-from-top-2">
+                <div className="flex items-center gap-4 p-3 bg-indigo-500/10 border-indigo-500/20 rounded-lg animate-in fade-in slide-in-from-top-2">
                     <span className="text-sm font-medium text-indigo-400 pl-2">
                         {selectedIds.size}개 선택됨
                     </span>
@@ -96,7 +97,7 @@ export function TransactionTable({ transactions, businessUnits, assets }: Transa
                 </div>
             )}
 
-            <div className="rounded-md border border-border overflow-hidden">
+            <div className="rounded-md border- overflow-hidden">
                 <Table>
                     <TableHeader className="bg-muted/50">
                         <TableRow className="hover:bg-transparent border-border">
@@ -128,8 +129,8 @@ export function TransactionTable({ transactions, businessUnits, assets }: Transa
                                 <TableRow
                                     key={tx.id}
                                     className={cn(
-                                        "hover:bg-muted/50 border-border transition-colors cursor-pointer",
-                                        selectedIds.has(tx.id) && "bg-indigo-500/5 hover:bg-indigo-500/10"
+                                        "hover:bg-muted/50 border- transition-colors cursor-pointer",
+                                        selectedIds.has(tx.id) && "bg-background hover:bg-indigo-500/10"
                                     )}
                                     onClick={() => toggleSelect(tx.id)}
                                 >
@@ -146,7 +147,7 @@ export function TransactionTable({ transactions, businessUnits, assets }: Transa
                                             <PopoverTrigger asChild>
                                                 <button
                                                     onClick={(e) => e.stopPropagation()}
-                                                    className="inline-flex focus:outline-none"
+                                                    className={cn("inline-flex focus:outline-none", tx.excluded_from_personal && "opacity-50")}
                                                 >
                                                     <Badge variant="outline" className="font-medium text-[11px] bg-slate-100 text-slate-800 border-0 px-2 py-0.5 whitespace-nowrap cursor-pointer hover:bg-slate-200 transition-colors">
                                                         {OWNER_OPTIONS.find(o => o.value === tx.owner_type)?.label || '미상'}
@@ -211,7 +212,7 @@ export function TransactionTable({ transactions, businessUnits, assets }: Transa
                                             <PopoverTrigger asChild>
                                                 <button
                                                     onClick={(e) => e.stopPropagation()}
-                                                    className="inline-flex focus:outline-none"
+                                                    className={cn("inline-flex focus:outline-none", tx.excluded_from_personal && "opacity-50")}
                                                 >
                                                     <Badge
                                                         variant="outline"
@@ -307,11 +308,12 @@ export function TransactionTable({ transactions, businessUnits, assets }: Transa
                                             </div>
                                         )}
                                     </TableCell>
-                                    <TableCell className="text-foreground/90">{tx.description}</TableCell>
+                                    <TableCell className={cn("text-foreground/90", tx.excluded_from_personal && "line-through opacity-50")}>{tx.description}</TableCell>
                                     <TableCell className={cn(
                                         "text-right font-medium whitespace-nowrap",
-                                        tx.amount > 0 ? "text-primary" :
-                                            tx.amount < 0 ? "text-destructive" : "text-muted-foreground"
+                                        tx.excluded_from_personal && "line-through opacity-50",
+                                        !tx.excluded_from_personal && tx.amount > 0 ? "text-primary" :
+                                            !tx.excluded_from_personal && tx.amount < 0 ? "text-destructive" : "text-muted-foreground"
                                     )}>
                                         {tx.amount > 0 ? '+' : ''}{formatCurrency(tx.amount)}원
                                     </TableCell>

@@ -16,7 +16,7 @@ export function TrendChart({ data }: { data: SummaryStats }) {
     };
 
     return (
-        <div className="glass-panel p-6 h-[400px] flex flex-col">
+        <div className="tactile-panel p-6 h-[400px] flex flex-col">
             <h3 className="text-lg font-semibold mb-6">월별 자산 흐름</h3>
             <div className="flex-1 w-full min-h-0">
                 <ResponsiveContainer width="100%" height="100%">

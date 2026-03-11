@@ -26,23 +26,27 @@ export function AnalyticsFilter() {
     }
 
     return (
-        <Card className="flex gap-4 p-4 glass-panel border-white/5 items-center">
+        <Card className="flex gap-4 p-4 tactile-panel items-center">
             <div className="flex items-center gap-2">
                 <label className="text-sm font-medium text-muted-foreground">연도</label>
                 <select
-                    className="h-9 w-[100px] rounded-md border border-white/10 bg-black/20 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    className="h-9 w-[100px] rounded-md bg-black/20 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                     value={currentYear}
                     onChange={handleYearChange}
                 >
-                    <option value="2024">2024년</option>
-                    <option value="2025">2025년</option>
+                    {Array.from(
+                        { length: Math.max(1, new Date().getFullYear() - 2025 + 1) }, 
+                        (_, i) => 2025 + i
+                    ).map(y => (
+                        <option key={y} value={y}>{y}년</option>
+                    ))}
                 </select>
             </div>
 
             <div className="flex items-center gap-2">
                 <label className="text-sm font-medium text-muted-foreground">월</label>
                 <select
-                    className="h-9 w-[100px] rounded-md border border-white/10 bg-black/20 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                    className="h-9 w-[100px] rounded-md bg-black/20 px-3 py-1 text-sm shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
                     value={currentMonth}
                     onChange={handleMonthChange}
                 >

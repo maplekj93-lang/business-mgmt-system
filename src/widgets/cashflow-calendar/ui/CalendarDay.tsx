@@ -21,7 +21,7 @@ export function CalendarDay({ day, currentMonth, inflow, outflow, isSelected, on
         <div
             onClick={() => onClick?.(day)}
             className={cn(
-                "group relative min-h-[100px] p-2 bg-slate-900/20 border border-white/5 transition-all hover:bg-white/[0.04] cursor-pointer",
+                "group relative min-h-[100px] p-2 bg-background/50   transition-all hover:bg-white/[0.04] cursor-pointer",
                 !isCurrentMonth && "opacity-30 grayscale-[50%]",
                 isSelected && "bg-primary/10 border-primary/30 z-10 ring-1 ring-primary/20",
                 isDayToday && "bg-white/[0.02]"
@@ -59,7 +59,7 @@ export function CalendarDay({ day, currentMonth, inflow, outflow, isSelected, on
             </div>
 
             {/* Hover Indicator */}
-            <div className="absolute inset-0 border-2 border-white/0 group-hover:border-white/5 transition-all rounded-sm pointer-events-none" />
+            <div className="absolute inset-0 border-2 border-white/0 group-hover: transition-all rounded-sm pointer-events-none" />
         </div>
     );
 }

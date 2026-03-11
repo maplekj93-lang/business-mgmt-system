@@ -1,28 +1,22 @@
-import { Logo } from './logo';
 import { UserBadge } from './user-badge';
-import { NavActions } from './nav-actions';
-import { ContextSwitcher } from './context-switcher';
+import { ModeToggle } from '@/shared/ui/mode-toggle';
 
 interface HeaderProps {
     userEmail?: string | null;
-    defaultMode?: 'personal' | 'total' | 'business';
 }
 
-export function Header({ userEmail, defaultMode = 'personal' }: HeaderProps) {
+export function Header({ userEmail }: HeaderProps) {
     return (
-        <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-            <div className="container flex h-14 items-center justify-between px-4 max-w-7xl mx-auto">
-                {/* Left: Logo & Context Switcher */}
-                <div className="flex items-center gap-4">
-                    <Logo />
-                    <ContextSwitcher defaultMode={defaultMode} />
-                </div>
+        <header className="h-20 flex items-center justify-between px-8 border-none bg-background/80 sticky top-0 z-40 [box-shadow:var(--tactile-shadow-sm)]">
+            <div className="flex items-center gap-4">
+                {/* Page Title or Breadcrumb will go here later */}
+                <h2 className="text-sm font-medium text-muted-foreground italic">Dashboard Overview</h2>
+            </div>
 
-                {/* Right: User Profile & Navigation & Logout */}
-                <div className="flex items-center gap-3">
-                    <UserBadge email={userEmail} />
-                    <NavActions />
-                </div>
+            <div className="flex items-center gap-4">
+                <ModeToggle />
+                <div className="h-4 w-[1px] bg-border/50 mx-2" />
+                <UserBadge email={userEmail} />
             </div>
         </header>
     );

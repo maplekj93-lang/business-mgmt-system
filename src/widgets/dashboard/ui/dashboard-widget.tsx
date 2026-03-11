@@ -5,15 +5,12 @@ import { TrendChart } from './trend-chart';
 import { UnitBreakdown } from './unit-breakdown';
 
 // Allow viewMode to be passed as prop (for future filtering support)
-export async function DashboardWidget({ viewMode = 'all' }: { viewMode?: 'personal' | 'business' | 'all' }) {
-    const stats = await getMonthlyStats();
-
-    const cookieStore = await cookies();
-    const appMode = (cookieStore.get('app-mode')?.value as 'personal' | 'total' | 'business') || 'personal';
+export async function DashboardWidget({ viewMode = 'personal' }: { viewMode?: 'personal' | 'business' | 'all' }) {
+    const stats = await getMonthlyStats({ mode: viewMode === 'all' ? 'total' : viewMode });
 
     if (!stats) {
         return (
-            <div className="w-full max-w-4xl mx-auto p-12 glass-panel text-center space-y-4">
+            <div className="w-full max-w-4xl mx-auto p-12 tactile-panel text-center space-y-4">
                 <h3 className="text-xl font-bold">Please sign in to view your financial data.</h3>
                 <p className="text-muted-foreground text-sm">Your session may have expired or you are not logged in.</p>
                 {/* Future: Add Login Button here */}
@@ -21,9 +18,9 @@ export async function DashboardWidget({ viewMode = 'all' }: { viewMode?: 'person
         );
     }
 
-    const dashboardTitle = appMode === 'business'
+    const dashboardTitle = viewMode === 'business'
         ? 'Business Operations'
-        : appMode === 'total'
+        : viewMode === 'all'
             ? 'Integrated Wealth Flow'
             : 'Personal Dashboard';
 
@@ -34,11 +31,11 @@ export async function DashboardWidget({ viewMode = 'all' }: { viewMode?: 'person
                     {dashboardTitle}
                 </h2>
                 <div className="flex items-center gap-2">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${appMode === 'business' ? 'bg-indigo-500/20 text-indigo-300'
-                            : appMode === 'total' ? 'bg-amber-500/20 text-amber-300'
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${viewMode === 'business' ? 'bg-indigo-500/20 text-indigo-300'
+                            : viewMode === 'all' ? 'bg-amber-500/20 text-amber-300'
                                 : 'bg-primary/10 text-primary'
                         }`}>
-                        {appMode.toUpperCase()} VIEW
+                        {viewMode.toUpperCase()} VIEW
                     </span>
                 </div>
             </div>
@@ -50,7 +47,7 @@ export async function DashboardWidget({ viewMode = 'all' }: { viewMode?: 'person
                     <TrendChart data={stats} />
                 </div>
                 <div>
-                    {(appMode === 'business' || appMode === 'total') && <UnitBreakdown data={stats} />}
+                    {(viewMode === 'business' || viewMode === 'all') && <UnitBreakdown data={stats} />}
                 </div>
             </div>
         </div>

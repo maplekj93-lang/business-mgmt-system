@@ -110,7 +110,7 @@ export function ClientSelect({ value, onValueChange }: ClientSelectProps) {
                                         <div className="flex items-center">
                                             <Check
                                                 className={cn(
-                                                    "mr-2 h-4 w-4 text-blue-600",
+                                                    "mr-2 h-4 w-4 text-primary",
                                                     value === client.id ? "opacity-100" : "opacity-0"
                                                 )}
                                             />
@@ -129,7 +129,7 @@ export function ClientSelect({ value, onValueChange }: ClientSelectProps) {
                             <Button
                                 variant="ghost"
                                 size="sm"
-                                className="w-full justify-start gap-2 h-9 text-blue-600 hover:text-blue-700 hover:bg-blue-50 font-bold"
+                                className="w-full justify-start gap-2 h-9 text-primary hover:text-blue-700 hover:bg-blue-50 font-bold"
                                 onClick={() => {
                                     setDialogOpen(true)
                                 }}

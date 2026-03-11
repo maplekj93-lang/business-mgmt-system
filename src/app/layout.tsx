@@ -18,6 +18,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  console.log('--- ROOT LAYOUT RENDERING ---');
   return (
     <html lang="ko" suppressHydrationWarning>
       <body className={cn(inter.className, "antialiased")}>

@@ -42,7 +42,7 @@ export function CategoryDonutChart({ data, totalAmount }: CategoryDonutChartProp
     };
 
     return (
-        <Card className="flex flex-col glass-panel border-border h-full">
+        <Card className="flex flex-col tactile-panel border- h-full">
             <CardHeader className="items-center pb-0">
                 <CardTitle>지출 분포</CardTitle>
                 <CardDescription>카테고리별 지출 비중</CardDescription>

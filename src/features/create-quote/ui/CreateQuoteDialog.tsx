@@ -100,7 +100,7 @@ export function CreateQuoteDialog({ project, profile }: CreateQuoteDialogProps) 
                             <div className="text-lg font-bold">
                                 예상 합계: {items.reduce((s, i) => s + (i.quantity * i.price), 0).toLocaleString()}원
                             </div>
-                            <Button className="bg-blue-600 hover:bg-blue-700" onClick={() => setIsPreview(true)}>
+                            <Button className="bg-primary hover:bg-blue-700" onClick={() => setIsPreview(true)}>
                                 미리보기 및 출력
                             </Button>
                         </div>

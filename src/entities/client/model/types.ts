@@ -17,4 +17,5 @@ export interface Client {
     total_revenue?: number;
     project_count?: number;
     last_project_at?: string;
+    avg_payment_lead_days?: number;
 }

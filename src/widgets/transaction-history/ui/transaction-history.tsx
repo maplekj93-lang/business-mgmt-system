@@ -1,5 +1,5 @@
 import React from 'react';
-import { cookies } from 'next/headers';
+
 import { createClient } from '@/shared/api/supabase/server';
 import { getTransactions } from '@/entities/transaction/api/get-transactions';
 import { getBusinessUnits } from '@/entities/business';
@@ -10,16 +10,15 @@ import { TransactionTable } from './transaction-table';
 import { getAssets } from '@/entities/asset/api/get-assets';
 
 async function TransactionHistoryWidget({
-    searchParams
+    searchParams,
+    mode = 'personal'
 }: {
-    searchParams?: { year?: string; month?: string }
+    searchParams?: { year?: string; month?: string },
+    mode?: 'personal' | 'business' | 'total'
 }) {
     // 1. Context Read
     const supabase = await createClient();
     const { data: { user } } = await supabase.auth.getUser();
-
-    const cookieStore = await cookies();
-    const appMode = (cookieStore.get('app-mode')?.value as 'personal' | 'business') || 'personal';
 
     const year = searchParams?.year ? Number(searchParams.year) : new Date().getFullYear();
     const month = searchParams?.month ? Number(searchParams.month) : undefined;
@@ -27,7 +26,7 @@ async function TransactionHistoryWidget({
 
     if (!user) {
         return (
-            <div className="glass-panel p-12 text-center space-y-4">
+            <div className="tactile-panel p-12 text-center space-y-4">
                 <h3 className="text-xl font-bold italic opacity-50 text-foreground">Transaction History Blocked</h3>
                 <p className="text-muted-foreground text-sm">Authentication required to view detailed ledger entries.</p>
             </div>
@@ -41,7 +40,7 @@ async function TransactionHistoryWidget({
             limit,
             year,
             month,
-            mode: appMode // API에 모드 전달
+            mode: mode as 'personal' | 'business' // API에 모드 전달
         }),
         getBusinessUnits(),
         getAllCategories(),
@@ -85,18 +84,18 @@ async function TransactionHistoryWidget({
 
     return (
         // ✅ Glassmorphism Container Applied (헌법 제4조)
-        <div className="glass-panel p-6 space-y-4">
+        <div className="tactile-panel p-6 space-y-4">
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
                     <h2 className="text-xl font-bold text-foreground">
-                        {appMode === 'business' ? '사업 지출 내역' : '거래 내역'}
+                        {mode === 'business' ? '사업 지출 내역' : '거래 내역'}
                     </h2>
                     {/* 모드 표시 배지 */}
-                    <span className={`text-xs px-2 py-0.5 rounded-full ${appMode === 'business'
+                    <span className={`text-xs px-2 py-0.5 rounded-full ${mode === 'business'
                         ? 'bg-indigo-500/20 text-indigo-300'
                         : 'bg-primary/10 text-primary'
                         }`}>
-                        {appMode === 'business' ? 'Business Mode' : 'Personal Mode'}
+                        {mode === 'business' ? 'Business Mode' : 'Personal Mode'}
                     </span>
                 </div>
                 <span className="text-sm text-muted-foreground">{transactions.length}건 조회됨</span>

@@ -21,20 +21,22 @@ export async function bulkUpdateTransactions(
 
     try {
         // 1. Update Transactions
-        const updateData: any = {
+        const updateData: {
+          category_id: number;
+          allocation_status: 'personal' | 'business_allocated';
+          business_unit_id?: string | null;
+        } = {
             category_id: categoryId,
+            allocation_status: businessUnitId ? 'business_allocated' : 'personal'
         };
 
         if (businessUnitId) {
-            updateData.allocation_status = 'business_allocated';
             updateData.business_unit_id = businessUnitId;
-        } else {
-            updateData.allocation_status = 'personal';
         }
 
-        const { data: updatedRows, error: txError } = await (supabase
-            .from('transactions') as any)
-            .update(updateData)
+        const { data: updatedRows, error: txError } = await supabase
+            .from('transactions')
+            .update(updateData as any) // Partial update sometimes needs as any if optional fields conflict
             .in('id', transactionIds)
             .select('id');
 
@@ -45,10 +47,8 @@ export async function bulkUpdateTransactions(
 
         // 2. Create Rule (if requested)
         if (createRule && ruleKeyword) {
-            // Check existence first or rely on UNIQUE constraint?
-            // UPSERT strategy: On conflict, update category
-            const { error: ruleError } = await (supabase
-                .from('mdt_allocation_rules' as any) as any)
+            const { error: ruleError } = await supabase
+                .from('mdt_allocation_rules')
                 .upsert({
                     user_id: user.id,
                     keyword: ruleKeyword,

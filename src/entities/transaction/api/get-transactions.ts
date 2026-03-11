@@ -35,6 +35,7 @@ interface FilteredTransactionRpcResponse {
     project_name?: string;
     receipt_memo?: string;
     is_reimbursable?: boolean;
+    excluded_from_personal?: boolean;
 }
 
 export async function getTransactions(params: GetTransactionsParams = {}): Promise<Transaction[]> {
@@ -49,15 +50,14 @@ export async function getTransactions(params: GetTransactionsParams = {}): Promi
     // Determine Mode (Default to personal if not provided)
     const appMode = params.mode || 'personal';
 
-    // 2. Query Builder (Constitution Art 3: Database-First)
-    // We use a dedicated RPC to handle complex business/personal logic correctly.
-    const { data: rawTxs, error: txError } = await (supabase.rpc as any)('get_filtered_transactions', {
+    // 2. Query (Type Safe)
+    const { data: rawTxs, error: txError } = await supabase.rpc('get_filtered_transactions', {
         p_mode: appMode,
-        p_year: params.year || undefined,
-        p_month: params.month || undefined,
-        p_page: params.page || 1,
-        p_limit: params.limit || 50
-    });
+        p_year: params.year ?? null,
+        p_month: params.month ?? null,
+        p_page: params.page ?? 1,
+        p_limit: params.limit ?? 50
+    } as any); // RPC overloads might still need partial as any if types disagree on nulls
 
     if (txError) {
         console.error('getTransactions RPC Error:', txError);
@@ -87,6 +87,7 @@ export async function getTransactions(params: GetTransactionsParams = {}): Promi
         project_id: row.project_id || null, // [NEW]
         receipt_memo: row.receipt_memo || null, // [NEW]
         is_reimbursable: row.is_reimbursable || false, // [NEW]
+        excluded_from_personal: row.excluded_from_personal || false,
         category: row.category_id ? {
             id: row.category_id,
             name: row.category_name,
