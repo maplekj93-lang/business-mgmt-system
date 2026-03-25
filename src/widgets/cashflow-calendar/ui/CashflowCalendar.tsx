@@ -13,6 +13,7 @@ import { CalendarGrid } from './CalendarGrid';
 import { CalendarSidebar } from './CalendarSidebar';
 import { getTransactions } from '@/entities/transaction/api/get-transactions';
 import { getPipelineIncomes } from '@/entities/project/api/get-pipeline';
+import { getDutchPayGroups } from '@/entities/dutch-pay/api/get-dutch-pay';
 import { Button } from '@/shared/ui/button';
 
 export function CashflowCalendar() {
@@ -20,6 +21,7 @@ export function CashflowCalendar() {
     const [selectedDate, setSelectedDate] = useState<Date>(new Date());
     const [historicalData, setHistoricalData] = useState<any[]>([]);
     const [pipelineData, setPipelineData] = useState<any[]>([]);
+    const [dutchPayData, setDutchPayData] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -30,13 +32,15 @@ export function CashflowCalendar() {
                 const month = currentMonth.getMonth() + 1;
 
                 // Concurrent fetching
-                const [txs, pipeline] = await Promise.all([
+                const [txs, pipeline, dutchPay] = await Promise.all([
                     getTransactions({ year, month, mode: 'business', limit: 300 }),
-                    getPipelineIncomes('all') // Pipeline is relatively small, fetch all and filter client-side
+                    getPipelineIncomes('all'), // Pipeline is relatively small, fetch all and filter client-side
+                    getDutchPayGroups({ isSettled: false })
                 ]);
-
++
                 setHistoricalData(txs);
                 setPipelineData(pipeline);
+                setDutchPayData(dutchPay);
             } catch (error) {
                 console.error('Failed to fetch calendar data:', error);
             } finally {
@@ -48,7 +52,7 @@ export function CashflowCalendar() {
 
     // Map data to calendar grid
     const mappedData = useMemo(() => {
-        const data: Record<string, { inflow: number; outflow: number }> = {};
+        const data: Record<string, { inflow: number; outflow: number; dutchPay?: number }> = {};
 
         // 1. Process Historical Transactions
         historicalData.forEach(tx => {
@@ -72,8 +76,26 @@ export function CashflowCalendar() {
             data[dateStr].inflow += income.amount;
         });
 
+        // 3. Process Dutch Pay (Settlement to receive)
+        dutchPayData.forEach(group => {
+            const dateStr = group.due_date || group.created_at.split('T')[0];
+            if (!data[dateStr]) data[dateStr] = { inflow: 0, outflow: 0 };
+            
+            // Calculate amount to receive for this group
+            let amountToReceive = 0;
+            group.members.forEach((m: any) => {
+                if (m.name !== '나' && !m.is_paid) {
+                    amountToReceive += m.amount_to_pay;
+                }
+            });
+            
+            if (amountToReceive > 0) {
+                data[dateStr].dutchPay = (data[dateStr].dutchPay || 0) + amountToReceive;
+            }
+        });
+
         return data;
-    }, [historicalData, pipelineData]);
+    }, [historicalData, pipelineData, dutchPayData]);
 
     const handlePrevMonth = () => setCurrentMonth(subMonths(currentMonth, 1));
     const handleNextMonth = () => setCurrentMonth(addMonths(currentMonth, 1));

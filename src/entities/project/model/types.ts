@@ -15,13 +15,14 @@ export interface Project {
     categories: string[];
     status: ProjectStatus;
     duration_days?: number;
-    start_date?: string;
-    end_date?: string;
-    deadline?: string;
-    memo?: string;
+    start_date?: string | null;
+    end_date?: string | null;
+    deadline?: string | null;
+    memo?: string | null;
     checklist: ChecklistItem[];
     created_at: string;
     // 리드타임 추적
+    quote_sent_date?: string | null;
     invoice_sent_date?: string | null;
     expected_payment_date?: string | null;
     actual_payment_date?: string | null;

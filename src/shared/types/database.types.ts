@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      activity_logs: {
+        Row: {
+          action_type: string
+          created_at: string | null
+          entity_id: string | null
+          entity_type: string
+          id: string
+          new_data: Json | null
+          previous_data: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          action_type: string
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type: string
+          id?: string
+          new_data?: Json | null
+          previous_data?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          action_type?: string
+          created_at?: string | null
+          entity_id?: string | null
+          entity_type?: string
+          id?: string
+          new_data?: Json | null
+          previous_data?: Json | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       app_settings: {
         Row: {
           key: string
@@ -203,6 +236,7 @@ export type Database = {
           paid: boolean | null
           paid_date: string | null
           role: string | null
+          vat_type: string | null
           verified_at: string | null
           withholding_rate: number | null
         }
@@ -217,6 +251,7 @@ export type Database = {
           paid?: boolean | null
           paid_date?: string | null
           role?: string | null
+          vat_type?: string | null
           verified_at?: string | null
           withholding_rate?: number | null
         }
@@ -231,6 +266,7 @@ export type Database = {
           paid?: boolean | null
           paid_date?: string | null
           role?: string | null
+          vat_type?: string | null
           verified_at?: string | null
           withholding_rate?: number | null
         }
@@ -298,6 +334,7 @@ export type Database = {
           payment_status: string | null
           site_name: string
           user_id: string | null
+          vat_type: string | null
           withholding_rate: number | null
           work_date: string
         }
@@ -312,6 +349,7 @@ export type Database = {
           payment_status?: string | null
           site_name: string
           user_id?: string | null
+          vat_type?: string | null
           withholding_rate?: number | null
           work_date: string
         }
@@ -326,6 +364,7 @@ export type Database = {
           payment_status?: string | null
           site_name?: string
           user_id?: string | null
+          vat_type?: string | null
           withholding_rate?: number | null
           work_date?: string
         }
@@ -335,6 +374,132 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dutch_pay_groups: {
+        Row: {
+          created_at: string | null
+          due_date: string | null
+          id: string
+          is_settled: boolean | null
+          name: string
+          owner_id: string | null
+          total_amount: number
+          transaction_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          due_date?: string | null
+          id?: string
+          is_settled?: boolean | null
+          name: string
+          owner_id?: string | null
+          total_amount?: number
+          transaction_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          due_date?: string | null
+          id?: string
+          is_settled?: boolean | null
+          name?: string
+          owner_id?: string | null
+          total_amount?: number
+          transaction_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dutch_pay_groups_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dutch_pay_members: {
+        Row: {
+          amount_to_pay: number
+          created_at: string | null
+          group_id: string | null
+          id: string
+          is_paid: boolean | null
+          name: string
+          paid_at: string | null
+        }
+        Insert: {
+          amount_to_pay?: number
+          created_at?: string | null
+          group_id?: string | null
+          id?: string
+          is_paid?: boolean | null
+          name: string
+          paid_at?: string | null
+        }
+        Update: {
+          amount_to_pay?: number
+          created_at?: string | null
+          group_id?: string | null
+          id?: string
+          is_paid?: boolean | null
+          name?: string
+          paid_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dutch_pay_members_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "dutch_pay_groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      fixed_expense_rules: {
+        Row: {
+          amount: number
+          category_id: number | null
+          created_at: string | null
+          day_of_month: number
+          id: string
+          is_active: boolean
+          name: string
+          owner_type: string | null
+          tolerance_days: number
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          category_id?: number | null
+          created_at?: string | null
+          day_of_month: number
+          id?: string
+          is_active?: boolean
+          name: string
+          owner_type?: string | null
+          tolerance_days?: number
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          category_id?: number | null
+          created_at?: string | null
+          day_of_month?: number
+          id?: string
+          is_active?: boolean
+          name?: string
+          owner_type?: string | null
+          tolerance_days?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "fixed_expense_rules_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "mdt_categories"
             referencedColumns: ["id"]
           },
         ]
@@ -368,6 +533,57 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      kakao_pay_mappings: {
+        Row: {
+          amount: number
+          category_id: number | null
+          created_at: string | null
+          id: string
+          kakao_merchant_name: string
+          kakao_type: string | null
+          matched_date: string | null
+          metadata: Json | null
+          source_transaction_id: string
+        }
+        Insert: {
+          amount: number
+          category_id?: number | null
+          created_at?: string | null
+          id?: string
+          kakao_merchant_name: string
+          kakao_type?: string | null
+          matched_date?: string | null
+          metadata?: Json | null
+          source_transaction_id: string
+        }
+        Update: {
+          amount?: number
+          category_id?: number | null
+          created_at?: string | null
+          id?: string
+          kakao_merchant_name?: string
+          kakao_type?: string | null
+          matched_date?: string | null
+          metadata?: Json | null
+          source_transaction_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kakao_pay_mappings_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "mdt_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kakao_pay_mappings_source_transaction_id_fkey"
+            columns: ["source_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       mdt_allocation_rules: {
         Row: {
@@ -594,6 +810,7 @@ export type Database = {
           invoice_sent_date: string | null
           memo: string | null
           name: string
+          quote_sent_date: string | null
           start_date: string | null
           status: string
           user_id: string | null
@@ -614,6 +831,7 @@ export type Database = {
           invoice_sent_date?: string | null
           memo?: string | null
           name: string
+          quote_sent_date?: string | null
           start_date?: string | null
           status?: string
           user_id?: string | null
@@ -634,6 +852,7 @@ export type Database = {
           invoice_sent_date?: string | null
           memo?: string | null
           name?: string
+          quote_sent_date?: string | null
           start_date?: string | null
           status?: string
           user_id?: string | null
@@ -764,11 +983,63 @@ export type Database = {
           },
         ]
       }
+      transaction_breakdowns: {
+        Row: {
+          amount: number
+          category_id: number | null
+          created_at: string | null
+          description: string
+          excluded_from_personal: boolean | null
+          id: string
+          metadata: Json | null
+          source_transaction_id: string
+          track: string | null
+        }
+        Insert: {
+          amount: number
+          category_id?: number | null
+          created_at?: string | null
+          description: string
+          excluded_from_personal?: boolean | null
+          id?: string
+          metadata?: Json | null
+          source_transaction_id: string
+          track?: string | null
+        }
+        Update: {
+          amount?: number
+          category_id?: number | null
+          created_at?: string | null
+          description?: string
+          excluded_from_personal?: boolean | null
+          id?: string
+          metadata?: Json | null
+          source_transaction_id?: string
+          track?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "transaction_breakdowns_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "mdt_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transaction_breakdowns_source_transaction_id_fkey"
+            columns: ["source_transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       transactions: {
         Row: {
           allocation_status: string | null
           amount: number
           asset_id: string | null
+          breakdown_source_id: string | null
           business_unit_id: string | null
           category_id: number | null
           date: string
@@ -779,10 +1050,15 @@ export type Database = {
           import_hash: string | null
           is_reimbursable: boolean | null
           is_virtual_salary: boolean | null
+          kakao_pay_row_id: string | null
+          manual_override: boolean
+          metadata: Json | null
+          normalized_name: string | null
           original_currency: string | null
           owner: string | null
           owner_type: string | null
           project_id: string | null
+          raw_description: string
           receipt_memo: string | null
           source: string
           source_raw_data: Json | null
@@ -793,6 +1069,7 @@ export type Database = {
           allocation_status?: string | null
           amount: number
           asset_id?: string | null
+          breakdown_source_id?: string | null
           business_unit_id?: string | null
           category_id?: number | null
           date: string
@@ -803,10 +1080,15 @@ export type Database = {
           import_hash?: string | null
           is_reimbursable?: boolean | null
           is_virtual_salary?: boolean | null
+          kakao_pay_row_id?: string | null
+          manual_override?: boolean
+          metadata?: Json | null
+          normalized_name?: string | null
           original_currency?: string | null
           owner?: string | null
           owner_type?: string | null
           project_id?: string | null
+          raw_description: string
           receipt_memo?: string | null
           source?: string
           source_raw_data?: Json | null
@@ -817,6 +1099,7 @@ export type Database = {
           allocation_status?: string | null
           amount?: number
           asset_id?: string | null
+          breakdown_source_id?: string | null
           business_unit_id?: string | null
           category_id?: number | null
           date?: string
@@ -827,10 +1110,15 @@ export type Database = {
           import_hash?: string | null
           is_reimbursable?: boolean | null
           is_virtual_salary?: boolean | null
+          kakao_pay_row_id?: string | null
+          manual_override?: boolean
+          metadata?: Json | null
+          normalized_name?: string | null
           original_currency?: string | null
           owner?: string | null
           owner_type?: string | null
           project_id?: string | null
+          raw_description?: string
           receipt_memo?: string | null
           source?: string
           source_raw_data?: Json | null
@@ -843,6 +1131,13 @@ export type Database = {
             columns: ["asset_id"]
             isOneToOne: false
             referencedRelation: "assets"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "transactions_breakdown_source_id_fkey"
+            columns: ["breakdown_source_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
             referencedColumns: ["id"]
           },
           {
@@ -874,6 +1169,27 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ungroupable_merchants: {
+        Row: {
+          created_at: string | null
+          id: string
+          normalized_name: string
+          reason: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          normalized_name: string
+          reason?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          normalized_name?: string
+          reason?: string | null
+        }
+        Relationships: []
       }
       user_settings: {
         Row: {
@@ -952,6 +1268,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_cashflow_stats: {
+        Args: { p_end_date: string; p_start_date: string; p_user_id: string }
+        Returns: Json
+      }
       cleanup_transaction_duplicates: {
         Args: never
         Returns: {
@@ -978,6 +1298,20 @@ export type Database = {
           recommended_start_date: string
         }[]
       }
+      get_clients_with_stats: {
+        Args: never
+        Returns: {
+          business_number: string
+          contacts: Json
+          created_at: string
+          files: Json
+          id: string
+          last_project_at: string
+          name: string
+          project_count: number
+          total_revenue: number
+        }[]
+      }
       get_dashboard_stats:
         | {
             Args: { p_mode: string }
@@ -1000,6 +1334,7 @@ export type Database = {
           }
       get_filtered_transactions: {
         Args: {
+          p_date_filter?: string
           p_limit?: number
           p_mode?: string
           p_month?: number
@@ -1022,6 +1357,7 @@ export type Database = {
           description: string
           id: string
           is_reimbursable: boolean
+          is_scheduled: boolean
           owner_type: string
           parent_category_name: string
           project_id: string
@@ -1036,6 +1372,7 @@ export type Database = {
         Returns: {
           amount: number
           count: number
+          is_groupable: boolean
           owner_type: string
           raw_name: string
           sample_date: string

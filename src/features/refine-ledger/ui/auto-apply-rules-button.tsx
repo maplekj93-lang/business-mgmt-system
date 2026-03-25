@@ -7,6 +7,7 @@ import { Sparkles, Loader2 } from 'lucide-react';
 import { applyTaggingRules } from '../api/apply-tagging-rules';
 import { toast } from 'sonner';
 import { useRouter } from 'next/navigation';
+import { ApplyRulesResult } from '../model/ai-classification';
 
 interface Props {
   transactionIds: string[];
@@ -20,22 +21,20 @@ export function AutoApplyRulesButton({ transactionIds }: Props) {
     if (transactionIds.length === 0) return;
 
     setIsLoading(true);
-    const toastId = toast.loading('자동 분류 룰 적용 중...');
+    toast.loading(`⚡ ${transactionIds.length}건 자동 분류 처리 중...`, { id: 'auto-apply' });
 
     try {
       const result = await applyTaggingRules(transactionIds);
       
-      if (result.auto_applied > 0) {
-        toast.success(`✨ ${result.auto_applied}건이 자동으로 분류되었습니다.`, { id: toastId });
+      if (result.auto_applied > 0 || result.suggested > 0) {
+        toast.success(`✅ 자동 적용 ${result.auto_applied}건 · 추천 ${result.suggested}건 · 미분류 ${result.unmatched}건`, { id: 'auto-apply' });
         router.refresh();
-      } else if (result.suggested > 0) {
-        toast.info(`적용된 건은 없으나 ${result.suggested}건의 추천이 발견되었습니다.`, { id: toastId });
       } else {
-        toast.info('적용할 수 있는 룰이 없습니다.', { id: toastId });
+        toast.error('적용 가능한 룰을 찾지 못했습니다.', { id: 'auto-apply' });
       }
     } catch (error) {
       console.error(error);
-      toast.error('룰 적용 중 오류가 발생했습니다.', { id: toastId });
+      toast.error('룰 적용 중 오류가 발생했습니다.', { id: 'auto-apply' });
     } finally {
       setIsLoading(false);
     }

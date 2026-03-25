@@ -9,8 +9,10 @@ export function RecentCrew() {
     useEffect(() => {
         async function load() {
             try {
-                const data = await getRecentCrew()
-                setCrew(data)
+                const result = await getRecentCrew()
+                if (result.success) {
+                    setCrew(result.data)
+                }
             } finally {
                 setLoading(false)
             }

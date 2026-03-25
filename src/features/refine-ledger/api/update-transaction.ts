@@ -29,11 +29,15 @@ export async function updateTransactionAction({
     try {
         const updateData: any = {};
 
-        if (categoryId !== undefined) updateData.category_id = categoryId;
+        if (categoryId !== undefined) {
+            updateData.category_id = categoryId;
+            updateData.manual_override = true;
+        }
         if (description !== undefined) updateData.description = description;
         if (businessUnitId !== undefined) {
             updateData.business_unit_id = businessUnitId;
             updateData.allocation_status = businessUnitId ? 'business_allocated' : 'personal';
+            updateData.manual_override = true;
         }
 
         if (assetId !== undefined) {

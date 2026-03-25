@@ -47,8 +47,10 @@ export function DailyRateTable({ refreshKey, onRowClick }: Props) {
     const load = useCallback(async () => {
         setIsLoading(true)
         try {
-            const data = await getDailyRateLogs(yearMonth)
-            setLogs(data)
+            const result = await getDailyRateLogs(yearMonth)
+            if (result.success) {
+                setLogs(result.data)
+            }
         } finally {
             setIsLoading(false)
         }
@@ -69,8 +71,12 @@ export function DailyRateTable({ refreshKey, onRowClick }: Props) {
         if (!confirm(`"${label}" 기록을 삭제할까요?\n크루/진행비 내역도 함께 삭제됩니다.`)) return
         setDeletingId(log.id)
         try {
-            await deleteDailyLog(log.id)
-            setLogs(prev => prev.filter(l => l.id !== log.id))
+            const result = await deleteDailyLog(log.id)
+            if (result.success) {
+                setLogs(prev => prev.filter(l => l.id !== log.id))
+            } else {
+                alert(result.error || '삭제 중 오류가 발생했습니다.')
+            }
         } catch {
             alert('삭제 중 오류가 발생했습니다.')
         } finally {
@@ -82,8 +88,12 @@ export function DailyRateTable({ refreshKey, onRowClick }: Props) {
         const next = log.payment_status === 'pending' ? 'paid' : 'pending'
         setTogglingId(log.id)
         try {
-            await updatePaymentStatus(log.id, next)
-            setLogs(prev => prev.map(l => l.id === log.id ? { ...l, payment_status: next } : l))
+            const result = await updatePaymentStatus(log.id, next)
+            if (result.success) {
+                setLogs(prev => prev.map(l => l.id === log.id ? { ...l, payment_status: next } : l))
+            } else {
+                alert(result.error || '상태 변경 중 오류가 발생했습니다.')
+            }
         } catch {
             alert('상태 변경 중 오류가 발생했습니다.')
         } finally {
@@ -95,6 +105,7 @@ export function DailyRateTable({ refreshKey, onRowClick }: Props) {
     const totalGross = logs.reduce((s, l) => s + l.amount_gross, 0)
     const totalCrew = logs.reduce((s, l) =>
         s + (l.crew_payments?.reduce((cs, c) => cs + c.amount_gross, 0) ?? 0), 0)
+    const totalInvoice = logs.reduce((s, l) => s + calcInvoiceTotal(l), 0)
     const pendingCount = logs.filter(l => l.payment_status === 'pending').length
 
     return (
@@ -121,16 +132,13 @@ export function DailyRateTable({ refreshKey, onRowClick }: Props) {
                 <div className="flex items-center gap-4">
                     <BankSyncVerifyModal />
                     {/* 월 요약 */}
-                    {!isLoading && logs.length > 0 && (
                         <div className="flex items-center gap-4 text-xs text-muted-foreground bg-white/5 px-4 py-2 rounded-full border border-white/10 shadow-sm">
                             <span className="font-medium">총 {logs.length}건</span>
-                            <span className="font-medium">내 일당 <strong className="text-foreground ml-1">₩{totalGross.toLocaleString()}</strong></span>
-                            {totalCrew > 0 && <span className="font-medium">크루 <strong className="text-foreground ml-1">₩{totalCrew.toLocaleString()}</strong></span>}
+                            <span className="font-medium">청구 합계 <strong className="text-blue-400 ml-1">₩{totalInvoice.toLocaleString()}</strong></span>
                             {pendingCount > 0 && (
                                 <Badge variant="outline" className="text-orange-500 border-orange-500/30 bg-orange-500/10 ml-2">{pendingCount}건 미수금</Badge>
                             )}
                         </div>
-                    )}
                 </div>
             </div>
 
@@ -212,7 +220,9 @@ export function DailyRateTable({ refreshKey, onRowClick }: Props) {
 
                                         {/* 내 일당 */}
                                         <div className="text-right text-sm font-black w-24 text-slate-200">
-                                            ₩{log.amount_gross.toLocaleString()}
+                                            <div>₩{log.amount_gross.toLocaleString()}</div>
+                                            {log.vat_type === 'exclude' && <div className="text-[9px] text-blue-400 font-medium">VAT 별도</div>}
+                                            {log.vat_type === 'include' && <div className="text-[9px] text-slate-500 font-medium">VAT 포함</div>}
                                         </div>
 
                                         {/* 청구 총액 */}
@@ -277,6 +287,8 @@ export function DailyRateTable({ refreshKey, onRowClick }: Props) {
                                                                 </span>
                                                                 <span className="font-bold text-slate-300">
                                                                     ₩{c.amount_gross.toLocaleString()}
+                                                                    {c.vat_type === 'exclude' && <span className="text-[9px] text-blue-400 ml-1">별도</span>}
+                                                                    {c.vat_type === 'include' && <span className="text-[9px] text-slate-500 ml-1">포함</span>}
                                                                     <span className="text-[10px] text-slate-500 ml-1.5 font-medium">(실 {c.amount_net.toLocaleString()})</span>
                                                                 </span>
                                                             </div>

@@ -35,7 +35,7 @@ export function NavActions() {
                         <div className="flex flex-col gap-1">
                             <p className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">설정</p>
 
-                            <Link href="/settings/categories">
+                            <Link href="/settings/classification">
                                 <Button variant="ghost" className="w-full justify-start gap-3 h-10 hover:bg-white/10 text-sm">
                                     <BarChart3 className="w-4 h-4 text-emerald-400" />
                                     카테고리 관리

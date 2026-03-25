@@ -2,22 +2,26 @@
 
 import { createClient } from '@/shared/api/supabase/server'
 import { ValidatedTransaction } from '../model/types'
+import { MatchingEngine } from '@/entities/transaction/lib/matching-engine'
+import { applyTaggingRules } from '@/features/refine-ledger/api/apply-tagging-rules'
 
 type ImportResult = {
     success: boolean
     count: number
     addedCount: number
     duplicateCount: number
+    pendingCount: number // [NEW] 확인 필요한 내역 수
     errors: string[]
+    insertedIds?: string[]
 }
 
-export async function uploadBatchAction(transactions: ValidatedTransaction[]): Promise<ImportResult> {
+export async function uploadBatchAction(transactions: ValidatedTransaction[], forcedAssetId?: string): Promise<ImportResult> {
     const supabase = await createClient()
 
     // 1. Auth Check
     const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
-        return { success: false, count: 0, addedCount: 0, duplicateCount: 0, errors: ['Unauthorized: Please log in.'] }
+        return { success: false, count: 0, addedCount: 0, duplicateCount: 0, pendingCount: 0, errors: ['Unauthorized: Please log in.'], insertedIds: [] }
     }
 
     try {
@@ -112,6 +116,13 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
             return match ? match.id : null;
         };
 
+        // [NEW] Helper to get owner_type from assetId
+        const getAssetOwnerType = (assetId: string | null): string | null => {
+            if (!assetId || !assets) return null;
+            const asset = assets.find(a => a.id === assetId);
+            return asset ? asset.owner_type : null;
+        };
+
         // Helper to normalize strings (remove all spaces) for loose matching
         const normalize = (s: string) => s.replace(/\s+/g, '');
 
@@ -134,95 +145,65 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
 
         // --- PARTIAL CANCEL PERSISTENCE (Refund Auto-Categorization) ---
         // 1. Identify potential refunds (Income > 0)
-        const refundCandidates = transactions.filter(t => t.amount > 0 && t.description);
-        const refundMap = new Map<string, number>();
+        const sourceExpenses = transactions.filter(t => t.amount < 0);
 
-        if (refundCandidates.length > 0) {
-            // 2. Extract unique descriptions
-            const descriptions = Array.from(new Set(refundCandidates.map(t => t.description)));
+        // [PHASE 2] Run AI Matching Engine on the whole batch
+        const matchResults = MatchingEngine.processBatch(transactions);
 
-            // 3. Query DB for matching EXPENSES with these descriptions
-            // We want to find: Expense with same Merchant and (ideally) matching amount magnitude
-            const { data: history } = await supabase
-                .from('transactions')
-                .select('description, amount, category_id')
-                .eq('user_id', user.id)
-                .in('description', descriptions)
-                .lt('amount', 0) // Look for expenses
-                .not('category_id', 'is', null)
-                .order('date', { ascending: false }) // Prefer recent
-                .limit(500); // Guard against too much data
+        let totalPendingCount = 0;
 
-            if (history) {
-                history.forEach(h => {
-                    // Key: "Merchant:Abs(Amount)"
-                    // If we find an expense of -10000 for "Starbucks", and we have a refund of +10000 for "Starbucks"
-                    const key = `${normalize(h.description!)}:${Math.abs(h.amount)}`;
-                    if (!refundMap.has(key)) {
-                        refundMap.set(key, h.category_id!);
-                    }
-
-                    // Also store a generic fallback by Merchant only?
-                    // Maybe riskier, but useful if amounts differ slightly (partial cancel).
-                    // Let's stick to strict Amount match for safety first.
-                });
-            }
-        }
-
-        const payload = transactions.map(tx => {
+        const payload = matchResults.map(match => {
+            const tx = match.transaction;
             let categoryId: number | null = null;
             let rawForRule = tx.categoryRaw ? normalize(tx.categoryRaw) : '';
 
+            // [Phase 2] Use Match Suggestions
+            let status: string = 'personal';
+            if (match.isSuggested) {
+                status = 'pending';
+                totalPendingCount++;
+            }
+
             // 1. Try Category Matching (Main > Sub)
             if (tx.categoryRaw) {
-                // Split by '>' and normalize each part
-                const parts = tx.categoryRaw.split('>').map(s => s.trim());
-                const mainName = normalize(parts[0]);
-                const subName = parts.length > 1 ? normalize(parts[parts.length - 1]) : null;
-
-                if (normalizedCatMap.size > 0) {
-                    // Try exact match on Sub Name (Highest Specificity)
-                    if (subName && normalizedCatMap.has(subName)) categoryId = normalizedCatMap.get(subName)!;
-                    // Try exact match on Main Name
-                    else if (normalizedCatMap.has(mainName)) categoryId = normalizedCatMap.get(mainName)!;
-                    // Try exact match on full string (normalized)
-                    else if (normalizedCatMap.has(rawForRule)) categoryId = normalizedCatMap.get(rawForRule)!;
+                const parts = tx.categoryRaw.split('>').map(p => p.trim());
+                if (parts.length > 1) {
+                    const subName = parts[parts.length - 1];
+                    categoryId = categoryMap.get(subName) || normalizedCatMap.get(normalize(subName)) || null;
+                } else {
+                    categoryId = categoryMap.get(tx.categoryRaw) || normalizedCatMap.get(normalize(tx.categoryRaw)) || null;
                 }
             }
 
-            // 2. Try Rule Engine (Keyword Match)
-            if (!categoryId && ruleMap.size > 0) {
-                // Check if specific raw category has a rule
-                if (ruleMap.has(rawForRule)) {
-                    categoryId = ruleMap.get(rawForRule)!;
+            // 2. Try Rule Matching
+            if (!categoryId && rawForRule) {
+                for (const [key, catId] of ruleMap.entries()) {
+                    if (rawForRule.includes(key)) {
+                        categoryId = catId;
+                        break;
+                    }
                 }
             }
 
-            // 3. Try Partial Cancel / Refund Matching
-            // If it's an Income transaction, see if we found a matching expense category
-            if (!categoryId && tx.amount > 0) {
-                const key = `${normalize(tx.description)}:${Math.abs(tx.amount)}`;
-                if (refundMap.has(key)) {
-                    categoryId = refundMap.get(key)!;
-                    console.log(`[AutoCat] Matched Refund: ${tx.description} (${tx.amount}) -> Category ${categoryId}`);
-                }
+            // [Phase 2] Suggestion Override
+            if (match.suggestionType === 'transfer') {
+                status = 'pending';
             }
 
-            // 4. [NEW] Link Account (Asset)
-            const explicitAccountHint = tx.source_raw_data?.deposit_account || tx.source_raw_data?.withdrawal_account;
-            const bankName = explicitAccountHint || tx.source_raw_data?._bank || tx.source_raw_data?.import_type; // Fallback to import type if needed
-            const cardNo = tx.source_raw_data?.card_no;
-            const accountId = findAssetId(bankName, cardNo);
+            // Asset Linking
+            const explicitAccountHint = (tx.source_raw_data as any)?._bank;
+            const accountId = forcedAssetId || findAssetId(explicitAccountHint, tx.cardNo);
 
-            let finalAmount = tx.amount;
-            if (tx.type === 'expense') finalAmount = -Math.abs(tx.amount);
-            else if (tx.type === 'income') finalAmount = Math.abs(tx.amount);
-            else if (tx.type === 'transfer') finalAmount = Math.abs(tx.amount);
+            // 2026 Strictness
+            const rawDate = tx.date;
+            const finalDate = rawDate.split('T')[0].split(' ')[0];
+            const is2026OrLater = new Date(finalDate).getFullYear() >= 2026;
+            
+            if (match.isSuggested && is2026OrLater) status = 'pending';
 
-            // DB schema: date = DATE only, transaction_time = TIME separately
-            const rawDate = tx.date; // e.g. "2025-01-01T18:24:11" or "2025-01-01"
-            const finalDate = rawDate.split('T')[0].split(' ')[0]; // "2025-01-01"
-            const timePart = rawDate.includes('T') ? rawDate.split('T')[1] : null; // "18:24:11" or null
+            const amountStr = String(tx.amount).replace(/,/g, '');
+            const finalAmount = parseFloat(amountStr);
+            const timePart = tx.transactionTime || null;
 
             return {
                 user_id: user.id,
@@ -231,9 +212,19 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
                 date: finalDate,
                 ...(timePart ? { transaction_time: timePart } : {}),
                 description: tx.description,
-                allocation_status: 'personal', // All imported ledger data is personal
+                raw_description: tx.raw_description,
+                normalized_name: tx.normalized_name || tx.description,
+                allocation_status: status,
                 asset_id: accountId,
-                source_raw_data: { original_category: tx.categoryRaw, import_type: 'bulk_excel_2025', _bank: explicitAccountHint || tx.source_raw_data?._bank },
+                owner_type: getAssetOwnerType(accountId) || 'other',
+                source_raw_data: { 
+                    original_category: tx.categoryRaw, 
+                    import_type: 'bulk_excel_2025', 
+                    _bank: explicitAccountHint,
+                    ai_confidence: match.confidence,
+                    ai_suggestion_type: match.suggestionType,
+                    ...(match.metadata || {}),
+                },
             }
         });
 
@@ -246,23 +237,20 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
         );
 
         console.log(`[UploadBatch] Valid Payload: ${validPayload.length} / ${payload.length}`);
-        if (validPayload.length > 0) {
-            console.log(`[UploadBatch] Sample:`, validPayload[0]);
-        }
-
+        
         if (validPayload.length === 0) {
             console.warn("[UploadBatch] No valid transactions to insert.");
-            return { success: true, count: 0, addedCount: 0, duplicateCount: 0, errors: ["No valid transactions found to insert."] }
+            return { success: true, count: 0, addedCount: 0, duplicateCount: 0, pendingCount: 0, errors: ["No valid transactions found to insert."], insertedIds: [] }
         }
 
         // 5. Create Import Batch
-        const filename = transactions[0]?.source_raw_data?._filename || 'unknown_file';
+        const filename = (transactions[0]?.source_raw_data as any)?._filename || 'unknown_file';
         const { data: batch, error: batchError } = await supabase
             .from('import_batches')
             .insert({
                 user_id: user.id,
                 filename,
-                import_type: transactions[0]?.source_raw_data?.import_type || 'bulk_excel',
+                import_type: (transactions[0]?.source_raw_data as any)?.import_type || 'bulk_excel',
                 row_count: validPayload.length,
                 metadata: { source: 'web_import_v2' }
             } as any)
@@ -271,25 +259,22 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
 
         if (batchError) {
             console.error("[UploadBatch] Batch Creation Error:", batchError);
-            return { success: false, count: 0, addedCount: 0, duplicateCount: 0, errors: [batchError.message] };
+            return { success: false, count: 0, addedCount: 0, duplicateCount: 0, pendingCount: 0, errors: [batchError.message], insertedIds: [] };
         }
 
         // 6. Generate Hashes for Deduplication
-        // We use Crypto (Web Crypto API or Node crypto) or simple string concat
-        const encoder = new TextEncoder();
         const generateHash = async (data: string) => {
-            // Using a simple but effective hash since we are in a server action
             let hash = 0;
             for (let i = 0; i < data.length; i++) {
                 const char = data.charCodeAt(i);
                 hash = ((hash << 5) - hash) + char;
-                hash = hash & hash; // Convert to 32bit integer
+                hash = (hash & hash);
             }
             return Math.abs(hash).toString(36);
         };
 
         const finalPayloadWithHashes = await Promise.all(validPayload.map(async (p) => {
-            const hashSource = `${p.date}|${p.amount}|${p.description || ''}|${p.asset_id || ''}`;
+            const hashSource = `${p.date}|${p.amount}|${p.raw_description || p.description || ''}|${p.asset_id || ''}`;
             const hash = await generateHash(hashSource);
             return {
                 ...p,
@@ -299,7 +284,7 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
             };
         }));
 
-        // 7. Deduplication Check (Check if hashes already exist in DB)
+        // 7. Deduplication Check
         const hashesToInsert = finalPayloadWithHashes.map(p => p.import_hash);
         const { data: existingHashes } = await supabase
             .from('transactions')
@@ -312,33 +297,45 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[]): P
         const duplicateCount = finalPayloadWithHashes.length - nonDuplicatePayload.length;
 
         if (nonDuplicatePayload.length === 0) {
-            // All were duplicates - Delete the empty batch for cleanliness
-            await supabase.from('import_batches' as any).delete().eq('id', batch.id);
-            return { success: true, count: validPayload.length, addedCount: 0, duplicateCount, errors: [] };
+            await supabase.from('import_batches').delete().eq('id', batch.id);
+            return { success: true, count: validPayload.length, addedCount: 0, duplicateCount, pendingCount: 0, errors: [] };
         }
 
         // 8. Batch Insert
-        const { error } = await supabase
+        const { data: insertedData, error } = await supabase
             .from('transactions')
-            .insert(nonDuplicatePayload);
+            .insert(nonDuplicatePayload)
+            .select('id');
 
         if (error) {
             console.error("[UploadBatch] Insert Error:", error)
-            await supabase.from('import_batches').delete().eq('id', batch!.id);
-            return { success: false, count: 0, addedCount: 0, duplicateCount: 0, errors: [error.message] }
+            await supabase.from('import_batches').delete().eq('id', batch.id);
+            return { success: false, count: 0, addedCount: 0, duplicateCount: 0, pendingCount: 0, errors: [error.message], insertedIds: [] }
         }
 
-        console.log(`[UploadBatch] Insert Success! Added: ${nonDuplicatePayload.length}, Duplicates: ${duplicateCount}`);
+        // [NEW] 후기 처리: 자동 태깅 룰 적용
+        const insertedIds = insertedData?.map(d => d.id) || [];
+        if (insertedIds.length > 0) {
+            console.log(`[UploadBatch] Triggering auto-tagging for ${insertedIds.length} transactions...`);
+            await applyTaggingRules(insertedIds);
+        }
+
+        // Count pending in actual inserted payload
+        const insertedPendingCount = nonDuplicatePayload.filter(p => p.allocation_status === 'pending').length;
+
+        console.log(`[UploadBatch] Insert Success! Added: ${nonDuplicatePayload.length}, Duplicates: ${duplicateCount}, Pending: ${insertedPendingCount}`);
         return {
             success: true,
             count: validPayload.length,
             addedCount: nonDuplicatePayload.length,
             duplicateCount,
-            errors: []
+            pendingCount: insertedPendingCount,
+            errors: [],
+            insertedIds: insertedData?.map(d => d.id) || []
         }
 
     } catch (err: any) {
         console.error("Server Action Error:", err)
-        return { success: false, count: 0, addedCount: 0, duplicateCount: 0, errors: [err.message] }
+        return { success: false, count: 0, addedCount: 0, duplicateCount: 0, pendingCount: 0, errors: [err.message], insertedIds: [] }
     }
 }

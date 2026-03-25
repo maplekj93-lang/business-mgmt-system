@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { getDailyRateLogs } from '@/entities/daily-rate/api/get-daily-logs'
 import { getProjects } from '@/entities/project/api/get-projects'
-import { Wallet, TrendingUp, Users, Briefcase, Loader2 } from 'lucide-react'
+import { Wallet, TrendingUp, Users, Briefcase, Loader2, HandCoins } from 'lucide-react'
 import { RevenueAnalysis } from './RevenueAnalysis'
 import { RecentCrew } from './RecentCrew'
 import { QuickInfoFooter } from './QuickInfoFooter'
@@ -17,28 +17,79 @@ import { RecurringExpenseCalendar } from '@/widgets/recurring-expense-calendar'
 import { ReceivablesAlertCard } from '@/widgets/receivables-alert/ui/ReceivablesAlertCard'
 import { getMonthlyStats, DashboardStats } from '@/entities/transaction/api/get-monthly-stats'
 import { getBusinessSummary, BusinessSummary } from '@/entities/daily-rate/api/get-business-summary'
+import { getUnsettledDutchPaySummary } from '@/entities/dutch-pay/api/get-dutch-pay'
+import { getCashflowStats } from '@/entities/transaction/api/get-cashflow-stats'
+import { CashflowInsight } from '@/entities/transaction/model/cashflow'
+import { ActionCenterWidget } from '@/widgets/action-center'
+import { MatchingHealthWidget } from '@/widgets/matching-health'
+import { OwnerToggle } from '@/shared/ui/OwnerToggle'
+import { OwnerType } from '@/shared/constants/business'
+import { useSearchParams, useRouter, usePathname } from 'next/navigation'
+import { ProjectProfitabilityTable } from './ProjectProfitabilityTable'
+import { CategoryDonutChart } from './CategoryDonutChart'
+import { ProfitBalanceCard } from './ProfitBalanceCard'
+import { ProfitabilityAlert } from './ProfitabilityAlert'
+import { getProjectAnalytics, ProjectProfitabilityData, CategoryDistribution } from '@/entities/project/api/get-project-analytics'
 
 export function BusinessDashboard() {
+    const searchParams = useSearchParams()
+    const router = useRouter()
+    const pathname = usePathname()
+    
+    // URL query param에서 ownerId 가져오기 (기본값 'all')
+    const ownerId = (searchParams.get('owner') as OwnerType | 'all') || 'all'
+
     const [summary, setSummary] = useState<BusinessSummary | null>(null)
     const [monthlyStats, setMonthlyStats] = useState<DashboardStats | null>(null)
+    const [dutchPayAmount, setDutchPayAmount] = useState<number>(0)
+    const [cashflowStats, setCashflowStats] = useState<CashflowInsight | null>(null)
+    const [profitability, setProfitability] = useState<ProjectProfitabilityData[]>([])
+    const [categoryDistribution, setCategoryDistribution] = useState<CategoryDistribution[]>([])
     const [loading, setLoading] = useState(true)
+
+    const handleOwnerChange = (newOwner: OwnerType | 'all') => {
+        const params = new URLSearchParams(searchParams)
+        if (newOwner === 'all') {
+            params.delete('owner')
+        } else {
+            params.set('owner', newOwner)
+        }
+        router.push(`${pathname}?${params.toString()}`, { scroll: false })
+    }
 
     useEffect(() => {
         async function loadData() {
             setLoading(true)
             try {
-                const [summaryData, txStats] = await Promise.all([
-                    getBusinessSummary(),
-                    getMonthlyStats({ mode: 'business' })
+                const now = new Date()
+                const startOfYear = `${now.getFullYear()}-01-01`
+                const endOfYear = `${now.getFullYear()}-12-31`
+
+                const [summaryResult, txStats, dpSummary, cfStats, analyticsResult] = await Promise.all([
+                    getBusinessSummary(ownerId),
+                    getMonthlyStats({ mode: 'business', ownerId }),
+                    getUnsettledDutchPaySummary(),
+                    getCashflowStats(startOfYear, endOfYear, ownerId),
+                    getProjectAnalytics({ ownerId, mode: 'business' })
                 ])
-                setSummary(summaryData)
+                if (summaryResult.success) {
+                    setSummary(summaryResult.data)
+                }
                 setMonthlyStats(txStats)
+                setDutchPayAmount(dpSummary.totalToReceive)
+                if (cfStats.success && cfStats.data) {
+                    setCashflowStats(cfStats.data)
+                }
+                if (analyticsResult.success) {
+                    setProfitability(analyticsResult.data.profitability)
+                    setCategoryDistribution(analyticsResult.data.categoryDistribution)
+                }
             } finally {
                 setLoading(false)
             }
         }
         loadData()
-    }, [])
+    }, [ownerId])
 
     if (loading || !summary) {
         return (
@@ -50,8 +101,41 @@ export function BusinessDashboard() {
 
     return (
         <div className="space-y-8">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <h2 className="text-2xl font-bold tracking-tight text-white mb-1">비즈니스 대시보드</h2>
+                    <p className="text-xs text-slate-500 font-medium">실시간 사업 현황 및 수익성 분석</p>
+                </div>
+                <OwnerToggle value={ownerId} onChange={handleOwnerChange} />
+            </div>
+
             {/* Summary Cards */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+                {/* Profit Balance Card (Visible only in 'all' view) */}
+                {ownerId === 'all' ? (
+                    <ProfitBalanceCard projects={profitability} />
+                ) : (
+                    /* Dashboard Stats Card as a placeholder or specific owner info */
+                    <div className="group relative overflow-hidden rounded-2xl bg-background p-6 transition-all hover:bg-slate-900/60">
+                        <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/10 blur-2xl" />
+                        <div className="flex items-center justify-between">
+                            <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">수익률(평균)</p>
+                            <div className="rounded-xl bg-primary/10 p-2.5 text-primary shadow-sm ring-1 ring-primary/20">
+                                <TrendingUp className="h-5 w-5" />
+                            </div>
+                        </div>
+                        <div className="mt-4 flex items-baseline gap-1">
+                            <h3 className="text-3xl font-black tracking-tight text-white">
+                                {profitability.length > 0 
+                                    ? (profitability.reduce((sum, p) => sum + p.profit_margin, 0) / profitability.length).toFixed(1)
+                                    : '0.0'
+                                }
+                            </h3>
+                            <span className="text-sm font-semibold text-slate-500">%</span>
+                        </div>
+                    </div>
+                )}
+
                 {/* Active Projects */}
                 <div className="group relative overflow-hidden rounded-2xl bg-background p-6 transition-all hover:bg-slate-900/60 hover: hover:shadow-primary/20">
                     <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-primary/10 blur-2xl transition-all group-hover:bg-primary/20" />
@@ -137,20 +221,56 @@ export function BusinessDashboard() {
                         <span className="text-[10px] text-slate-500 font-medium">송금 대기 중</span>
                     </div>
                 </div>
+
+                {/* Dutch Pay Unsettled */}
+                <div className="group relative overflow-hidden rounded-2xl bg-background p-6 transition-all hover:bg-slate-900/60 hover: hover:shadow-orange-500/20">
+                    <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-orange-500/10 blur-2xl transition-all group-hover:bg-orange-500/20" />
+                    <div className="flex items-center justify-between">
+                        <p className="text-xs font-bold text-slate-400 uppercase tracking-widest">미정산 더치페이</p>
+                        <div className="rounded-xl bg-orange-500/10 p-2.5 text-orange-500 shadow-sm ring-1 ring-orange-500/20">
+                            <HandCoins className="h-5 w-5" />
+                        </div>
+                    </div>
+                    <div className="mt-4 flex items-baseline gap-1">
+                        <span className="text-lg font-bold text-slate-500">₩</span>
+                        <h3 className="text-3xl font-black tracking-tight text-white">{dutchPayAmount.toLocaleString()}</h3>
+                    </div>
+                    <div className="mt-2 flex items-center gap-2">
+                        <div className="flex items-center gap-1 text-orange-400 text-[10px] font-bold bg-orange-500/10 px-1.5 py-0.5 rounded transition-all group-hover:bg-orange-500/20">
+                            RECEIVABLE
+                        </div>
+                        <span className="text-[10px] text-slate-500 font-medium font-bold tracking-tight">받아야 할 정산금</span>
+                    </div>
+                </div>
             </div>
+
+            <ProfitabilityAlert projects={profitability} />
 
             {/* Main Content: Chart & Projects & Crew */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <div className="lg:col-span-2 space-y-6">
                     <ReceivablesAlertCard />
+                    {cashflowStats && (
+                        <MatchingHealthWidget 
+                            pendingCount={cashflowStats.pending_count || 0} 
+                            totalCount={cashflowStats.total_count || 0} 
+                        />
+                    )}
                     <RevenueAnalysis data={monthlyStats?.trend || []} />
                 </div>
-                <div>
+                <div className="space-y-6">
                     <ProjectBriefList />
+                    <CategoryDonutChart data={categoryDistribution} />
                 </div>
-                <div>
+                <div className="space-y-6">
+                    <ActionCenterWidget />
                     <RecentCrew />
                 </div>
+            </div>
+
+            {/* Phase 5 Analytics Level */}
+            <div className="grid grid-cols-1 gap-6">
+                <ProjectProfitabilityTable projects={profitability} />
             </div>
 
             {/* Sub-widgets Level */}

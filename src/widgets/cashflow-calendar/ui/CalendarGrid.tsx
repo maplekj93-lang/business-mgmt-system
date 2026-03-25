@@ -13,7 +13,7 @@ import { CalendarDay } from './CalendarDay';
 
 interface CalendarGridProps {
     currentMonth: Date;
-    data: Record<string, { inflow: number; outflow: number }>;
+    data: Record<string, { inflow: number; outflow: number; dutchPay?: number }>;
     selectedDate?: Date;
     onDateSelect?: (date: Date) => void;
 }
@@ -57,6 +57,7 @@ export function CalendarGrid({ currentMonth, data, selectedDate, onDateSelect }:
                             currentMonth={currentMonth}
                             inflow={dayData.inflow}
                             outflow={dayData.outflow}
+                            dutchPay={dayData.dutchPay}
                             isSelected={selectedDate ? format(day, 'yyyy-MM-dd') === format(selectedDate, 'yyyy-MM-dd') : false}
                             onClick={onDateSelect}
                         />

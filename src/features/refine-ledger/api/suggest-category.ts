@@ -27,8 +27,10 @@ export async function suggestCategory(
 
   if (!user || !description) return null;
 
+  // 1. 전처리 (Trim + LowerCase)
+  const cleanDesc = description.trim().toLowerCase();
+
   // 1 & 2. Allocation Rules 조회 (Exact & Contains)
-  // priority 오름차순 (작을수록 우선) -> id 오름차순 (먼저 등록된 것 우선)
   const { data: rules } = await supabase
     .from('mdt_allocation_rules')
     .select(`
@@ -45,8 +47,11 @@ export async function suggestCategory(
     .order('id', { ascending: true });
 
   if (rules && rules.length > 0) {
-    // 1단계: Exact Match 검사
-    const exactMatch = rules.find((r) => r.match_type === 'exact' && r.keyword === description);
+    // 1단계: Exact Match 검사 (대소문자 무시, 정규화된 키워드 비교)
+    const exactMatch = rules.find((r) => 
+      r.match_type === 'exact' && 
+      r.keyword.trim().toLowerCase() === cleanDesc
+    );
     if (exactMatch && exactMatch.category_id) {
       return {
         category_id: exactMatch.category_id,
@@ -57,8 +62,14 @@ export async function suggestCategory(
       };
     }
 
-    // 2단계: Contains Match 검사
-    const containsMatch = rules.find((r) => r.match_type === 'contains' && description.includes(r.keyword));
+    // 2단계: Contains Match 검사 (대소문자 무시, priority 순 정렬 보장)
+    const containsMatch = rules
+      .filter(r => r.match_type === 'contains')
+      .sort((a, b) => (a.priority ?? 999) - (b.priority ?? 999)) // 명시적 정렬
+      .find((r) => 
+        cleanDesc.includes(r.keyword.trim().toLowerCase())
+      );
+
     if (containsMatch && containsMatch.category_id) {
       return {
         category_id: containsMatch.category_id,
@@ -71,14 +82,14 @@ export async function suggestCategory(
   }
 
   // 3단계: History Match (과거 거래 내역 기반)
-  // 동일한 description을 가진 내역 중 가장 자주 분류된 카테고리를 찾음
+  // 정규화된 description으로 조회하거나 원본으로 조회 후 결과 매칭
   const { data: history } = await supabase
     .from('transactions')
     .select('category_id, mdt_categories(name)')
     .eq('user_id', user.id)
-    .eq('description', description)
+    .eq('description', description) // DB 인덱스 효율을 위해 원본 우선 사용
     .not('category_id', 'is', null)
-    .limit(10);
+    .limit(15);
 
   if (history && history.length > 0) {
     const frequency: Record<number, { count: number; name: string }> = {};
@@ -100,7 +111,6 @@ export async function suggestCategory(
     }
 
     if (bestCategory !== 0) {
-      // 5번 이상 동일하게 분류했으면 medium, 그 외에는 low
       const conf = maxCount >= 5 ? 'medium' : 'low';
       return {
         category_id: bestCategory,

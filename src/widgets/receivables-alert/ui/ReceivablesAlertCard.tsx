@@ -3,80 +3,95 @@
 import React, { useEffect, useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Badge } from '@/shared/ui/badge';
-import { AlertCircle, Loader2 } from 'lucide-react';
-import Link from 'next/link';
-import { getOverdueProjects, OverdueProject } from '@/entities/project/api/get-overdue-projects';
+import { createClient } from '@/shared/api/supabase/client';
+import { AlertCircle, Clock, CheckCircle2, ArrowRight, Calendar } from 'lucide-react';
+import { cn } from '@/shared/lib/utils';
+import { format } from 'date-fns';
+import { ko } from 'date-fns/locale';
+
+interface delayedInvoice {
+  id: string;
+  name: string;
+  amount: number;
+  invoice_sent_date: string;
+  expected_payment_date: string;
+  delay_days: number;
+}
 
 export function ReceivablesAlertCard() {
-  const [overdueList, setOverdueList] = useState<OverdueProject[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [delayedInvoices, setDelayedInvoices] = useState<delayedInvoice[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    async function loadData() {
-      try {
-        const data = await getOverdueProjects();
-        setOverdueList(data);
-      } catch (error) {
-        console.error('Failed to load overdue projects:', error);
-      } finally {
-        setLoading(false);
+    const fetchDelayedInvoices = async () => {
+      const supabase = createClient();
+      const today = new Date().toISOString().split('T')[0];
+
+      const { data, error } = await supabase
+        .from('projects')
+        .select('id, name, invoice_sent_date, expected_payment_date')
+        .not('invoice_sent_date', 'is', null)
+        .is('actual_payment_date', null)
+        .lt('expected_payment_date', today)
+        .order('expected_payment_date', { ascending: true });
+
+      if (data) {
+        const formatted = data.map(p => {
+          const expected = new Date(p.expected_payment_date!);
+          const now = new Date();
+          const delay = Math.floor((now.getTime() - expected.getTime()) / (1000 * 60 * 60 * 24));
+          
+          return {
+            id: p.id,
+            name: p.name,
+            amount: 0, // In real scenario, would join with income transactions or have budget field
+            invoice_sent_date: p.invoice_sent_date!,
+            expected_payment_date: p.expected_payment_date!,
+            delay_days: delay
+          };
+        });
+        setDelayedInvoices(formatted);
       }
-    }
-    loadData();
+      setIsLoading(false);
+    };
+
+    fetchDelayedInvoices();
   }, []);
 
-  if (loading) {
-    return (
-      <Card className="border-red-200 bg-red-50/10">
-        <div className="flex h-32 items-center justify-center">
-          <Loader2 className="h-5 w-5 animate-spin text-red-500" />
-        </div>
-      </Card>
-    );
-  }
-
-  if (overdueList.length === 0) {
-    return null;
-  }
-
-  const totalReceivables = overdueList.reduce((acc, p) => acc + p.amount, 0);
+  if (isLoading) return <div className="h-32 bg-muted animate-pulse rounded-xl" />;
+  if (delayedInvoices.length === 0) return null;
 
   return (
-    <Card className="border-red-200 bg-red-50/10 shadow-sm transition-all hover:bg-red-50/20">
-      <CardHeader className="pb-2 flex flex-row items-center gap-2">
-        <AlertCircle className="w-5 h-5 text-red-500" />
-        <CardTitle className="text-red-700 font-bold mb-0">입금 지연 경고 (미수금)</CardTitle>
+    <Card className="border-destructive/20 bg-destructive/5 overflow-hidden">
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-bold flex items-center gap-2 text-destructive">
+          <AlertCircle className="w-4 h-4" /> 입금 지연 알림 ({delayedInvoices.length})
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="text-xs text-red-600/80 mb-2 font-medium">
-          총 {overdueList.length}건 / {totalReceivables.toLocaleString()}원의 입금이 지연 중입니다.
-        </div>
-        
-        <div className="space-y-2">
-          {overdueList.slice(0, 5).map(p => (
-            <Link key={p.id} href={`/business/projects`} className="block bg-white border border-red-100 p-2 rounded-md hover:border-red-300 transition-all shadow-sm group">
-              <div className="flex justify-between items-start">
-                <div>
-                  <div className="font-medium text-[13px] group-hover:text-red-700 transition-colors">{p.name}</div>
-                  <div className="text-[10px] text-muted-foreground">{p.client_name}</div>
-                </div>
-                <div className="text-right flex flex-col items-end">
-                  <div className="text-[13px] font-bold text-slate-800 tracking-tight">
-                    {p.amount.toLocaleString()}원
-                  </div>
-                  <Badge variant="outline" className="text-[9px] h-4 leading-none py-0 px-1 mt-1 text-red-600 border-red-200 bg-red-50">
-                    +{p.overdue_days}일 초과
-                  </Badge>
-                </div>
+        {delayedInvoices.map((inv) => (
+          <div key={inv.id} className="flex items-center justify-between p-3 rounded-lg bg-background border border-destructive/10">
+            <div className="space-y-1">
+              <p className="text-sm font-semibold">{inv.name}</p>
+              <div className="flex items-center gap-3 text-[11px] text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <Calendar className="w-3 h-3" />
+                  발행: {inv.invoice_sent_date}
+                </span>
+                <span className="flex items-center gap-1 text-destructive font-medium">
+                  <Clock className="w-3 h-3" />
+                  {inv.delay_days}일 지연됨
+                </span>
               </div>
-            </Link>
-          ))}
-          {overdueList.length > 5 && (
-            <div className="text-center text-[10px] text-muted-foreground pt-1 font-medium">
-              ...외 {overdueList.length - 5}건이 더 있습니다
             </div>
-          )}
-        </div>
+            <Badge variant="destructive" className="bg-destructive/10 text-destructive border-0">
+              미입금
+            </Badge>
+          </div>
+        ))}
+        <p className="text-[11px] text-muted-foreground text-center pt-1 italic">
+          ※ 프로젝트 상세 페이지에서 입금 확인 처리를 할 수 있습니다.
+        </p>
       </CardContent>
     </Card>
   );

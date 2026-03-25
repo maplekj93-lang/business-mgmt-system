@@ -32,12 +32,14 @@ export async function middleware(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser()
 
-    // 2. Route Protection
+    // 2. Route Protection & Redirection
+    const pathname = request.nextUrl.pathname;
+
     const isPublicRoute =
-        request.nextUrl.pathname.startsWith('/login') ||
-        request.nextUrl.pathname.startsWith('/auth') ||
-        request.nextUrl.pathname.startsWith('/_next') ||
-        request.nextUrl.pathname.includes('.');
+        pathname.startsWith('/login') ||
+        pathname.startsWith('/auth') ||
+        pathname.startsWith('/_next') ||
+        pathname.includes('.');
 
     if (!user && !isPublicRoute) {
         const url = request.nextUrl.clone()
@@ -45,10 +47,29 @@ export async function middleware(request: NextRequest) {
         return NextResponse.redirect(url)
     }
 
-    if (user && request.nextUrl.pathname.startsWith('/login')) {
+    if (user && pathname.startsWith('/login')) {
         const url = request.nextUrl.clone()
         url.pathname = '/'
         return NextResponse.redirect(url)
+    }
+
+    // 3. New Route Redirections (Phase 2 Restructure)
+    if (user) {
+        if (pathname.startsWith('/manage/import')) {
+            const url = request.nextUrl.clone();
+            url.pathname = '/import';
+            return NextResponse.redirect(url);
+        }
+        if (pathname.startsWith('/transactions/history')) {
+            const url = request.nextUrl.clone();
+            url.pathname = '/ledger';
+            return NextResponse.redirect(url);
+        }
+        if (pathname.startsWith('/transactions/unclassified')) {
+            const url = request.nextUrl.clone();
+            url.pathname = '/import';
+            return NextResponse.redirect(url);
+        }
     }
 
     return supabaseResponse

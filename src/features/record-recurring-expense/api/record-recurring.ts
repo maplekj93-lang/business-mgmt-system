@@ -50,6 +50,7 @@ export async function recordPendingRecurringExpenses() {
             amount: -Math.abs(subscription.amount), // 지출은 음수
             category_id: subscription.category_id || null,
             description: `[자동기록] ${subscription.name}`,
+            raw_description: subscription.name,
             allocation_status: subscription.is_business ? 'business_allocated' : 'personal',
             date: new Date().toISOString().split('T')[0],
             owner: subscription.owner_type || null,
@@ -128,6 +129,7 @@ export async function recordSpecificRecurringExpenses(ids: string[]) {
           amount: -Math.abs(subscription.amount),
           category_id: subscription.category_id || null,
           description: `[자동기록] ${subscription.name}`,
+          raw_description: subscription.name,
           allocation_status: subscription.is_business ? 'business_allocated' : 'personal',
           date: new Date().toISOString().split('T')[0],
           owner: subscription.owner_type || null,

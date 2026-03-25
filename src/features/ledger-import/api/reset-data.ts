@@ -4,15 +4,24 @@ import { createClient } from '@/shared/api/supabase/server'
 
 export async function resetTransactionsAction() {
     const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    
+    if (!user) return { success: false, error: 'Unauthorized' }
 
-    const { error } = await supabase
+    // RLS will handle user isolation, but we specify user_id to be safe
+    const { error: txError } = await supabase
         .from('transactions')
         .delete()
-        .neq('id', '00000000-0000-0000-0000-000000000000') // Delete all
+        .eq('user_id', user.id)
 
-    if (error) {
-        console.error("Reset Error:", error)
-        return { success: false, error: error.message }
+    const { error: batchError } = await supabase
+        .from('import_batches')
+        .delete()
+        .eq('user_id', user.id)
+
+    if (txError || batchError) {
+        console.error("Reset Error:", txError || batchError)
+        return { success: false, error: (txError || batchError)?.message }
     }
     return { success: true }
 }

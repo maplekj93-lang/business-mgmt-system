@@ -46,6 +46,6 @@ export async function upsertCategory(formData: {
         return { success: false, message: error.message };
     }
 
-    revalidatePath('/settings/categories');
+    revalidatePath('/settings/classification');
     return { success: true };
 }

@@ -13,6 +13,8 @@ export const metadata: Metadata = {
   description: "통합 자산 관리 시스템",
 };
 
+import { SidebarProvider } from "@/shared/ui/sidebar-provider";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -28,8 +30,10 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <Toaster position="top-center" richColors />
+          <SidebarProvider>
+            {children}
+            <Toaster position="top-center" richColors />
+          </SidebarProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -1,6 +1,16 @@
 import { z } from 'zod';
 
-export const AssetTypeSchema = z.enum(['bank_account', 'credit_card', 'cash', 'other']);
+export const AssetTypeSchema = z.enum([
+    'bank_account',
+    'credit_card',
+    'debit_card',
+    'cash',
+    'pay_proxy',
+    'investment',
+    'insurance',
+    'debt',
+    'other'
+]);
 export type AssetType = z.infer<typeof AssetTypeSchema>;
 
 export const OwnerTypeSchema = z.enum([

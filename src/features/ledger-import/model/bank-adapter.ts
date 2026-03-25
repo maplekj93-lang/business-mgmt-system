@@ -12,14 +12,18 @@ import {
     hyundaiCardProfile,
     kakaoBankProfile,
     bankAccountProfile,
-    nelnaProfile
+    nelnaProfile,
+    kakaoPayProfile,
+    ibkAccountProfile
 } from './profiles';
 
 export const BANK_PROFILES: BankProfile[] = [
-    // ⚠️ 해외 프로파일을 국내보다 먼저 등록 (키워드가 더 구체적이어서 선매칭 필요)
+    // ⚠️ 해외 프로파일 및 특수 매퍼 프로파일을 먼저 등록
     samsungCardOverseasProfile,
-    samsungCardProfile,
+    kakaoPayProfile, // 카카오페이 매퍼용 프로파일 우선순위 상향
+    ibkAccountProfile, // IBK 전용 프로파일 우선순위 상향
     bcCardProfile,
+    samsungCardProfile,
     hyundaiCardProfile,
     kakaoBankProfile,
     bankAccountProfile,
@@ -30,13 +34,12 @@ export const BANK_PROFILES: BankProfile[] = [
  * logic to identify which bank a sheet belongs to
  */
 export function identifyBank(headers: string[]): BankProfile | null {
-    const headerString = headers.join(' ').normalize('NFC').toLowerCase();
+    const normalizedHeaders = headers.map(h => String(h || "").replace(/\s/g, '').normalize('NFC').toLowerCase());
+    const headerString = normalizedHeaders.join(' ');
 
-    // Sort profiles by specificity (more keywords matched = better)
-    // For now, simple first-match based on unique keywords
     for (const profile of BANK_PROFILES) {
         if (profile.keywords.every(k => {
-            const key = k.normalize('NFC').toLowerCase();
+            const key = k.replace(/\s/g, '').normalize('NFC').toLowerCase();
             return headerString.includes(key);
         })) {
             return profile;

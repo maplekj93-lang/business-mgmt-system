@@ -2,7 +2,7 @@
 import { BankProfile } from "../types";
 
 export const bankAccountProfile: BankProfile = {
-    name: "Standard Bank Account",
+    name: "기본 은행 계좌",
     keywords: ["거래일시", "출금", "입금", "거래후 잔액"],
     mapping: {
         date: "거래일시",

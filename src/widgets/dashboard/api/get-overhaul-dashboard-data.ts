@@ -25,6 +25,19 @@ export interface OverhaulDashboardData {
       amount: number;
     }[];
   };
+  summary: {
+    totalBalance: number;
+    monthlySpent: number;
+    dailyAverage: number;
+  };
+  recentTransactions: {
+    id: string;
+    date: string;
+    description: string;
+    amount: number;
+    category: string;
+    type: 'income' | 'expense';
+  }[];
 }
 
 export async function getOverhaulDashboardData(): Promise<OverhaulDashboardData> {
@@ -60,23 +73,61 @@ export async function getOverhaulDashboardData(): Promise<OverhaulDashboardData>
     amount: p.project_incomes?.reduce((sum, inc) => sum + inc.amount, 0) || 0
   }));
 
-  // 3. Mock/Calculate extra fields (Budget, Card spending etc for now)
-  // In a real scenario, these would come from specific tables or settings.
+  // 3. Fetch Recent Transactions with Categories
+  const { data: recentTxData } = await supabase
+    .from('transactions')
+    .select(`
+      id,
+      date,
+      description,
+      amount,
+      mdt_categories (
+        name,
+        type
+      )
+    `)
+    .order('date', { ascending: false })
+    .limit(5);
+
+  const recentTransactions = (recentTxData || []).map(tx => ({
+    id: tx.id,
+    date: tx.date,
+    description: tx.description || '내역 없음',
+    amount: Number(tx.amount),
+    category: (tx.mdt_categories as any)?.name || '미분류',
+    type: ((tx.mdt_categories as any)?.type || 'expense') as 'income' | 'expense'
+  }));
+
+  // 4. Calculate Summary Stats
+  const monthlySpent = Number(pResult.total_expense) || 0;
+  const daysInMonth = new Date().getDate();
+  const dailyAverage = Math.round(monthlySpent / (daysInMonth || 1));
+  
+  // Total Balance Calculation (Sum of all assets current_balance)
+  const { data: assetData } = await supabase.from('assets').select('current_balance');
+  const totalBalance = (assetData || []).reduce((sum, asset) => sum + (Number(asset.current_balance) || 0), 0);
+
   return {
     personal: {
-      monthlyExpense: Number(pResult.total_expense) || 0,
-      budget: 3000000, // Placeholder
-      cardSpending: 1820000, // Placeholder
-      nextPayment: 420000, // Placeholder
-      unclassifiedCount: 12 // Placeholder
+      monthlyExpense: monthlySpent,
+      budget: 3000000, 
+      cardSpending: 1820000, 
+      nextPayment: 420000, 
+      unclassifiedCount: 12 
     },
     business: {
       outstandingAmount: outstandingAmount,
-      targetRevenue: 12000000, // Placeholder
+      targetRevenue: 12000000, 
       currentRevenue: Number(bResult.total_income) || 0,
       activeProjectCount: activeProjects.length,
-      unbilledAmount: 1200000, // Placeholder
+      unbilledAmount: 1200000, 
       recentProjects
-    }
+    },
+    summary: {
+      totalBalance,
+      monthlySpent,
+      dailyAverage
+    },
+    recentTransactions
   };
 }

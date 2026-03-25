@@ -63,6 +63,7 @@ export const transactionSchema = z.object({
     receipt_memo: z.string().nullable().optional(),
     is_reimbursable: z.boolean().default(false).optional(),
     excluded_from_personal: z.boolean().default(false).optional(),
+    is_scheduled: z.boolean().optional(),
 });
 
 export type Category = z.infer<typeof categorySchema>;

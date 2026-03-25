@@ -23,6 +23,6 @@ export async function deleteCategory(id: number) {
         return { success: false, message: error.message };
     }
 
-    revalidatePath('/settings/categories');
+    revalidatePath('/settings/classification');
     return { success: true };
 }

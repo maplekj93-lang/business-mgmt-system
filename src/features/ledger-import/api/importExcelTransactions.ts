@@ -34,6 +34,7 @@ export async function importExcelTransactions(
             date: row.date,            // YYYY-MM-DD 정규화된 상태
             amount: row.amount,
             description: row.description.trim(),
+            raw_description: row.raw_description || row.description,
             source: 'EXCEL' as const,
             import_hash: await generateImportHash(
                 row.date,

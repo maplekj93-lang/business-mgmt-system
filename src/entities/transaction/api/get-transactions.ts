@@ -10,6 +10,7 @@ export type GetTransactionsParams = {
     year?: number;
     month?: number;
     mode?: 'personal' | 'business' | 'total'; // [NEW] Explicit mode parameter
+    dateFilter?: 'today' | 'this_week' | 'scheduled' | null;
 }
 
 interface FilteredTransactionRpcResponse {
@@ -56,7 +57,8 @@ export async function getTransactions(params: GetTransactionsParams = {}): Promi
         p_year: params.year ?? null,
         p_month: params.month ?? null,
         p_page: params.page ?? 1,
-        p_limit: params.limit ?? 50
+        p_limit: params.limit ?? 50,
+        p_date_filter: params.dateFilter ?? null
     } as any); // RPC overloads might still need partial as any if types disagree on nulls
 
     if (txError) {
@@ -88,6 +90,8 @@ export async function getTransactions(params: GetTransactionsParams = {}): Promi
         receipt_memo: row.receipt_memo || null, // [NEW]
         is_reimbursable: row.is_reimbursable || false, // [NEW]
         excluded_from_personal: row.excluded_from_personal || false,
+        is_scheduled: (row as any).is_scheduled || false,
+        source: 'MANUAL', // [NEW] Default for display
         category: row.category_id ? {
             id: row.category_id,
             name: row.category_name,

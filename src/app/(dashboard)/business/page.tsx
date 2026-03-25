@@ -1,11 +1,10 @@
 "use client"
 
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/shared/ui/card'
 
 import { BusinessDashboard } from '@/widgets/business-dashboard/ui/BusinessDashboard'
-import { IncomeKanban } from '@/widgets/income-kanban/ui/IncomeKanban'
 import { CashflowCalendar } from '@/widgets/cashflow-calendar/ui/CashflowCalendar'
 import { BusinessProfileSettings } from '@/features/manage-business-profile'
 import { LogDailyRateModal } from '@/features/log-daily-rate/ui/LogDailyRateModal'
@@ -13,13 +12,43 @@ import { DailyRateTable } from '@/features/manage-daily-rate/ui/DailyRateTable'
 import { Button } from '@/shared/ui/button'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui/tabs'
 import Link from 'next/link'
-import { Plus, LayoutGrid, Settings, Wallet2, FolderOpen } from 'lucide-react'
+import { Plus, LayoutGrid, Settings, Wallet2, FolderOpen, Users, Loader2 } from 'lucide-react'
+import { ClientListWidget } from '@/widgets/client-list/ui/ClientListWidget'
+import { getProjects } from '@/entities/project/api'
+import { ProjectCard, ProjectDetailModal } from '@/entities/project'
+import type { Project } from '@/entities/project/model/types'
+import { getBusinessProfiles } from '@/features/manage-business-profile/api/business-profile-api'
 
 export default function BusinessPage() {
     const router = useRouter()
     const [isLogModalOpen, setIsLogModalOpen] = useState(false)
     const [dashboardKey, setDashboardKey] = useState(0)
     const [tableRefreshKey, setTableRefreshKey] = useState(0)
+
+    // Euiyoung Projects State
+    const [euiyoungProjects, setEuiyoungProjects] = useState<Project[]>([])
+    const [isProjectsLoading, setIsProjectsLoading] = useState(false)
+    const [selectedProject, setSelectedProject] = useState<Project | null>(null)
+    const [projectsRefreshKey, setProjectsRefreshKey] = useState(0)
+    const [profiles, setProfiles] = useState<any[]>([])
+
+    const fetchEuiyoungProjects = useCallback(async () => {
+        setIsProjectsLoading(true)
+        try {
+            const data = await getProjects({ owner: 'euiyoung' })
+            setEuiyoungProjects(data)
+        } finally {
+            setIsProjectsLoading(false)
+        }
+    }, [])
+
+    useEffect(() => {
+        fetchEuiyoungProjects()
+    }, [fetchEuiyoungProjects, projectsRefreshKey])
+
+    useEffect(() => {
+        getBusinessProfiles().then(setProfiles).catch(console.error)
+    }, [])
 
     const handleLogSuccess = useCallback(() => {
         setIsLogModalOpen(false)
@@ -62,19 +91,19 @@ export default function BusinessPage() {
             <Tabs defaultValue="overview" className="space-y-8">
                 <div className="sticky top-20 z-40 py-3 -mx-4 px-4 bg-background/40 rounded-[2rem]">
                     <TabsList className="bg-white/5 h-12 p-1.5 rounded-2xl flex w-full md:w-fit gap-1">
-                        <TabsTrigger value="overview" className="flex-1 md:flex-none rounded-xl px-8 data-[state=active]:bg-primary data-[state=active]:text-white font-black text-[11px] uppercase tracking-widest transition-all gap-2 border-transparent data-[state=active]:">
+                        <TabsTrigger value="overview" className="flex-1 md:flex-none rounded-xl px-8 data-[state=active]:bg-primary data-[state=active]:text-white font-black text-[11px] uppercase tracking-widest transition-all gap-2 border-transparent">
                             <LayoutGrid className="h-4 w-4" /> Overview
                         </TabsTrigger>
-                        <TabsTrigger value="pipeline" className="flex-1 md:flex-none rounded-xl px-8 data-[state=active]:bg-primary data-[state=active]:text-white font-black text-[11px] uppercase tracking-widest transition-all gap-2 border-transparent data-[state=active]:">
-                            <FolderOpen className="h-4 w-4" /> Pipeline
+                        <TabsTrigger value="euiyoung" className="flex-1 md:flex-none rounded-xl px-8 data-[state=active]:bg-primary data-[state=active]:text-white font-black text-[11px] uppercase tracking-widest transition-all gap-2 border-transparent">
+                            <FolderOpen className="h-4 w-4" /> Euiyoung Projects
                         </TabsTrigger>
-                        <TabsTrigger value="cashflow" className="flex-1 md:flex-none rounded-xl px-8 data-[state=active]:bg-primary data-[state=active]:text-white font-black text-[11px] uppercase tracking-widest transition-all gap-2 border-transparent data-[state=active]:">
+                        <TabsTrigger value="kwangjun" className="flex-1 md:flex-none rounded-xl px-8 data-[state=active]:bg-primary data-[state=active]:text-white font-black text-[11px] uppercase tracking-widest transition-all gap-2 border-transparent">
+                            <LayoutGrid className="h-4 w-4" /> Kwangjun Ledger
+                        </TabsTrigger>
+                        <TabsTrigger value="cashflow" className="flex-1 md:flex-none rounded-xl px-8 data-[state=active]:bg-primary data-[state=active]:text-white font-black text-[11px] uppercase tracking-widest transition-all gap-2 border-transparent">
                             <Wallet2 className="h-4 w-4" /> Cashflow
                         </TabsTrigger>
-                        <TabsTrigger value="ledger" className="flex-1 md:flex-none rounded-xl px-8 data-[state=active]:bg-primary data-[state=active]:text-white font-black text-[11px] uppercase tracking-widest transition-all gap-2 border-transparent data-[state=active]:">
-                            <LayoutGrid className="h-4 w-4" /> Ledger
-                        </TabsTrigger>
-                        <TabsTrigger value="settings" className="flex-1 md:flex-none rounded-xl px-8 data-[state=active]:bg-primary data-[state=active]:text-white font-black text-[11px] uppercase tracking-widest transition-all gap-2 border-transparent data-[state=active]:">
+                        <TabsTrigger value="settings" className="flex-1 md:flex-none rounded-xl px-8 data-[state=active]:bg-primary data-[state=active]:text-white font-black text-[11px] uppercase tracking-widest transition-all gap-2 border-transparent">
                             <Settings className="h-4 w-4" /> Settings
                         </TabsTrigger>
                     </TabsList>
@@ -84,17 +113,39 @@ export default function BusinessPage() {
                     <BusinessDashboard key={dashboardKey} />
                 </TabsContent>
 
-                <TabsContent value="pipeline" className="border-none p-0 outline-none animate-in fade-in slide-in-from-bottom-4">
-                    <IncomeKanban />
+                <TabsContent value="euiyoung" className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
+                    <div className="flex justify-between items-center">
+                        <h2 className="text-xl font-black text-white uppercase tracking-tight px-2">Euiyoung's Project Center</h2>
+                        <Button variant="outline" size="sm" asChild className="rounded-xl font-black text-[10px] uppercase tracking-widest">
+                            <Link href="/business/projects">전체 프로젝트 보기</Link>
+                        </Button>
+                    </div>
+                    
+                    {isProjectsLoading ? (
+                        <div className="flex h-[300px] items-center justify-center bg-white/5 rounded-[2rem] border border-dashed text-slate-500">
+                            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        </div>
+                    ) : euiyoungProjects.length === 0 ? (
+                        <div className="flex h-[300px] flex-col items-center justify-center bg-white/5 rounded-[2rem] border border-dashed text-slate-500">
+                            <FolderOpen className="h-10 w-10 mb-4 opacity-20" />
+                            <p className="font-bold">진행 중인 프로젝트가 없습니다.</p>
+                        </div>
+                    ) : (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {euiyoungProjects.map(project => (
+                                <ProjectCard 
+                                    key={project.id} 
+                                    project={project} 
+                                    onSelect={() => setSelectedProject(project)}
+                                />
+                            ))}
+                        </div>
+                    )}
                 </TabsContent>
 
-                <TabsContent value="cashflow" className="border-none p-0 outline-none animate-in fade-in slide-in-from-bottom-4">
-                    <CashflowCalendar />
-                </TabsContent>
-
-                <TabsContent value="ledger" className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
-                    <Card className="rounded-[2rem] bg-background overflow-hidden">
-                        <CardHeader className="flex flex-row items-center justify-between pb-6 border-b px-8 pt-8">
+                <TabsContent value="kwangjun" className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
+                    <Card className="rounded-[2rem] bg-background overflow-hidden border-none shadow-2xl">
+                        <CardHeader className="flex flex-row items-center justify-between pb-6 border-b px-8 pt-8 bg-white/5">
                             <div>
                                 <CardTitle className="text-lg font-black text-white uppercase tracking-tight">Financial Ledger</CardTitle>
                                 <CardDescription className="text-slate-500 font-bold italic mt-1 uppercase text-[10px] tracking-widest">Permanent Transaction Logs</CardDescription>
@@ -115,10 +166,29 @@ export default function BusinessPage() {
                     </Card>
                 </TabsContent>
 
-                <TabsContent value="settings" className="space-y-6 animate-in fade-in slide-in-from-bottom-4">
-                    <section className="tactile-panel p-8 rounded-[2rem] bg-background">
-                        <h2 className="text-xl font-black text-white uppercase tracking-tight mb-6">Business profile</h2>
+                <TabsContent value="cashflow" className="border-none p-0 outline-none animate-in fade-in slide-in-from-bottom-4">
+                    <CashflowCalendar />
+                </TabsContent>
+
+                <TabsContent value="settings" className="space-y-8 animate-in fade-in slide-in-from-bottom-4">
+                    <section className="tactile-panel p-8 rounded-[2rem] bg-background border border-white/5">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="h-8 w-8 rounded-lg bg-primary/10 flex items-center justify-center border border-primary/20">
+                                <Settings className="h-4 w-4 text-primary" />
+                            </div>
+                            <h2 className="text-xl font-black text-white uppercase tracking-tight">Business profile</h2>
+                        </div>
                         <BusinessProfileSettings />
+                    </section>
+
+                    <section className="tactile-panel p-8 rounded-[2rem] bg-background border border-white/5">
+                        <div className="flex items-center gap-3 mb-6">
+                            <div className="h-8 w-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                                <Users className="h-4 w-4 text-blue-400" />
+                            </div>
+                            <h2 className="text-xl font-black text-white uppercase tracking-tight">Client Relationship Management</h2>
+                        </div>
+                        <ClientListWidget />
                     </section>
                 </TabsContent>
             </Tabs>
@@ -129,6 +199,20 @@ export default function BusinessPage() {
                 onClose={() => setIsLogModalOpen(false)}
                 onSuccess={handleLogSuccess}
             />
+
+            {selectedProject && (
+                <ProjectDetailModal 
+                    project={selectedProject}
+                    profiles={profiles}
+                    open={!!selectedProject}
+                    onClose={() => setSelectedProject(null)}
+                    onUpdated={() => setProjectsRefreshKey(k => k + 1)}
+                    onDeleted={() => {
+                        setSelectedProject(null)
+                        setProjectsRefreshKey(k => k + 1)
+                    }}
+                />
+            )}
         </div>
     )
 }

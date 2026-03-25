@@ -21,7 +21,7 @@ import {
 import { Checkbox } from '@/shared/ui/checkbox';
 import { Badge } from '@/shared/ui/badge';
 import { bulkUpdateTransactions } from '../api/bulk-update';
-import { UnclassifiedGroup } from '@/entities/transaction/api/get-unclassified';
+import { UnclassifiedGroup } from '@/entities/transaction/model/unclassified';
 
 import { BusinessUnit } from '@/entities/business';
 import { suggestCategory, SuggestionResult } from '../api/suggest-category';

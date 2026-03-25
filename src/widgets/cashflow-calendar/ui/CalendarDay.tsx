@@ -9,11 +9,12 @@ interface CalendarDayProps {
     currentMonth: Date;
     inflow?: number;
     outflow?: number;
+    dutchPay?: number;
     isSelected?: boolean;
     onClick?: (day: Date) => void;
 }
 
-export function CalendarDay({ day, currentMonth, inflow, outflow, isSelected, onClick }: CalendarDayProps) {
+export function CalendarDay({ day, currentMonth, inflow, outflow, dutchPay, isSelected, onClick }: CalendarDayProps) {
     const isCurrentMonth = isSameMonth(day, currentMonth);
     const isDayToday = isToday(day);
 
@@ -34,9 +35,14 @@ export function CalendarDay({ day, currentMonth, inflow, outflow, isSelected, on
                 )}>
                     {format(day, 'd')}
                 </span>
-                {inflow && inflow > 0 && (
-                    <div className="h-1.5 w-1.5 bg-sky-400 rounded-full shadow-[0_0_8px_rgba(56,189,248,0.8)]" />
-                )}
+                <div className="flex gap-1">
+                    {inflow && inflow > 0 && (
+                        <div className="h-1.5 w-1.5 bg-sky-400 rounded-full shadow-[0_0_8px_rgba(56,189,248,0.8)]" />
+                    )}
+                    {dutchPay && dutchPay > 0 && (
+                        <div className="h-1.5 w-1.5 bg-orange-500 rounded-full shadow-[0_0_8px_rgba(249,115,22,0.8)]" />
+                    )}
+                </div>
             </div>
 
             <div className="mt-auto space-y-1 pt-4">
@@ -53,6 +59,14 @@ export function CalendarDay({ day, currentMonth, inflow, outflow, isSelected, on
                         <div className="h-1 w-2 bg-rose-500/30 rounded" />
                         <span className="text-[10px] font-black text-rose-400">
                             -{(outflow / 10000).toFixed(0)}만
+                        </span>
+                    </div>
+                )}
+                {dutchPay && dutchPay > 0 && (
+                    <div className="flex items-center gap-1">
+                        <div className="h-1 w-2 bg-orange-500/30 rounded" />
+                        <span className="text-[10px] font-black text-orange-400">
+                            {(dutchPay / 10000).toFixed(0)}만
                         </span>
                     </div>
                 )}

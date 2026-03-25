@@ -5,3 +5,5 @@ export * from './hyundai-card';
 export * from './kakao-bank';
 export * from './bank-account';
 export * from './nelna';
+export * from './kakao-pay';
+export * from './ibk-account';

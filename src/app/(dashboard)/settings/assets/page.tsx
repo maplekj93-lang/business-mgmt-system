@@ -12,11 +12,18 @@ import { Asset, AssetType, OwnerType } from '@/entities/asset/model/schema';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select';
 
 const ASSET_TYPE_LABELS: Record<AssetType, string> = {
-    bank_account: '계좌',
-    credit_card: '신용/체크카드',
+    bank_account: '은행 계좌',
+    credit_card: '신용카드',
+    debit_card: '체크카드',
     cash: '현금',
+    pay_proxy: '간편결제',
+    investment: '투자',
+    insurance: '보험',
+    debt: '부채',
     other: '기타'
 };
+
+const PAYMENT_METHOD_TYPES: AssetType[] = ['credit_card', 'debit_card', 'pay_proxy'];
 
 const OWNER_TYPE_LABELS: Record<OwnerType, string> = {
     kwangjun: '광준',
@@ -38,7 +45,9 @@ export default function AssetSettingsPage() {
     const loadAssets = async () => {
         setLoading(true);
         const data = await getAssets();
-        setAssets(data || []);
+        // 보유 자산 탭에서는 결제수단(카드/간편결제) 제외
+        const filtered = (data || []).filter(a => !PAYMENT_METHOD_TYPES.includes(a.asset_type));
+        setAssets(filtered);
         setLoading(false);
     };
 
@@ -172,9 +181,11 @@ export default function AssetSettingsPage() {
                                                     <SelectValue />
                                                 </SelectTrigger>
                                                 <SelectContent>
-                                                    {Object.entries(ASSET_TYPE_LABELS).map(([val, label]) => (
-                                                        <SelectItem key={val} value={val}>{label}</SelectItem>
-                                                    ))}
+                                                    {Object.entries(ASSET_TYPE_LABELS)
+                                                        .filter(([val]) => !PAYMENT_METHOD_TYPES.includes(val as AssetType))
+                                                        .map(([val, label]) => (
+                                                            <SelectItem key={val} value={val}>{label}</SelectItem>
+                                                        ))}
                                                 </SelectContent>
                                             </Select>
                                         </td>

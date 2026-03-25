@@ -1,6 +1,5 @@
 import React from 'react';
 import Link from 'next/link';
-import { createClient } from '@/shared/api/supabase/server';
 import { cn } from '@/shared/lib/utils';
 import {
   Wallet,
@@ -10,13 +9,20 @@ import {
   Clock,
   Receipt,
   ChevronRight,
-  Plus
+  Plus,
+  PlusCircle,
+  Download,
+  Users,
+  Settings,
+  ArrowUpRight,
+  ArrowDownRight
 } from 'lucide-react';
 import { Button } from '@/shared/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card';
 import { Progress } from '@/shared/ui/progress';
-
 import { getOverhaulDashboardData } from '@/widgets/dashboard/api/get-overhaul-dashboard-data';
+import { ReceivablesAlertCard } from '@/widgets/receivables-alert/ui/ReceivablesAlertCard';
+import { CashflowDashboardWidget } from '@/widgets/cashflow-dashboard/ui/CashflowDashboardWidget';
 
 export default async function Home() {
   const data = await getOverhaulDashboardData();
@@ -29,169 +35,188 @@ export default async function Home() {
   };
 
   return (
-    <div className="space-y-8 pb-20">
+        <div className="space-y-8 pb-20 max-w-7xl mx-auto">
       {/* Welcome Section */}
-      <section className="flex items-end justify-between">
+      <section className="flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">좋은 하루입니다, 광준님!</h1>
-          <p className="text-muted-foreground mt-1">오늘의 재정 상태를 한눈에 확인해보세요.</p>
+          <h1 className="text-3xl font-black tracking-tight text-foreground">좋은 하루입니다, 광준님!</h1>
+          <p className="text-muted-foreground mt-1 text-lg">오늘의 재정 상태를 한눈에 확인해보세요.</p>
         </div>
-        <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 px-4 py-2 rounded-full [box-shadow:var(--tactile-inner)]">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground bg-muted/30 px-4 py-2 rounded-full border border-border/50 backdrop-blur-sm">
           <Clock className="w-4 h-4" />
           <span>마지막 업데이트: 방금 전</span>
         </div>
       </section>
 
-      {/* 50:50 Dashboard Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 min-h-[600px]">
+      {/* Cashflow Insights Widget */}
+      <CashflowDashboardWidget />
 
-        {/* Left Side: Family / Personal Finance */}
-        <section className="space-y-6 flex flex-col pt-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-blue-500/20 flex items-center justify-center text-blue-400">
-                <Wallet className="w-5 h-5" />
-              </div>
-              <h2 className="text-xl font-bold">가계부 (Family)</h2>
+      {/* Row 1: Summary Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-none shadow-md overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-6 opacity-5">
+            <Wallet className="w-20 h-20" />
+          </div>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">현재 총 자산</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-black">{formatCurrency(data.summary.totalBalance)}</div>
+            <p className="text-xs text-muted-foreground mt-1 flex items-center gap-1">
+              <span className="text-emerald-500 font-bold">▲ 2.5%</span> 지난 달 대비
+            </p>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-red-500/10 to-red-500/5 border-none shadow-md overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-6 opacity-5">
+            <CreditCard className="w-20 h-20" />
+          </div>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">당월 지출 총액</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-black">{formatCurrency(data.summary.monthlySpent)}</div>
+            <div className="mt-2 text-xs flex justify-between mb-1">
+                <span>예산 대비</span>
+                <span className="font-bold">{Math.round((data.summary.monthlySpent / data.personal.budget) * 100)}%</span>
             </div>
-            <Link href="/transactions/unclassified">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                전체 내역 <ChevronRight className="ml-1 w-4 h-4" />
+            <Progress value={(data.summary.monthlySpent / data.personal.budget) * 100} className="h-1.5" />
+          </CardContent>
+        </Card>
+
+        <Card className="bg-gradient-to-br from-blue-500/10 to-blue-500/5 border-none shadow-md overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-6 opacity-5">
+            <TrendingUp className="w-20 h-20" />
+          </div>
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-medium text-muted-foreground">일일 평균 지출</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-black">{formatCurrency(data.summary.dailyAverage)}</div>
+            <p className="text-xs text-muted-foreground mt-1">
+                지지난달 평균: {formatCurrency(Math.round(data.summary.dailyAverage * 0.95))}
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* Left Layer: Recent Transactions (2/3 width on desktop) */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold flex items-center gap-2">
+              <Clock className="w-5 h-5 text-primary" />
+              최근 거래 내역
+            </h2>
+            <Link href="/ledger">
+              <Button variant="ghost" size="sm" className="text-muted-foreground">
+                전체 보기 <ChevronRight className="ml-1 w-4 h-4" />
               </Button>
             </Link>
           </div>
 
-          {/* Personal Summary Card */}
-          <Card className="bg-gradient-to-br from-blue-600/20 to-indigo-600/5 border-none overflow-hidden relative group">
-            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
-              <TrendingUp className="w-24 h-24" />
-            </div>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium text-blue-400/80">당월 총 지출</CardTitle>
-              <p className="text-3xl font-bold tabular-nums italic">{formatCurrency(data.personal.monthlyExpense)}</p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">남은 예산 ({formatCurrency(data.personal.budget)} 중)</span>
-                  <span className="font-medium">{formatCurrency(data.personal.budget - data.personal.monthlyExpense)} ({Math.round((1 - data.personal.monthlyExpense / data.personal.budget) * 100)}%)</span>
-                </div>
-                <Progress value={(data.personal.monthlyExpense / data.personal.budget) * 100} className="h-2 bg-muted" />
-              </div>
-              <div className="grid grid-cols-2 gap-4 pt-2">
-                <div className="p-3 rounded-2xl bg-muted/30 [box-shadow:var(--tactile-inner)]">
-                  <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">카드 사용액</p>
-                  <p className="text-base font-semibold text-foreground">{formatCurrency(data.personal.cardSpending)}</p>
-                </div>
-                <div className="p-3 rounded-2xl bg-muted/30 [box-shadow:var(--tactile-inner)]">
-                  <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">다음 결제액</p>
-                  <p className="text-base font-semibold text-foreground">{formatCurrency(data.personal.nextPayment)}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Quick Stats or Small Widgets */}
-          <div className="grid grid-cols-2 gap-4">
-            <Link href="/transactions/unclassified" className="tactile-card p-5 cursor-pointer block">
-              <Receipt className="w-5 h-5 text-indigo-400 mb-3" />
-              <p className="text-xs text-muted-foreground">미분류 지출</p>
-              <p className="text-lg font-bold text-foreground">{data.personal.unclassifiedCount} 건</p>
-            </Link>
-            <div className="tactile-card p-5 cursor-pointer flex flex-col items-start">
-              <CreditCard className="w-5 h-5 text-indigo-400 mb-3" />
-              <p className="text-xs text-muted-foreground">주요 사용 카드</p>
-              <p className="text-lg font-bold text-foreground">현대카드 ZERO</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Right Side: Business Management */}
-        <section className="space-y-6 flex flex-col pt-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center text-emerald-400">
-                <Briefcase className="w-5 h-5" />
-              </div>
-              <h2 className="text-xl font-bold">사업 (Business)</h2>
-            </div>
-            <Link href="/business/projects">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                프로젝트 현황 <ChevronRight className="ml-1 w-4 h-4" />
-              </Button>
-            </Link>
-          </div>
-
-          {/* Business Summary Card */}
-          <Card className="bg-gradient-to-br from-emerald-600/20 to-teal-600/5 border-none overflow-hidden relative group">
-            <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
-              <Briefcase className="w-24 h-24" />
-            </div>
-            <CardHeader>
-              <CardTitle className="text-sm font-medium text-emerald-400/80">예상 미수금 (Outstanding)</CardTitle>
-              <p className="text-3xl font-bold tabular-nums italic text-emerald-400">{formatCurrency(data.business.outstandingAmount)}</p>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs">
-                  <span className="text-muted-foreground">당월 매출 ({formatCurrency(data.business.targetRevenue)} 목표)</span>
-                  <span className="font-medium">{formatCurrency(data.business.currentRevenue)} ({Math.round((data.business.currentRevenue / data.business.targetRevenue) * 100)}%)</span>
-                </div>
-                <Progress value={(data.business.currentRevenue / data.business.targetRevenue) * 100} className="h-2 bg-emerald-500/20 shadow-[0_0_10px_rgba(16,185,129,0.2)]" />
-              </div>
-              <div className="grid grid-cols-2 gap-4 pt-2">
-                <div className="p-3 rounded-2xl bg-muted/30 [box-shadow:var(--tactile-inner)]">
-                  <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">진행 중 프로젝트</p>
-                  <p className="text-base font-semibold text-foreground">{data.business.activeProjectCount} 건</p>
-                </div>
-                <div className="p-3 rounded-2xl bg-muted/30 [box-shadow:var(--tactile-inner)]">
-                  <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider mb-1">미발행 세금계산서</p>
-                  <p className="text-base font-semibold text-foreground">{formatCurrency(data.business.unbilledAmount)}</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Business Projects List */}
-          {/* Business Projects List */}
-          <div className="tactile-panel flex-1 p-6 flex flex-col overflow-hidden">
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-sm font-bold text-foreground/80">중요 프로젝트</h3>
-              <Link href="/business/projects">
-                <Button size="icon" variant="ghost" className="h-8 w-8 rounded-full">
-                  <Plus className="w-4 h-4" />
-                </Button>
-              </Link>
-            </div>
-            <div className="space-y-4 overflow-y-auto custom-scrollbar pr-1">
-              {data.business.recentProjects.length > 0 ? (
-                data.business.recentProjects.map((project, i) => (
-                  <div key={i} className="flex items-center justify-between p-3 rounded-2xl hover:[box-shadow:var(--tactile-inner)] transition-all group cursor-pointer bg-transparent">
-                    <div className="flex items-center gap-3">
+          <div className="tactile-panel overflow-hidden border border-border/40 bg-card">
+            <div className="divide-y divide-border/40">
+              {data.recentTransactions.length > 0 ? (
+                data.recentTransactions.map((tx) => (
+                  <div key={tx.id} className="flex items-center justify-between p-4 hover:bg-muted/30 transition-colors group">
+                    <div className="flex items-center gap-4">
                       <div className={cn(
-                        "w-2 h-2 rounded-full animate-pulse",
-                        project.status === '진행중' ? 'bg-blue-500' : project.status === '완료' ? 'bg-emerald-500' : 'bg-amber-500'
-                      )} />
-                      <div className="max-w-[150px] md:max-w-[200px] truncate">
-                        <p className="text-xs font-semibold text-foreground group-hover:text-primary transition-colors">{project.name}</p>
-                        <p className="text-[10px] text-muted-foreground">{project.date} 마감</p>
+                        "w-10 h-10 rounded-2xl flex items-center justify-center border",
+                        tx.type === 'income' 
+                          ? "bg-emerald-500/10 border-emerald-500/20 text-emerald-500" 
+                          : "bg-red-500/10 border-red-500/20 text-red-500"
+                      )}>
+                        {tx.type === 'income' ? <ArrowUpRight className="w-5 h-5" /> : <ArrowDownRight className="w-5 h-5" />}
+                      </div>
+                      <div>
+                        <p className="font-bold text-sm text-foreground">{tx.description}</p>
+                        <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-medium mt-0.5">
+                          {tx.date} • {tx.category}
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs font-bold text-foreground">{formatCurrency(project.amount)}</p>
-                      <p className="text-[10px] text-muted-foreground">{project.status}</p>
+                      <p className={cn(
+                        "font-black text-sm",
+                        tx.type === 'income' ? "text-emerald-500" : "text-foreground"
+                      )}>
+                        {tx.type === 'income' ? '+' : ''}{formatCurrency(tx.amount)}
+                      </p>
                     </div>
                   </div>
                 ))
               ) : (
-                <div className="flex flex-col items-center justify-center py-10 text-zinc-600">
-                  <Briefcase className="w-8 h-8 mb-2 opacity-20" />
-                  <p className="text-xs">등록된 프로젝트가 없습니다.</p>
+                <div className="py-20 flex flex-col items-center justify-center text-muted-foreground opacity-50">
+                  <Receipt className="w-12 h-12 mb-2" />
+                  <p>최근 거래 내역이 없습니다.</p>
                 </div>
               )}
             </div>
           </div>
-        </section>
+        </div>
+
+        {/* Right Layer: Widgets & Quick Actions (1/3 width on desktop) */}
+        <div className="space-y-8">
+          
+          {/* Quick Actions */}
+          <section className="space-y-4">
+            <h2 className="text-xl font-bold">빠른 작업</h2>
+            <div className="grid grid-cols-2 gap-3">
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2 rounded-2xl border-2 hover:border-primary/50 hover:bg-primary/5 group" asChild>
+                <Link href="/ledger?action=new">
+                  <PlusCircle className="w-6 h-6 text-primary group-hover:scale-110 transition-transform" />
+                  <span className="text-xs font-bold text-foreground">지출 기록</span>
+                </Link>
+              </Button>
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2 rounded-2xl border-2 hover:border-blue-500/50 hover:bg-blue-500/5 group" asChild>
+                <Link href="/import">
+                  <Download className="w-6 h-6 text-blue-500 group-hover:scale-110 transition-transform" />
+                  <span className="text-xs font-bold text-foreground">내역 로드</span>
+                </Link>
+              </Button>
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2 rounded-2xl border-2 hover:border-emerald-500/50 hover:bg-emerald-500/5 group">
+                <Users className="w-6 h-6 text-emerald-500 group-hover:scale-110 transition-transform" />
+                <span className="text-xs font-bold text-foreground">더치페이</span>
+              </Button>
+              <Button variant="outline" className="h-auto py-4 flex flex-col gap-2 rounded-2xl border-2 hover:border-muted-foreground/50 hover:bg-muted group">
+                <Settings className="w-6 h-6 text-muted-foreground group-hover:rotate-45 transition-transform" />
+                <span className="text-xs font-bold text-foreground">설정</span>
+              </Button>
+            </div>
+          </section>
+
+          {/* Business projects summary (Reused from previous design but fits better here) */}
+          <section className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold">중요 프로젝트</h2>
+              <Link href="/business">
+                <Button variant="link" size="sm" className="h-auto p-0 text-muted-foreground">전체보기</Button>
+              </Link>
+            </div>
+            
+            <ReceivablesAlertCard />
+
+            <div className="tactile-panel p-5 space-y-4 bg-emerald-500/[0.03] border-emerald-500/10">
+              {data.business.recentProjects.length > 0 ? (
+                data.business.recentProjects.map((project, i) => (
+                  <div key={i} className="flex items-center justify-between border-b border-border/30 pb-3 last:border-0 last:pb-0">
+                    <div className="flex flex-col">
+                      <p className="text-xs font-bold text-foreground truncate max-w-[120px]">{project.name}</p>
+                      <p className="text-[10px] text-muted-foreground">{project.status}</p>
+                    </div>
+                    <p className="text-xs font-black text-foreground">{formatCurrency(project.amount)}</p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-xs text-center text-muted-foreground py-4">활성 프로젝트가 없습니다.</p>
+              )}
+            </div>
+          </section>
+        </div>
       </div>
     </div>
   );

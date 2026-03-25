@@ -25,9 +25,11 @@ export async function bulkUpdateTransactions(
           category_id: number;
           allocation_status: 'personal' | 'business_allocated';
           business_unit_id?: string | null;
+          manual_override: boolean;
         } = {
             category_id: categoryId,
-            allocation_status: businessUnitId ? 'business_allocated' : 'personal'
+            allocation_status: businessUnitId ? 'business_allocated' : 'personal',
+            manual_override: true
         };
 
         if (businessUnitId) {

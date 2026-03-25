@@ -308,7 +308,16 @@ export function TransactionTable({ transactions, businessUnits, assets }: Transa
                                             </div>
                                         )}
                                     </TableCell>
-                                    <TableCell className={cn("text-foreground/90", tx.excluded_from_personal && "line-through opacity-50")}>{tx.description}</TableCell>
+                                    <TableCell className={cn("text-foreground/90", tx.excluded_from_personal && "line-through opacity-50")}>
+                                        <div className="flex items-center gap-2">
+                                            {tx.description}
+                                            {tx.excluded_from_personal && (
+                                                <Badge variant="secondary" className="bg-slate-200 text-slate-500 border-0 text-[10px] h-4 px-1 font-normal">
+                                                    운영비 제외
+                                                </Badge>
+                                            )}
+                                        </div>
+                                    </TableCell>
                                     <TableCell className={cn(
                                         "text-right font-medium whitespace-nowrap",
                                         tx.excluded_from_personal && "line-through opacity-50",

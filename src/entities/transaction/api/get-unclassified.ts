@@ -1,17 +1,8 @@
 'use server'
 
 import { createClient } from '@/shared/api/supabase/server';
+import { UnclassifiedGroup, OWNER_OPTIONS } from '../model/unclassified';
 
-export interface UnclassifiedGroup {
-    rawName: string;
-    amount: number; // [NEW] Added for granular grouping
-    ownerType: string; // [NEW] Added owner type from RPC
-    count: number;
-    transactionIds: string[];
-    sampleDate: string;
-    totalAmount: number;
-    type: 'income' | 'expense';
-}
 
 interface UnclassifiedRpcResponse {
     raw_name: string;
@@ -22,6 +13,7 @@ interface UnclassifiedRpcResponse {
     sample_date: string;
     total_amount: number;
     type: 'income' | 'expense';
+    is_groupable: boolean;
 }
 
 export async function getUnclassifiedTransactions(): Promise<UnclassifiedGroup[]> {
@@ -49,6 +41,7 @@ export async function getUnclassifiedTransactions(): Promise<UnclassifiedGroup[]
         transactionIds: row.transaction_ids, // UUID Array
         sampleDate: row.sample_date ? new Date(row.sample_date).toISOString().split('T')[0] : '',
         totalAmount: Number(row.total_amount),
-        type: row.type
+        type: row.type,
+        isGroupable: row.is_groupable
     }));
 }

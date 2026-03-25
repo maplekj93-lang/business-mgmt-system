@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from '@/shared/api/supabase/server';
+import { OwnerType } from '@/shared/constants/business';
 
 
 // [Type Definition] RPC가 반환하는 데이터 구조 (SQL 리턴값과 일치)
@@ -32,17 +33,22 @@ export interface DashboardStats {
     unitBreakdown: DashboardRpcResponse['unit_breakdown'];
 }
 
-export async function getMonthlyStats(params?: { mode?: 'personal' | 'total' | 'business' }): Promise<DashboardStats | null> {
+export async function getMonthlyStats(params?: { 
+    mode?: 'personal' | 'total' | 'business',
+    ownerId?: OwnerType | 'all' 
+}): Promise<DashboardStats | null> {
     const supabase = await createClient();
 
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return null;
 
     const mode = params?.mode || 'personal';
+    const ownerId = params?.ownerId === 'all' ? null : params?.ownerId;
 
     // 1. RPC Call (Type Safe)
     const { data, error } = await supabase.rpc('get_dashboard_stats', {
-        p_mode: mode
+        p_mode: mode,
+        p_owner_id: ownerId
     });
 
     if (error) {
@@ -58,10 +64,10 @@ export async function getMonthlyStats(params?: { mode?: 'personal' | 'total' | '
     }
 
     return {
-        totalIncome: Number(result.total_income),
-        totalExpense: Number(result.total_expense),
-        netProfit: Number(result.net_profit),
-        trend: (result.trend as unknown as DashboardRpcResponse['trend']) || [],
-        unitBreakdown: (result.unit_breakdown as unknown as DashboardRpcResponse['unit_breakdown']) || []
+        totalIncome: Number((result as any).total_income),
+        totalExpense: Number((result as any).total_expense),
+        netProfit: Number((result as any).net_profit),
+        trend: ((result as any).trend as unknown as DashboardRpcResponse['trend']) || [],
+        unitBreakdown: ((result as any).unit_breakdown as unknown as DashboardRpcResponse['unit_breakdown']) || []
     };
 }

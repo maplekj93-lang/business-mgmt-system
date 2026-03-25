@@ -8,6 +8,8 @@ export interface ValidatedTransaction {
     date: string;       // ISO Date String (YYYY-MM-DD or YYYY-MM-DDTHH:mm:ss)
     amount: number;     // Negative for expense, Positive for income (항상 KRW 기준)
     description: string;
+    raw_description: string; // [NEW] 원본 거래 설명 (정규화 전)
+    normalized_name?: string; // [NEW] 정규화된 가맹점명
     categoryRaw: string;
     type: 'income' | 'expense' | 'transfer';
     source_raw_data?: Record<string, any>; // Store original row data + extras
@@ -17,6 +19,8 @@ export interface ValidatedTransaction {
     _local_amount?: number;         // 결제 통화 기준 금액
     _fx_rate_used?: number;         // 적용된 환율 (1 USD = ? KRW)
     _is_fx_approximate?: boolean;   // 환율이 근사치인 경우 true
+    cardNo?: string;                // [NEW] 카드번호
+    transactionTime?: string;       // [NEW] 거래시간
 }
 
 // [NEW] 엑셀 파싱 후 임포트 전 중간 타입
@@ -24,6 +28,8 @@ export interface ExcelTransactionRow {
     date: string;   // YYYY-MM-DD로 정규화된 상태
     amount: number;
     description: string;
+    raw_description: string; // [NEW] 원본 거래 설명
+    normalized_name?: string; // [NEW] 정규화된 가맹점명
     asset_id: string;
 }
 
@@ -60,5 +66,6 @@ export interface BankProfile {
         // Bank specific cleanup logic
         parseAmount?: (val: any) => number;
         parseStatus?: (val: any) => 'approved' | 'cancelled' | 'skip';
+        postProcess?: (tx: ValidatedTransaction) => ValidatedTransaction;
     }
 }

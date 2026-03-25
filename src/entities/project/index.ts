@@ -1,4 +1,5 @@
 export * from './model/types';
-export * from './api/get-projects';
-export * from './api/get-pipeline';
-export * from './api/update-income-status';
+export * from './api';
+export { ProjectCard } from './ui/ProjectCard';
+export { CreateProjectModal } from './ui/CreateProjectModal';
+export { ProjectDetailModal } from './ui/ProjectDetailModal';
