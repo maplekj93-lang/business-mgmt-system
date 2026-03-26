@@ -43,7 +43,7 @@ export async function getMonthlyStats(params?: {
     if (!user) return null;
 
     const mode = params?.mode || 'personal';
-    const ownerId = params?.ownerId === 'all' ? null : params?.ownerId;
+    const ownerId = params?.ownerId === 'all' ? undefined : params?.ownerId;
 
     // 1. RPC Call (Type Safe)
     const { data, error } = await supabase.rpc('get_dashboard_stats', {

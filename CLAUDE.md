@@ -31,6 +31,18 @@
 
 ---
 
+## 🚀 GStack AI Workflow
+
+GStack의 가이드라인을 최우선으로 준수합니다:
+
+- **Web Browsing:** 모든 웹 브라우징은 GStack의 `/browse` 스킬을 사용하며, `mcp__claude-in-chrome__*` 도구는 절대 사용하지 않습니다.
+- **AI Persona Skills:** 아래 전용 슬래시 커맨드를 활용하여 작업의 품질과 일관성을 유지합니다.
+
+**Available Skills:**
+`/office-hours`, `/plan-ceo-review`, `/plan-eng-review`, `/plan-design-review`, `/design-consultation`, `/review`, `/ship`, `/land-and-deploy`, `/canary`, `/benchmark`, `/browse`, `/qa`, `/qa-only`, `/design-review`, `/setup-browser-cookies`, `/setup-deploy`, `/retro`, `/investigate`, `/document-release`, `/codex`, `/cso`, `/autoplan`, `/careful`, `/freeze`, `/guard`, `/unfreeze`, `/gstack-upgrade`
+
+---
+
 ## 🔨 현재 진행 중인 작업
 
 **Phase 4: ERP 기능 구현**

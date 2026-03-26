@@ -1,0 +1,250 @@
+{
+  "taskId": "validate-db-and-regression",
+  "title": "1순위 + 2순위: DB 마이그레이션 검증 및 회귀 테스트",
+  "description": "Phase 4 ERP 구현 시작 전 데이터베이스 상태 확인 및 기존 기능 동작 검증",
+  "priority": "CRITICAL",
+  "owner": "Antigravity",
+  "createdDate": "2026-03-20",
+  "estimatedTime": "1.5-2시간",
+  "status": "PENDING",
+
+  "phase1": {
+    "title": "1순위: 데이터베이스 마이그레이션 검증",
+    "description": "Supabase에서 Phase 4 DB 스키마가 정상 적용됐는지 확인",
+    "estimatedTime": "45분",
+    "tasks": [
+      {
+        "id": "db-check-01",
+        "title": "신규 테이블 존재 확인",
+        "description": "Supabase SQL Editor에서 다음 테이블이 존재하는지 확인",
+        "checkpoints": [
+          "business_profiles 테이블 존재 여부",
+          "clients 테이블 존재 여부",
+          "projects 테이블 스키마 (교체 완료 여부)",
+          "project_incomes 테이블 존재 여부",
+          "daily_rate_logs 테이블 존재 여부",
+          "crew_payments 테이블 존재 여부",
+          "site_expenses 테이블 존재 여부"
+        ],
+        "sql": "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_name IN ('business_profiles', 'clients', 'projects', 'project_incomes', 'daily_rate_logs', 'crew_payments', 'site_expenses') ORDER BY table_name;",
+        "expectedResult": "7개 테이블 모두 조회"
+      },
+      {
+        "id": "db-check-02",
+        "title": "projects 테이블 스키마 확인",
+        "description": "기존 구조에서 ERP 스펙으로 교체됐는지 확인",
+        "checkpoints": [
+          "client_id 컬럼 존재 (FK to clients)",
+          "business_owner 컬럼 존재 (CHECK: kwangjun, euiyoung, joint)",
+          "income_type 컬럼 존재 (CHECK: freelance, daily_rate, photo_project)",
+          "categories 컬럼 존재 (TEXT[] 배열)",
+          "status 컬럼 존재 (CHECK: active, completed, cancelled)",
+          "duration_days 컬럼 존재",
+          "start_date, end_date 컬럼 존재"
+        ],
+        "sql": "\\d public.projects;",
+        "expectedResult": "위 7개 컬럼이 모두 보여야 함 (기존 budget, 단순 status 제거됨)"
+      },
+      {
+        "id": "db-check-03",
+        "title": "FK 제약 조건 확인",
+        "description": "transactions.project_id가 새 projects 테이블을 정상 참조하는지 확인",
+        "checkpoints": [
+          "transactions 테이블의 project_id FK 제약 존재",
+          "FK가 projects(id)를 가리킴",
+          "ON DELETE SET NULL 동작 확인"
+        ],
+        "sql": "SELECT constraint_name, table_name, column_name, foreign_table_name, foreign_column_name FROM information_schema.key_column_usage WHERE table_name = 'transactions' AND column_name = 'project_id';",
+        "expectedResult": "FK 제약이 projects 테이블을 참조"
+      },
+      {
+        "id": "db-check-04",
+        "title": "RLS 정책 확인",
+        "description": "신규 ERP 테이블들에 RLS가 활성화되고 정책이 설정됐는지 확인",
+        "checkpoints": [
+          "business_profiles RLS 활성화 + authenticated_all 정책",
+          "clients RLS 활성화 + authenticated_all 정책",
+          "projects RLS 활성화 + authenticated_all 정책",
+          "project_incomes RLS 활성화 + authenticated_all 정책",
+          "daily_rate_logs RLS 활성화 + authenticated_all 정책",
+          "crew_payments RLS 활성화 + authenticated_all 정책",
+          "site_expenses RLS 활성화 + authenticated_all 정책"
+        ],
+        "sql": "SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename IN ('business_profiles', 'clients', 'projects', 'project_incomes', 'daily_rate_logs', 'crew_payments', 'site_expenses');",
+        "expectedResult": "7개 테이블 모두 목록 표시 (RLS 활성화 확인)"
+      },
+      {
+        "id": "db-check-05",
+        "title": "시드 데이터 확인",
+        "description": "기본 거래처 4개와 자사 프로필 3개가 삽입됐는지 확인",
+        "checkpoints": [
+          "business_profiles: 3개 행 (kwangjun, euiyoung, joint)",
+          "clients: 4개 행 (스튜디오리프, 기브온, 그립두드, 한국 다이이치산쿄)"
+        ],
+        "sql": "SELECT COUNT(*) FROM public.business_profiles; SELECT COUNT(*) FROM public.clients;",
+        "expectedResult": "3, 4"
+      },
+      {
+        "id": "db-check-06",
+        "title": "GENERATED COLUMN 동작 확인",
+        "description": "amount_net이 자동 계산되는지 테스트",
+        "checkpoints": [
+          "daily_rate_logs: amount_net = amount_gross * (1 - withholding_rate / 100)",
+          "crew_payments: amount_net = amount_gross * (1 - withholding_rate / 100)"
+        ],
+        "sql": "INSERT INTO public.daily_rate_logs (user_id, work_date, site_name, amount_gross, withholding_rate, payment_status) VALUES (NULL, '2026-03-20', 'Test', 100, 0, 'pending') RETURNING amount_gross, withholding_rate, amount_net;",
+        "expectedResult": "amount_net = 100 (withholding_rate=0이므로 동일)",
+        "cleanup": "DELETE FROM public.daily_rate_logs WHERE site_name = 'Test';"
+      },
+      {
+        "id": "db-check-07",
+        "title": "database.types.ts 동기화",
+        "description": "Supabase CLI로 TypeScript 타입 파일 재생성",
+        "command": "npx supabase gen types typescript --project-id <YOUR_PROJECT_ID> --schema public > src/shared/api/supabase/database.types.ts",
+        "note": "프로젝트 ID는 Supabase 대시보드 Settings > General에서 확인",
+        "verification": "src/shared/api/supabase/database.types.ts 파일에 BusinessProfile, Client, Project, ProjectIncome, DailyRateLog, CrewPayment, SiteExpense 타입이 모두 포함됐는지 확인"
+      }
+    ],
+    "successCriteria": "위 7개 체크포인트 모두 PASS"
+  },
+
+  "phase2": {
+    "title": "2순위: 기존 기능 회귀 테스트",
+    "description": "projects 테이블 교체 후 기존 가계부 기능이 정상 동작하는지 검증",
+    "estimatedTime": "45분",
+    "tasks": [
+      {
+        "id": "regression-01",
+        "title": "대시보드 렌더링 확인",
+        "route": "/",
+        "description": "가계부 메인 대시보드가 에러 없이 로드되는지 확인",
+        "checkpoints": [
+          "페이지 로드 완료 (500ms 이내)",
+          "상단 요약 카드 표시 (월별 수입/지출)",
+          "최근 거래 목록 렌더링",
+          "카테고리별 분석 차트 표시",
+          "브라우저 콘솔에 에러 없음"
+        ],
+        "failureAction": "브라우저 개발자 도구 > Console/Network에서 에러 로그 스크린샷 찍어서 보고"
+      },
+      {
+        "id": "regression-02",
+        "title": "엑셀 임포트 기능 확인",
+        "route": "/manage/import",
+        "description": "거래내역 엑셀 임포트 기능이 정상 동작하는지 확인",
+        "checkpoints": [
+          "임포트 페이지 로드 완료",
+          "파일 업로드 버튼 작동",
+          "샘플 엑셀 파일 임포트 시작 (실제 업로드 불필요, 로직만 확인)",
+          "프리뷰 테이블 렌더링",
+          "매핑 선택 UI 동작"
+        ],
+        "note": "실제 DB 삽입까지는 하지 않아도 됨 (UI/로직만 확인)",
+        "failureAction": "에러 메시지 캡처하고 보고"
+      },
+      {
+        "id": "regression-03",
+        "title": "미분류 거래 페이지 확인",
+        "route": "/transactions/unclassified",
+        "description": "미분류 거래내역 정리 페이지가 정상 동작하는지 확인",
+        "checkpoints": [
+          "페이지 로드 완료",
+          "미분류 거래 목록 표시 (0개여도 OK)",
+          "카테고리 선택 드롭다운 작동",
+          "거래내역 필터링 작동",
+          "저장/취소 버튼 UI 정상"
+        ],
+        "failureAction": "페이지 로드 실패 시 에러 스크린샷"
+      },
+      {
+        "id": "regression-04",
+        "title": "거래내역 조회 기능 확인",
+        "route": "/transactions/history",
+        "description": "거래내역 조회 페이지가 정상 동작하는지 확인",
+        "checkpoints": [
+          "페이지 로드 완료",
+          "거래 목록 테이블 렌더링",
+          "필터 (기간/카테고리) 작동",
+          "정렬 기능 작동",
+          "페이지네이션 작동"
+        ],
+        "failureAction": "로드 실패 시 콘솔 에러 보고"
+      },
+      {
+        "id": "regression-05",
+        "title": "설정 페이지 확인",
+        "route": "/settings/*",
+        "description": "모든 설정 서브페이지가 정상 작동하는지 확인",
+        "subpages": [
+          "/settings/categories (카테고리 관리)",
+          "/settings/assets (자산 관리)",
+          "/settings/fx-rates (환율 설정)",
+          "/settings/recurring-expenses (반복 거래)",
+          "/settings/import (임포트 설정)",
+          "/settings/tagging-rules (태깅 규칙)",
+          "/settings/user (사용자 정보)",
+          "/settings/crew (크루원 관리)"
+        ],
+        "checkpoints": [
+          "모든 서브페이지 로드 완료",
+          "폼 필드 렌더링",
+          "저장 버튼 클릭 가능",
+          "콘솔 에러 없음"
+        ],
+        "note": "실제 저장까지는 하지 않아도 됨 (UI 렌더링만 확인)",
+        "failureAction": "로드 실패한 페이지 명시하고 에러 보고"
+      },
+      {
+        "id": "regression-06",
+        "title": "기존 프로젝트 조회 기능 확인",
+        "route": "/dashboard/business/projects",
+        "description": "기존 프로젝트 목록이 정상 표시되는지 확인",
+        "note": "projects 테이블이 교체됐으므로, 기존 프로젝트 데이터가 있으면 표시 확인 (없으면 빈 목록 OK)",
+        "checkpoints": [
+          "페이지 로드 완료",
+          "프로젝트 목록 테이블 렌더링",
+          "필터 작동",
+          "새 프로젝트 추가 버튼 접근 가능"
+        ],
+        "failureAction": "로드 실패 시 에러 보고"
+      }
+    ],
+    "successCriteria": "위 6개 테스트 중 5개 이상 PASS (1개 실패는 허용, 3개 이상 실패면 심각)"
+  },
+
+  "reportingTemplate": {
+    "title": "검증 결과 보고서",
+    "sections": [
+      {
+        "section": "Phase 1: DB 마이그레이션",
+        "format": "각 체크포인트별 PASS/FAIL + 스크린샷 (FAIL인 경우)"
+      },
+      {
+        "section": "Phase 2: 회귀 테스트",
+        "format": "각 페이지별 상태 + 에러 발생 시 콘솔 로그/스크린샷"
+      },
+      {
+        "section": "종합 평가",
+        "format": "전체 성공 여부 + 블로킹 이슈 목록 + 우선순위"
+      }
+    ]
+  },
+
+  "blockers": {
+    "critical": [
+      "projects 테이블이 완전히 교체되지 않음 → 즉시 Step 1-B SQL 실행",
+      "transactions.project_id FK 깨짐 → DB 스키마 복구 필요",
+      "주요 페이지 렌더링 에러 → 코드 수정 필요"
+    ],
+    "medium": [
+      "일부 회귀 테스트 실패 → 원인 파악 후 수정",
+      "RLS 정책 미적용 → Step 1-D SQL 실행"
+    ],
+    "minor": [
+      "UI 미세한 버그 → 나중에 수정 가능",
+      "성능 이슈 → 최적화 단계에서 처리"
+    ]
+  },
+
+  "nextAction": "Phase 1 모두 PASS + Phase 2 5개 이상 PASS 시 → Phase 4 메인 작업 시작 (widgets/client-list 구현)"
+}

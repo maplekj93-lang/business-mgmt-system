@@ -1,0 +1,79 @@
+{
+  "phase": "Phase 4: ERP 기능 구현",
+  "lastUpdated": "2026-03-20",
+  "overallProgress": "85%",
+  "summary": "DB 검증 및 회귀 테스트 완료. 잔여 작업: client-list 위젯 구현",
+
+  "completed": {
+    "step3": "shared/constants/business.ts",
+    "step4a": "entities/client/ (get-clients, upsert-client, types)",
+    "step4b": "entities/project/ (get-projects, get-pipeline, update-income-status, types)",
+    "step4c": "entities/daily-rate/ (create/get/update/delete, types)",
+    "step5a": "features/log-daily-rate/ (LogDailyRateModal.tsx)",
+    "step5b": "features/manage-pipeline/ (KanbanBoard, KanbanCard, KanbanColumn)",
+    "step5c": "features/manage-daily-rate/ (DailyRateTable.tsx)",
+    "step5d": "features/manage-business-profile/",
+    "step6a": "widgets/income-kanban/ (IncomeKanban.tsx)",
+    "step6b": "widgets/cashflow-calendar/ (완전 구현)",
+    "step6c": "widgets/business-dashboard/",
+    "step7a": "/business/page.tsx (탭 기반 통합 대시보드)",
+    "step7b": "/business/projects/page.tsx",
+    "validate1": "DB 마이그레이션 완료 확인 (신규 테이블 7개 + RLS 정상)",
+    "validate2": "database.types.ts Supabase CLI로 재생성 완료",
+    "validate3": "amount_net GENERATED COLUMN 실데이터 검증 완료",
+    "validate4": "타입 에러 0건 확인 (npx tsc --noEmit)",
+    "validate5": "회귀 테스트 완료 — 기존 가계부 기능 정상 동작",
+    "validate6": "404 오류 원인 파악 및 해소 (/dashboard/* vs /business/* 경로 차이)"
+  },
+
+  "incomplete": [
+    {
+      "priority": 1,
+      "item": "widgets/client-list/ UI 구현",
+      "status": "❌",
+      "severity": "높음",
+      "description": "거래처 LTV 집계 쿼리 + 테이블 UI, 명세는 WORK_ORDER_ERP_PHASE4.md Step 6-C",
+      "estimatedTime": "3-4시간"
+    },
+    {
+      "priority": 1,
+      "item": "/business/clients/page.tsx 생성",
+      "status": "❌",
+      "severity": "중간",
+      "description": "ClientListWidget 마운트 + 비즈니스 레이아웃 통합",
+      "estimatedTime": "30분"
+    },
+    {
+      "priority": 2,
+      "item": "테스트 체크리스트 잔여 항목 검증",
+      "status": "⚠️",
+      "severity": "중간",
+      "description": "client-list 구현 후 WORK_ORDER_ERP_PHASE4.md 체크리스트 최종 확인"
+    }
+  ],
+
+  "nextSteps": [
+    {
+      "phase": "Next",
+      "title": "widgets/client-list/ 구현 → /business/clients/page.tsx 생성",
+      "time": "4시간",
+      "tasks": [
+        "명세: WORK_ORDER_ERP_PHASE4.md Step 6-C 참고",
+        "거래처 LTV 집계 SQL (Step 8 참고): COUNT(projects), SUM(project_incomes where status=입금완료), MAX(end_date)",
+        "테이블 컬럼: 업체명 / 프로젝트 수 / 누적 매출 / 최근 거래일 / 액션",
+        "행 클릭 → 우측 사이드 패널 (담당자 관리 + 프로젝트 이력)",
+        "완료 후 /business/clients/page.tsx에 ClientListWidget 마운트"
+      ]
+    }
+  ],
+
+  "warnings": [
+    "business_units (기존) ≠ business_profiles (신규) → 별개의 테이블, 혼동 금지"
+  ],
+
+  "references": {
+    "spec": "docs/handover/WORK_ORDER_ERP_PHASE4.md",
+    "constitution": "docs/reference/AI_RULES.md",
+    "techStack": "docs/handover/ANTIGRAVITY_HANDOVER.md"
+  }
+}

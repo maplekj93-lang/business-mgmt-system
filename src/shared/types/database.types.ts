@@ -330,8 +330,10 @@ export type Database = {
           created_at: string | null
           id: string
           matched_transaction_id: string | null
+          owner_id: string | null
           payment_date: string | null
           payment_status: string | null
+          project_id: string | null
           site_name: string
           user_id: string | null
           vat_type: string | null
@@ -345,8 +347,10 @@ export type Database = {
           created_at?: string | null
           id?: string
           matched_transaction_id?: string | null
+          owner_id?: string | null
           payment_date?: string | null
           payment_status?: string | null
+          project_id?: string | null
           site_name: string
           user_id?: string | null
           vat_type?: string | null
@@ -360,8 +364,10 @@ export type Database = {
           created_at?: string | null
           id?: string
           matched_transaction_id?: string | null
+          owner_id?: string | null
           payment_date?: string | null
           payment_status?: string | null
+          project_id?: string | null
           site_name?: string
           user_id?: string | null
           vat_type?: string | null
@@ -374,6 +380,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "daily_rate_logs_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -533,6 +546,86 @@ export type Database = {
           user_id?: string | null
         }
         Relationships: []
+      }
+      income_matching_rules: {
+        Row: {
+          conditions: Json | null
+          confidence_boost: number | null
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          is_locked: boolean | null
+          last_used_at: string | null
+          project_keyword: string
+          sender_name: string
+          usage_count: number | null
+          user_id: string
+        }
+        Insert: {
+          conditions?: Json | null
+          confidence_boost?: number | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_locked?: boolean | null
+          last_used_at?: string | null
+          project_keyword: string
+          sender_name: string
+          usage_count?: number | null
+          user_id?: string
+        }
+        Update: {
+          conditions?: Json | null
+          confidence_boost?: number | null
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          is_locked?: boolean | null
+          last_used_at?: string | null
+          project_keyword?: string
+          sender_name?: string
+          usage_count?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      income_transaction_links: {
+        Row: {
+          amount_allocated: number
+          created_at: string | null
+          id: string
+          income_id: string
+          income_type: string
+          transaction_id: string
+          user_id: string
+        }
+        Insert: {
+          amount_allocated: number
+          created_at?: string | null
+          id?: string
+          income_id: string
+          income_type: string
+          transaction_id: string
+          user_id?: string
+        }
+        Update: {
+          amount_allocated?: number
+          created_at?: string | null
+          id?: string
+          income_id?: string
+          income_type?: string
+          transaction_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "income_transaction_links_transaction_id_fkey"
+            columns: ["transaction_id"]
+            isOneToOne: false
+            referencedRelation: "transactions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       kakao_pay_mappings: {
         Row: {
@@ -1088,7 +1181,7 @@ export type Database = {
           owner?: string | null
           owner_type?: string | null
           project_id?: string | null
-          raw_description: string
+          raw_description?: string
           receipt_memo?: string | null
           source?: string
           source_raw_data?: Json | null
@@ -1269,7 +1362,12 @@ export type Database = {
     }
     Functions: {
       calculate_cashflow_stats: {
-        Args: { p_end_date: string; p_start_date: string; p_user_id: string }
+        Args: {
+          p_end_date: string
+          p_owner_id?: string
+          p_start_date: string
+          p_user_id: string
+        }
         Returns: Json
       }
       cleanup_transaction_duplicates: {
@@ -1279,8 +1377,37 @@ export type Database = {
           updated_count: number
         }[]
       }
+      confirm_income_matching_v2: {
+        Args: {
+          p_amounts_allocated: number[]
+          p_create_rule?: boolean
+          p_income_id: string
+          p_income_type: string
+          p_rule_keyword?: string
+          p_rule_sender_name?: string
+          p_transaction_ids: string[]
+        }
+        Returns: undefined
+      }
+      confirm_income_matching_v3: {
+        Args: {
+          p_amounts_allocated: number[]
+          p_create_rule?: boolean
+          p_income_id: string
+          p_income_type: string
+          p_rule_keyword?: string
+          p_rule_sender_name?: string
+          p_transaction_ids: string[]
+        }
+        Returns: undefined
+      }
       get_advanced_analytics: {
-        Args: { p_mode: string; p_month: number; p_year: number }
+        Args: {
+          p_mode: string
+          p_month: number
+          p_owner_id?: string
+          p_year: number
+        }
         Returns: {
           category_distribution: Json
           daily_trend: Json
@@ -1314,7 +1441,7 @@ export type Database = {
       }
       get_dashboard_stats:
         | {
-            Args: { p_mode: string }
+            Args: { p_mode?: string; p_owner_id?: string }
             Returns: {
               net_profit: number
               total_expense: number
@@ -1367,6 +1494,52 @@ export type Database = {
           tx_owner_type: string
         }[]
       }
+      get_income_matching_candidates_v2: {
+        Args: {
+          p_income_id: string
+          p_income_type: string
+          p_search_query?: string
+          p_target_amount: number
+        }
+        Returns: {
+          confidence_score: number
+          match_reason: string
+          transaction_amount: number
+          transaction_date: string
+          transaction_description: string
+          transaction_id: string
+        }[]
+      }
+      get_income_matching_candidates_v3: {
+        Args: {
+          p_search_query?: string
+          p_target_amount: number
+          p_target_date?: string
+        }
+        Returns: {
+          confidence_score: number
+          is_choice_required: boolean
+          match_reason: string
+          transaction_amount: number
+          transaction_date: string
+          transaction_description: string
+          transaction_id: string
+        }[]
+      }
+      get_project_profitability: {
+        Args: { p_owner_id?: string; p_status?: string }
+        Returns: {
+          expenses: number
+          labor_cost: number
+          net_profit: number
+          owner_id: string
+          profit_margin: number
+          project_id: string
+          project_name: string
+          revenue: number
+          status: string
+        }[]
+      }
       get_unclassified_stats: {
         Args: never
         Returns: {
@@ -1394,6 +1567,8 @@ export type Database = {
           type: string
         }[]
       }
+      show_limit: { Args: never; Returns: number }
+      show_trgm: { Args: { "": string }; Returns: string[] }
     }
     Enums: {
       [_ in never]: never

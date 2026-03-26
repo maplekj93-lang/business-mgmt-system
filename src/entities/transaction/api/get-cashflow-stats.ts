@@ -23,7 +23,7 @@ export async function getCashflowStats(startDate: string, endDate: string, owner
             p_user_id: user.id,
             p_start_date: startDate,
             p_end_date: endDate,
-            p_owner_id: ownerId === 'all' ? null : ownerId
+            p_owner_id: ownerId === 'all' ? undefined : ownerId
         });
 
         if (error) {

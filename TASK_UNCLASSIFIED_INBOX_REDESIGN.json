@@ -1,0 +1,232 @@
+{
+  "taskId": "unclassified-inbox-redesign",
+  "title": "임포트 파이프라인 + 미분류 수신함 전면 재설계",
+  "createdDate": "2026-03-20",
+  "lastUpdated": "2026-03-20",
+  "priority": "CRITICAL",
+  "owner": "Antigravity",
+  "status": "PENDING",
+  "reason": "현재 그룹핑 방식으로는 정확한 카테고라이징 불가. 모든 ERP/가계부 기능의 데이터 품질 선행 조건.",
+
+  "researchFindings": {
+    "summary": "2026-03-20 Gemini 딥리서치 결과 기반. 원본: RESEARCH_PROMPT_IMPORT_CATEGORIZATION.md",
+
+    "keyInsights": [
+      {
+        "insight": "카카오페이/네이버페이 원가맹점 파싱은 엑셀 임포트 방식으로는 원천 불가능",
+        "detail": "카드사 B2C 명세서에는 PG사명(카카오페이)만 찍힘. 원가맹점은 마이데이터 API(사업자번호)를 통해서만 가능. 현재 시스템이 이미 카카오페이 거래내역서 별도 임포트 → timestamp+금액 교차병합 방식을 구현해 놓은 것이 사실상 최선의 대안.",
+        "implication": "현재 카카오페이 매처(kakao-pay-matcher) 로직은 리서치가 제안한 'Dual Excel Merge' 방식과 동일. 이미 올바른 방향. 유지 및 고도화."
+      },
+      {
+        "insight": "쿠팡/배달앱은 품목 단위 파싱 없이는 단일 카테고리 불가능",
+        "detail": "Monarch Money는 브라우저 확장으로 아마존 품목 파싱. 국내에서는 불가. 배달앱(배민/요기요/쿠팡이츠)은 간식/커피/식사 구분이 불가. 쿠팡은 식품/의류/전자기기 구분 불가.",
+        "implication": "이 가맹점들은 그룹핑 대상에서 제외하고 건별 처리 강제. 사용자가 개별 지정."
+      },
+      {
+        "insight": "백화점 가맹점명은 카드사에 따라 다름",
+        "detail": "직영 카드(삼성카드 → 신세계백화점 등)는 층별/매장별까지 나올 수 있음. 그러나 독립 임대 매장은 생소한 법인명으로 나옴. 완전 신뢰 불가.",
+        "implication": "백화점 브랜드명 정규화(롯데백화점 강남점 → 롯데백화점)는 가능. 하지만 층별 카테고리 분류는 사용자 수동 처리 필요."
+      },
+      {
+        "insight": "owner_type 자동화는 카드/계좌 매핑 테이블로 해결 가능",
+        "detail": "Copilot Money 등의 사례처럼, 초기 설정에서 '이 카드/계좌 = 광준 것'을 등록하면 임포트 시 자동 적용 가능. 현재 시스템은 asset 선택이 선택적이라 누락 시 owner_type = 'other'로 떨어짐.",
+        "implication": "임포트 시 asset 선택 필수화 → 해당 asset의 owner_type 자동 세팅. 이미 asset_id는 importExcelTransactions에 전달되고 있음."
+      },
+      {
+        "insight": "가맹점명 정규화(Normalization)가 그룹핑 품질을 크게 향상시킴",
+        "detail": "'스타벅스 강남점'과 '스타벅스 역삼점'이 현재 별도 그룹으로 쪼개지는 문제. 정규식으로 지점명 제거 → 'normalized_name' 기준 그룹핑하면 동일 브랜드로 묶임.",
+        "implication": "parser.ts 또는 RPC 단에서 정규화 처리 추가 필요."
+      },
+      {
+        "insight": "임포트 직후 자동 규칙 적용이 미분류 수신함 부담을 대폭 감소시킴",
+        "detail": "현재는 임포트 후 사용자가 수동으로 '자동분류' 버튼을 눌러야 함. 임포트 완료 시 applyTaggingRules() 자동 실행하면 규칙 있는 거래는 즉시 분류됨.",
+        "implication": "uploadBatchAction 또는 importExcelTransactions 완료 후 자동 호출 추가."
+      },
+      {
+        "insight": "LLM 폴백은 비용 효율적 접근이 필요",
+        "detail": "모든 거래에 LLM 호출 시 비용/속도 문제. 룰 엔진 + 히스토리 매칭 실패한 롱테일 거래만 배치로 LLM에 전송하는 방식이 현실적.",
+        "implication": "단기 과제 아님. Phase 5 이후 고도화 아이템으로 분류."
+      }
+    ],
+
+    "currentSystemStrengths": [
+      "카카오페이 Dual Excel Merge 이미 구현됨 (kakao-pay-matcher)",
+      "3단계 룰 엔진(Exact/Contains/History) 구조 자체는 올바름",
+      "asset_id가 importExcelTransactions에 이미 전달되고 있음 → owner_type 자동화 용이",
+      "import_hash 기반 중복 방지 로직 탄탄"
+    ]
+  },
+
+  "problemAnalysis": {
+    "problem1": {
+      "title": "그룹핑 기준이 너무 넓음 (가장 심각)",
+      "detail": "GROUP BY (raw_name, owner_type, type)만으로 묶으면 쿠팡/배달앱처럼 카테고리가 다양한 거래가 전부 1개 그룹됨. 반대로 '스타벅스 강남점'/'스타벅스 역삼점'처럼 같은 브랜드인데 텍스트 차이로 쪼개지는 문제도 있음.",
+      "solution": "① 블랙리스트(ungroupable) 가맹점은 건별 처리 강제. ② normalized_name으로 지점명 제거 후 그룹핑.",
+      "impact": "HIGH"
+    },
+    "problem2": {
+      "title": "owner_type 임포트 시 자동 세팅 안 됨",
+      "detail": "importExcelTransactions()에 assetId가 전달되지만 해당 asset의 owner_type을 rows에 세팅하는 로직이 없음. migration에서 나중에 채우는 방식은 타이밍 이슈 있음.",
+      "solution": "importExcelTransactions() 시작 시 assetId로 asset의 owner_type 조회 → 모든 row에 세팅.",
+      "impact": "HIGH"
+    },
+    "problem3": {
+      "title": "임포트 후 자동 규칙 적용이 수동",
+      "detail": "uploadBatchAction 완료 후 applyTaggingRules()가 자동 실행되지 않음. 사용자가 미분류 수신함에서 수동으로 '자동분류' 버튼을 눌러야 함.",
+      "solution": "uploadBatchAction 또는 LedgerImportWidget handleSave() 완료 후 applyTaggingRules() 자동 호출.",
+      "impact": "MEDIUM"
+    },
+    "problem4": {
+      "title": "건별 처리 UI 없음",
+      "detail": "미분류 수신함에서 개별 거래를 다르게 분류할 방법이 없음. 그룹 내 건별 패널은 읽기 전용.",
+      "solution": "per-item 모드 UI 추가. is_groupable=false 거래는 독립 행으로 표시, 인라인 카테고리 선택.",
+      "impact": "HIGH"
+    },
+    "problem5": {
+      "title": "가맹점명 텍스트 파편화",
+      "detail": "'스타벅스 강남점', '스타벅스 역삼점' 등 동일 브랜드가 다수의 그룹으로 쪼개져 규칙 생성 효율 저하.",
+      "solution": "normalized_name 필드 추가 및 정규식으로 지점명/지역명 제거.",
+      "impact": "MEDIUM"
+    }
+  },
+
+  "ungroupableMerchants": {
+    "description": "이 가맹점들은 같은 이름이어도 매번 카테고리가 달라 그룹핑 불가. 건별 처리 강제.",
+    "list": [
+      { "name": "쿠팡", "reason": "식품/의류/전자기기/생활용품 혼재" },
+      { "name": "Coupang", "reason": "쿠팡 영문 표기" },
+      { "name": "쿠팡이츠", "reason": "음식 종류 매번 다름 (식사/카페/간식 구분 불가)" },
+      { "name": "배달의민족", "reason": "음식 종류 매번 다름 (식사/카페/간식 구분 불가)" },
+      { "name": "요기요", "reason": "음식 종류 매번 다름" },
+      { "name": "카카오페이", "reason": "실제 가맹점 불명 (단, 카카오페이 매처로 일부 해소 가능)" },
+      { "name": "네이버페이", "reason": "실제 가맹점 불명" },
+      { "name": "토스페이", "reason": "실제 가맹점 불명" },
+      { "name": "ATM", "reason": "현금 인출 후 용도 불명" },
+      { "name": "현금출금", "reason": "용도 불명" },
+      { "name": "CD출금", "reason": "용도 불명" }
+    ],
+    "note": "DB 테이블(ungroupable_merchants)로 관리하여 설정 화면에서 사용자가 추가/제거 가능하게 할 것"
+  },
+
+  "normalizePatterns": {
+    "description": "가맹점명 정규화 패턴. parser.ts 또는 DB RPC 단에서 적용.",
+    "patterns": [
+      { "regex": "\\s*(강남|홍대|신촌|종로|명동|이태원|건대|신림|수원|부산|대구|인천|광주|대전|울산|세종|제주)\\s*(점|역|점$)?", "replace": "", "example": "스타벅스 강남점 → 스타벅스" },
+      { "regex": "\\s*(본점|지점|직영점|가맹점|매장|센터|지사|지점|영업점)$", "replace": "", "example": "다이소 본점 → 다이소" },
+      { "regex": "(주)|\\(주\\)|㈜|유한회사|주식회사", "replace": "", "example": "(주)비바리퍼블리카 → 비바리퍼블리카" },
+      { "regex": "\\s*[A-Z0-9]{4,}$", "replace": "", "example": "이마트 E1234 → 이마트" }
+    ],
+    "implementationNote": "transactions 테이블에 normalized_name GENERATED 컬럼 추가 또는 임포트 시 parser에서 전처리"
+  },
+
+  "implementationPlan": [
+    {
+      "order": 1,
+      "title": "owner_type 임포트 시 자동 세팅",
+      "estimatedTime": "1시간",
+      "why": "가장 근본적인 '미상' 문제 해결. 기존 구조에서 최소 변경으로 가능.",
+      "files": ["src/features/ledger-import/api/importExcelTransactions.ts"],
+      "spec": "함수 시작 시 supabase.from('assets').select('owner_type').eq('id', assetId).single() 조회 → 각 row에 owner_type 세팅. 기존 assetId 파라미터 이미 있으므로 추가 작업 최소."
+    },
+    {
+      "order": 2,
+      "title": "임포트 직후 자동 규칙 적용",
+      "estimatedTime": "1시간",
+      "why": "규칙 있는 거래를 임포트 즉시 분류 완료 → 미분류 수신함 부담 대폭 감소.",
+      "files": ["src/features/ledger-import/ui/ledger-import-widget.tsx"],
+      "spec": "handleSave() 완료 후 applyTaggingRules(insertedIds) 호출. uploadBatchAction이 삽입된 id 배열을 반환하도록 수정 필요."
+    },
+    {
+      "order": 3,
+      "title": "ungroupable_merchants DB 테이블 + RPC 개선",
+      "estimatedTime": "2시간",
+      "why": "쿠팡/배달앱 등을 자동으로 건별 처리 대상으로 분리. 사용자가 설정에서 관리 가능.",
+      "files": ["supabase/migrations/YYYYMMDD_ungroupable_merchants.sql"],
+      "spec": {
+        "newTable": "CREATE TABLE public.ungroupable_merchants (id UUID PK, normalized_name TEXT UNIQUE, reason TEXT, created_at TIMESTAMPTZ). RLS: authenticated_all.",
+        "seedData": "쿠팡, 배달의민족, 쿠팡이츠, 요기요, 카카오페이, 네이버페이, 토스페이, ATM, 현금출금",
+        "rpcChange": "get_unclassified_stats에 is_groupable 필드 추가. LEFT JOIN ungroupable_merchants → 매칭되면 false, 아니면 true.",
+        "newRpcField": "CASE WHEN um.normalized_name IS NOT NULL THEN false ELSE true END as is_groupable"
+      }
+    },
+    {
+      "order": 4,
+      "title": "가맹점명 정규화(normalized_name) 도입",
+      "estimatedTime": "2시간",
+      "why": "스타벅스 강남점/역삼점 파편화 해소. 그룹핑 품질 향상.",
+      "files": [
+        "supabase/migrations/YYYYMMDD_add_normalized_name.sql",
+        "src/features/ledger-import/model/parser.ts"
+      ],
+      "spec": "parser.ts에서 description 생성 시 normalizemerchantName() 함수 적용하여 normalized_name 필드 추가. RPC GROUP BY를 raw_name → normalized_name 기준으로 변경.",
+      "normalizeFn": "지점명/지역명 suffix 제거 → 법인 표기 제거 → trim"
+    },
+    {
+      "order": 5,
+      "title": "미분류 수신함 UI — 건별 처리 모드",
+      "estimatedTime": "4-5시간",
+      "why": "쿠팡/배달앱 등 is_groupable=false 거래를 개별 행으로 표시. 인라인 카테고리 지정.",
+      "files": [
+        "src/features/refine-ledger/ui/unclassified-row.tsx",
+        "src/features/refine-ledger/ui/per-item-row.tsx (신규)",
+        "src/app/(dashboard)/transactions/unclassified/page.tsx"
+      ],
+      "spec": {
+        "perItemRow": "날짜 / 가맹점명 / 금액 / 카드(asset) / owner 배지 / 카테고리 드롭다운(인라인) 컬럼",
+        "onCategorySelect": "updateTransactionAction() 호출 → 성공 시 해당 행 즉시 사라짐 (토스트 불필요)",
+        "onOwnerClick": "owner 배지 클릭 → 광준/의영/공동 토글 팝오버",
+        "groupRowChange": "is_groupable=true이고 count>=2인 것만 기존 그룹 행으로 표시"
+      }
+    },
+    {
+      "order": 6,
+      "title": "그룹 내 건별 편집 가능하도록 TransactionDetailPanel 개선",
+      "estimatedTime": "2-3시간",
+      "why": "그룹으로 묶인 거래 중 일부만 다른 카테고리로 지정할 수 있어야 함.",
+      "files": ["src/features/refine-ledger/ui/transaction-detail-panel.tsx"],
+      "spec": "현재 읽기 전용 테이블 → 각 행에 카테고리 드롭다운 + owner 수정 버튼 추가. 개별 저장 시 updateTransactionAction() 호출. '이 건만 그룹에서 제외' 기능 선택 구현."
+    }
+  ],
+
+  "outOfScope": [
+    {
+      "item": "LLM 폴백 자동분류 (Transformers.js + pgvector)",
+      "reason": "리서치에서 유효성 확인됐으나 현재 사용자 2명 규모에서는 과도한 복잡도. 히스토리 매칭으로 충분히 커버 가능. Phase 5 이후 고도화 검토.",
+      "phase": "Phase 5+"
+    },
+    {
+      "item": "마이데이터 API 연동",
+      "reason": "금융위원회 마이데이터 사업자 자격 필요. 현재 규모에서 불필요.",
+      "phase": "N/A"
+    },
+    {
+      "item": "네이버페이/토스페이 Dual Excel Merge",
+      "reason": "카카오페이 매처와 동일한 방식으로 구현 가능하나 우선순위 낮음. 카카오페이 매처 안정화 후 확장.",
+      "phase": "Phase 5+"
+    }
+  ],
+
+  "testChecklist": [
+    "쿠팡 거래 3건 임포트 → 3개 독립 per-item 행으로 표시 확인",
+    "배달의민족 거래 5건 임포트 → 5개 독립 per-item 행으로 표시 확인",
+    "스타벅스 강남점/역삼점 → normalized_name='스타벅스'로 1개 그룹으로 묶임 확인",
+    "asset 선택 후 임포트 → 해당 asset의 owner_type이 모든 거래에 자동 세팅 확인",
+    "임포트 완료 후 규칙 있는 거래 자동 분류 확인 (미분류 수신함에서 사라짐)",
+    "per-item 행에서 카테고리 선택 → 행 즉시 사라짐 확인",
+    "그룹 행 펼쳤을 때 개별 거래 카테고리 수정 가능 확인",
+    "owner 배지 클릭 → 광준/의영/공동 변경 확인",
+    "기존 그룹 분류 기능 회귀 없음 확인",
+    "카카오페이 매처 기존 동작 회귀 없음 확인"
+  ],
+
+  "references": {
+    "researchPrompt": "RESEARCH_PROMPT_IMPORT_CATEGORIZATION.md",
+    "currentRpc": "supabase/migrations/20260311_ledger_cleanup_and_refined_grouping.sql",
+    "importWidget": "src/features/ledger-import/ui/ledger-import-widget.tsx",
+    "importApi": "src/features/ledger-import/api/importExcelTransactions.ts",
+    "kakaoMatcher": "src/features/kakao-pay-matcher/",
+    "unclassifiedRow": "src/features/refine-ledger/ui/unclassified-row.tsx",
+    "bulkUpdate": "src/features/refine-ledger/api/bulk-update.ts",
+    "applyTaggingRules": "src/features/refine-ledger/api/apply-tagging-rules.ts"
+  }
+}

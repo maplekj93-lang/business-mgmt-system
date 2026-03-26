@@ -1,0 +1,312 @@
+{
+  "taskId": "TASK_BUSINESS_TAB_REDESIGN",
+  "title": "사업 탭 전면 재설계 — 의영(프로젝트형) + 광준(일당/프리랜서) 분리",
+  "createdAt": "2026-03-20",
+  "priority": 1,
+  "estimatedHours": 10,
+
+  "background": {
+    "summary": "현재 /business 탭은 광준(일당 기록) 위주로 설계되어 있고, 의영은 프로젝트형 사업자임에도 적합한 뷰가 없음. 형 앱(회사 앱)의 '프로젝트 탭' 구조를 참고하여 두 사람의 사업 방식 차이를 명확하게 분리·반영한다.",
+    "currentPainPoints": [
+      "의영의 프로젝트 상태 타임라인(견적수립→프로젝트시작→계산서발행→입금완료→최종종료) UI 없음",
+      "의영의 프로젝트별 '프로젝트 운영 탭'(일정/편집본/피드백/외주요청/로그) 개념 없음",
+      "광준의 프리랜서 계약 건(건당 계약, 계산서 발행)과 일당 건이 구분 없이 섞여 있음",
+      "/business/projects 와 /business 가 분리된 별도 페이지로 흩어져 있어 내비게이션 파편화",
+      "클라이언트 관리 위젯(widgets/client-list)이 아직 미구현"
+    ],
+    "referenceApp": {
+      "description": "형이 만든 회사 앱의 프로젝트 탭 구조 참고",
+      "features": [
+        "프로젝트 헤더: 이름 + STATUS 뱃지 + AG(에이전시)/CL(클라이언트)/담당자 칩",
+        "상태 타임라인: 견적수립 → 프로젝트시작 → 계산서발행 → 입금완료 → 최종종료 (단계별 날짜 표시, 현재 단계 강조)",
+        "진행 버튼: 다음 단계로 이동",
+        "프로젝트 운영 탭: 일정(PROJECT TIMELINE) / 편집본 / 피드백 / 외주요청 / 로그",
+        "일정 탭: 마스터플랜 추가 / 개별일정 추가, 전체/마스터일정/보조일정/직접일정/요청원안 필터",
+        "자료 허브 버튼 (우상단 고정)"
+      ]
+    }
+  },
+
+  "userProfiles": {
+    "euiyoung": {
+      "businessType": "프로젝트형",
+      "description": "영상제작/디자인 프리랜서. 클라이언트에게 견적→계약→납품→정산하는 프로젝트 단위 작업",
+      "needs": [
+        "프로젝트별 상태 타임라인 (견적수립→시작→계산서발행→입금→종료)",
+        "프로젝트 운영 탭 (일정/편집본/피드백/외주요청/로그) — 1단계는 일정+메모 수준으로 단순화",
+        "견적서/계산서 생성 및 PDF 출력",
+        "클라이언트별 프로젝트 목록 / 리드타임 추적"
+      ],
+      "existingCode": [
+        "entities/project/ — Project, ProjectIncome 타입, CRUD API",
+        "features/create-quote/ — 견적서 생성 다이얼로그 + QuoteTemplate (이미 있음)",
+        "features/match-income/ — 입금 매칭",
+        "widgets/income-kanban/ — 파이프라인 칸반 (이미 있음)",
+        "constants/business.ts — PIPELINE_STATUSES (의뢰중→포스팅완료 8단계)"
+      ]
+    },
+    "kwangjun": {
+      "businessType": "일당 + 프리랜서 계약 혼합",
+      "description": "조명 퍼스트로 현장 당일/단기 출동이 대부분. 간헐적으로 건당 프리랜서 계약도 있음",
+      "needs": [
+        "현장 일당 빠른 기록 (이미 구현: log-daily-rate 모달)",
+        "프리랜서 계약 건도 프로젝트로 등록해 계산서 발행 가능해야 함",
+        "월별 수입 요약, 크루 인건비 정산",
+        "일당 로그 테이블 (이미 구현: DailyRateTable)"
+      ],
+      "existingCode": [
+        "features/log-daily-rate/ — 일당 기록 모달",
+        "features/manage-daily-rate/ — DailyRateTable",
+        "features/verify-crew-payment/ — 크루 인건비 확인",
+        "widgets/business-dashboard/ — 수입 요약 카드",
+        "widgets/cashflow-calendar/ — 캐시플로우 달력"
+      ]
+    }
+  },
+
+  "newArchitecture": {
+    "summary": "/business 탭을 두 사람의 관점으로 명확히 분리하되, 한 페이지 안에서 탭으로 전환 가능하게 유지",
+
+    "topLevelTabs": [
+      {
+        "value": "overview",
+        "label": "Overview",
+        "description": "공동 수입 요약, 세금 적립 현황. 기존 BusinessDashboard 유지"
+      },
+      {
+        "value": "euiyoung_projects",
+        "label": "의영 프로젝트",
+        "description": "프로젝트 목록 + 상태 타임라인 + 프로젝트 운영 탭 (NEW)",
+        "isNew": true
+      },
+      {
+        "value": "kwangjun_ledger",
+        "label": "광준 현장",
+        "description": "일당 기록 + 프리랜서 계약 건 목록 + DailyRateTable (기존 Pipeline+Ledger 통합)"
+      },
+      {
+        "value": "cashflow",
+        "label": "Cashflow",
+        "description": "캐시플로우 달력. 기존 그대로"
+      },
+      {
+        "value": "settings",
+        "label": "Settings",
+        "description": "Business Profile 설정. 기존 그대로"
+      }
+    ],
+
+    "removedTabs": [
+      {
+        "value": "pipeline",
+        "reason": "광준 탭 / 의영 탭으로 흡수. 기존 IncomeKanban은 의영 프로젝트 탭 내부의 서브뷰로 이동"
+      },
+      {
+        "value": "ledger",
+        "reason": "광준 탭으로 흡수"
+      }
+    ]
+  },
+
+  "euiyoungProjectTabSpec": {
+    "description": "의영 프로젝트 탭 — 형 앱 구조를 기반으로 단순화한 버전",
+
+    "listView": {
+      "layout": "카드 그리드 (기존 /business/projects 와 동일한 ProjectCard 재사용)",
+      "header": {
+        "left": "의영 프로젝트",
+        "right": ["+ 새 프로젝트 버튼", "필터(전체/진행중/완료/보류)"]
+      },
+      "cardInfo": ["프로젝트명", "클라이언트", "현재 파이프라인 상태", "체크리스트 진행률", "마감일"]
+    },
+
+    "detailView": {
+      "description": "프로젝트 카드 클릭 시 — 현재 모달 방식에서 '슬라이드-인 패널' 또는 '전체 페이지'로 전환 검토",
+      "recommendation": "모달 유지 (현재 구조 최소 변경), 단 모달 내부를 '상태 타임라인 + 운영 탭' 구조로 개선",
+
+      "statusTimeline": {
+        "description": "상태 타임라인 — 형 앱과 동일한 5단계",
+        "stages": [
+          { "key": "quote_sent", "label": "견적수립", "icon": "check-circle", "dateField": "quote_sent_date" },
+          { "key": "project_started", "label": "프로젝트시작", "icon": "check-circle", "dateField": "start_date" },
+          { "key": "invoice_sent", "label": "계산서발행", "icon": "receipt", "dateField": "invoice_sent_date" },
+          { "key": "payment_received", "label": "입금완료", "icon": "check-circle", "dateField": "actual_payment_date" },
+          { "key": "completed", "label": "최종종료", "icon": "x-circle", "dateField": "end_date" }
+        ],
+        "mapping": "기존 PIPELINE_STATUSES(8단계)를 5단계로 매핑: '의뢰중/작업중/보류취소'→견적수립, '작업완료/수정완료'→프로젝트시작, '입금대기'→계산서발행, '입금완료'→입금완료, '포스팅완료'→최종종료",
+        "note": "DB는 기존 project_incomes.status (PipelineStatus) 그대로 사용. 타임라인은 프론트 매핑만 추가."
+      },
+
+      "operationTabs": {
+        "description": "프로젝트 운영 탭 — Phase 1에서는 3개만 구현",
+        "tabs": [
+          {
+            "value": "schedule",
+            "label": "일정",
+            "phase": 1,
+            "description": "기존 체크리스트(checklist[])를 일정 형태로 표시. 제목/날짜/분류 입력 가능. '마스터플랜 추가' / '개별일정 추가' 버튼."
+          },
+          {
+            "value": "memo",
+            "label": "메모",
+            "phase": 1,
+            "description": "기존 project.memo 필드 확장판. 자유 텍스트 메모 편집."
+          },
+          {
+            "value": "quote",
+            "label": "견적서/계산서",
+            "phase": 1,
+            "description": "기존 CreateQuoteDialog를 탭 내부 인라인으로 이동. PDF 출력 버튼."
+          },
+          {
+            "value": "log",
+            "label": "로그",
+            "phase": 2,
+            "description": "프로젝트 상태 변경 이력 자동 기록 (Phase 2 이후)"
+          },
+          {
+            "value": "files",
+            "label": "자료 허브",
+            "phase": 2,
+            "description": "파일/링크 저장 (Phase 2 이후, Supabase Storage 연동 필요)"
+          }
+        ]
+      },
+
+      "progressButton": {
+        "description": "현재 단계 → 다음 단계로 이동하는 '진행' 버튼 (형 앱과 동일)",
+        "implementation": "project_incomes의 현재 status를 다음 단계로 update_income_status API 호출"
+      }
+    },
+
+    "dbChangesNeeded": [
+      {
+        "change": "projects 테이블에 quote_sent_date 컬럼 추가",
+        "sql": "ALTER TABLE projects ADD COLUMN IF NOT EXISTS quote_sent_date DATE;",
+        "risk": "낮음 — nullable 컬럼 추가"
+      }
+    ]
+  },
+
+  "kwangjunLedgerTabSpec": {
+    "description": "광준 현장 탭 — 일당 기록 중심, 프리랜서 계약 건 추가",
+
+    "subTabs": [
+      {
+        "value": "daily",
+        "label": "현장 일당",
+        "description": "기존 DailyRateTable + '현장 일당 기록' 버튼. 현재 Ledger 탭과 동일."
+      },
+      {
+        "value": "freelance",
+        "label": "프리랜서 계약",
+        "description": "광준의 프리랜서 계약 건만 필터링한 프로젝트 목록. income_type='freelance' AND business_owner='kwangjun' 필터. 기존 ProjectCard 재사용.",
+        "note": "의영 프로젝트 탭과 동일한 컴포넌트를 kwangjun 필터로 재사용. 중복 구현 없음."
+      },
+      {
+        "value": "summary",
+        "label": "월별 요약",
+        "description": "기존 BusinessDashboard의 광준 수입 요약 카드 + 크루 인건비 정산 현황."
+      }
+    ],
+
+    "quickActions": {
+      "primary": "현장 일당 기록 (LogDailyRateModal — 기존 그대로)",
+      "secondary": "프리랜서 계약 추가 (CreateProjectModal — income_type을 'freelance'로 고정하여 열기)"
+    }
+  },
+
+  "clientListSpec": {
+    "description": "클라이언트 목록 위젯 (widgets/client-list — Phase 4 잔여 작업)",
+    "location": "의영 프로젝트 탭의 사이드 패널 또는 Settings 탭 내부",
+    "recommendation": "별도 라우트(/business/clients)보다 Settings 탭 내부에 포함하는 것이 단순",
+    "existingCode": [
+      "widgets/client-list/ui/ — 디렉토리 존재, UI 미구현",
+      "entities/client/api/get-clients-with-stats.ts — 통계 포함 조회 이미 있음",
+      "entities/client/ui/ClientSelect.tsx — 셀렉트 컴포넌트 이미 있음",
+      "entities/client/ui/CreateClientDialog.tsx — 생성 다이얼로그 이미 있음"
+    ]
+  },
+
+  "implementationPlan": [
+    {
+      "step": 1,
+      "title": "/business/page.tsx 탭 구조 개편",
+      "hours": 1.5,
+      "changes": [
+        "Pipeline 탭 → '의영 프로젝트' 탭으로 교체",
+        "Ledger 탭 → '광준 현장' 탭으로 교체",
+        "기존 IncomeKanban, DailyRateTable import 유지 (재배치만)"
+      ]
+    },
+    {
+      "step": 2,
+      "title": "의영 프로젝트 탭 — 프로젝트 목록 이전",
+      "hours": 2,
+      "changes": [
+        "기존 /business/projects/page.tsx 의 ProjectCard, 목록 로직을 widget으로 추출",
+        "새 widgets/project-list/ 생성 또는 인라인으로 탭 내부에 포함 (FSD 규칙 준수)",
+        "/business/projects 라우트는 redirect('/business') 처리"
+      ]
+    },
+    {
+      "step": 3,
+      "title": "프로젝트 상세 모달 — 상태 타임라인 UI 추가",
+      "hours": 3,
+      "changes": [
+        "ProjectDetailModal 상단에 5단계 타임라인 컴포넌트 추가",
+        "'진행' 버튼 → update_income_status 호출",
+        "projects 테이블 quote_sent_date 컬럼 마이그레이션",
+        "기존 CreateQuoteDialog를 탭 '견적서/계산서'로 이동"
+      ]
+    },
+    {
+      "step": 4,
+      "title": "광준 현장 탭 — 프리랜서 계약 서브탭 추가",
+      "hours": 1.5,
+      "changes": [
+        "일당/프리랜서/요약 3개 서브탭 구현",
+        "프리랜서 탭: income_type='freelance' AND business_owner='kwangjun' 필터 적용한 ProjectCard 목록",
+        "헤더에 '현장 일당 기록' + '프리랜서 계약 추가' 2개 버튼"
+      ]
+    },
+    {
+      "step": 5,
+      "title": "widgets/client-list UI 구현 (Phase 4 잔여)",
+      "hours": 3,
+      "changes": [
+        "ClientListWidget 컴포넌트 작성",
+        "get-clients-with-stats 데이터 조회",
+        "클라이언트별: 프로젝트 수, 총 매출, 마지막 거래일, 평균 리드타임 표시",
+        "위치: Settings 탭 내부에 '거래처 관리' 섹션으로 추가"
+      ]
+    },
+    {
+      "step": 6,
+      "title": "검증",
+      "hours": 1,
+      "checks": [
+        "tsc --noEmit 에러 0건",
+        "/business 탭 5개 모두 정상 렌더",
+        "의영 프로젝트 생성 → 타임라인 '진행' 버튼 클릭 → 상태 업데이트 확인",
+        "광준 프리랜서 계약 추가 → 일당 탭에 미표시, 프리랜서 탭에 표시 확인",
+        "클라이언트 목록 정상 조회"
+      ]
+    }
+  ],
+
+  "notInScope": [
+    "일정 탭 DB 스키마 변경 (checklist[] 재활용으로 Phase 1 해결)",
+    "로그 자동 기록 (Phase 2)",
+    "자료 허브 / Supabase Storage (Phase 2)",
+    "외주요청 기능 (해당 없음)",
+    "피드백 탭 (해당 없음)"
+  ],
+
+  "doNotTouch": [
+    "/transactions/*",
+    "/ledger, /import (TASK_APP_RESTRUCTURE 작업 범위)",
+    "entities/business/ (business_units 가계부 분류용, ERP와 별개)",
+    "기존 PIPELINE_STATUSES 상수 — 변경하지 말고 프론트에서 매핑만"
+  ]
+}

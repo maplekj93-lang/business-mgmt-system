@@ -79,7 +79,29 @@
   - `unknown` — **JSONB/외부 API 파싱 시에만 허용**, 단 반드시 Zod 또는 타입가드와 함께 사용. 그 외 사용 금지.
 - **Error Handling:** `try/catch` 대신 `{ success, data, error }` 패턴의 결과 객체를 반환합니다.
 - **UUID 생성:** Supabase SQL에서는 `gen_random_uuid()`를 사용합니다. (`uuid_generate_v4()` 사용 금지)
-- **Spec-First:** 새 기능 구현 전 반드시 `docs/specs/기능명.md`에 명세서를 먼저 작성합니다.
+- **Sprint-First (Gstack):** 새 기능 구현 전 `/office-hours` 슬래시 커맨드를 통해 다듬고, `/plan-eng-review`로 설계를 확정합니다. 수동 문서화 프로세스보다 Gstack 기반의 AI 페르소나 스프린트를 우선합니다.
+- **Harness Engineering Compliance:** AI는 자율적으로 코드를 작성하되, 에이전트가 제어하는 '하네스(Harness)' 환경 내에서만 동작해야 합니다. (린터, 테스트, 문서 일관성 검사 필수)
+- **CPS Framework:** 모든 과업은 맥락(Context), 문제(Problem), 해결책(Solution)의 3단계 구조로 분석하고 보고해야 합니다.
+
+---
+
+## 5-1. Gstack & Harness Workflow (공식 개발 프로세스)
+
+프로젝트의 기본 개발 워크플로우는 **Gstack의 7단계 스프린트**와 **하네스 엔지니어링** 철학을 따릅니다.
+
+1. `/office-hours`: (기획/접근법 설계) 수요 검증 및 최소 기능(MVP) 축소.
+2. `/plan-eng-review`: (아키텍처 검증) 하네스 환경 제약 조건 및 테스트 계획 수립.
+3. `/qa` 또는 `/qa-review`: (품질 관리) 브라우저/터미널 기반 인수 테스트(UAT) 수행.
+
+---
+
+## 5-2. No-Touch Policy (접근 금지 구역)
+
+'스파게티 바이브'와 이해도 부채(Comprehension Debt)를 방지하기 위해 아래 영역은 AI가 사용자의 명시적 허가 없이 직접 수정할 수 없습니다:
+
+- `src/shared/api`: 핵심 백엔드 통신 인터페이스 및 보안 키 관리.
+- `supabase/migrations`: 원자적 데이터베이스 스키마 정의 (수동 리뷰 필수).
+- 특정 핵심 알고리즘이 포함된 파일 (`No-Touch` 주석이 있는 경우).
 
 ---
 

@@ -30,6 +30,7 @@ import { CategoryDonutChart } from './CategoryDonutChart'
 import { ProfitBalanceCard } from './ProfitBalanceCard'
 import { ProfitabilityAlert } from './ProfitabilityAlert'
 import { getProjectAnalytics, ProjectProfitabilityData, CategoryDistribution } from '@/entities/project/api/get-project-analytics'
+import { IncomeMatchingWidget } from '@/features/match-income/ui/IncomeMatchingWidget'
 
 export function BusinessDashboard() {
     const searchParams = useSearchParams()
@@ -249,6 +250,7 @@ export function BusinessDashboard() {
             {/* Main Content: Chart & Projects & Crew */}
             <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
                 <div className="lg:col-span-2 space-y-6">
+                    <IncomeMatchingWidget />
                     <ReceivablesAlertCard />
                     {cashflowStats && (
                         <MatchingHealthWidget 

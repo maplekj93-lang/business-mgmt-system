@@ -21,7 +21,8 @@ The following documents are part of this rule's context — no need to manually 
 The above documents are already in context. Before writing any code or file:
 1. Confirm you have read the above @mentioned documents
 2. If requirements are ambiguous → ask questions first, never fill gaps with assumptions
-3. New feature → write spec in `docs/specs/[feature].md` first, then code
+3. 새로운 기능 구현 → 무작정 코드를 작성하지 말고 `/office-hours` 워크플로우를 먼저 실행하여 요구사항을 뾰족하게 다듬을 것
+4. 설계 검증 → 코드 작성 전 `/plan-eng-review` 워크플로우를 통해 FSD 및 타입 규칙 위반이 없는지 셀프 검토할 것
 
 **"질문 먼저, 코드는 나중 (Questions first, code later)"**
 
