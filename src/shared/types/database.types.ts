@@ -382,13 +382,6 @@ export type Database = {
             referencedRelation: "clients"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "daily_rate_logs_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
         ]
       }
       dutch_pay_groups: {
@@ -876,79 +869,56 @@ export type Database = {
           status?: string
           title?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "project_incomes_project_id_fkey"
-            columns: ["project_id"]
-            isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       projects: {
         Row: {
           actual_payment_date: string | null
           business_owner: string
           categories: string[] | null
-          checklist: Json | null
           client_id: string | null
           created_at: string | null
-          deadline: string | null
           duration_days: number | null
           end_date: string | null
           expected_payment_date: string | null
           id: string
           income_type: string
           invoice_sent_date: string | null
-          memo: string | null
           name: string
-          quote_sent_date: string | null
           start_date: string | null
           status: string
-          user_id: string | null
         }
         Insert: {
           actual_payment_date?: string | null
           business_owner: string
           categories?: string[] | null
-          checklist?: Json | null
           client_id?: string | null
           created_at?: string | null
-          deadline?: string | null
           duration_days?: number | null
           end_date?: string | null
           expected_payment_date?: string | null
           id?: string
           income_type: string
           invoice_sent_date?: string | null
-          memo?: string | null
           name: string
-          quote_sent_date?: string | null
           start_date?: string | null
           status?: string
-          user_id?: string | null
         }
         Update: {
           actual_payment_date?: string | null
           business_owner?: string
           categories?: string[] | null
-          checklist?: Json | null
           client_id?: string | null
           created_at?: string | null
-          deadline?: string | null
           duration_days?: number | null
           end_date?: string | null
           expected_payment_date?: string | null
           id?: string
           income_type?: string
           invoice_sent_date?: string | null
-          memo?: string | null
           name?: string
-          quote_sent_date?: string | null
           start_date?: string | null
           status?: string
-          user_id?: string | null
         }
         Relationships: [
           {

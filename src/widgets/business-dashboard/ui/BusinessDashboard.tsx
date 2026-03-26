@@ -4,11 +4,13 @@ import React, { useState, useEffect } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/shared/ui/card'
 import { getDailyRateLogs } from '@/entities/daily-rate/api/get-daily-logs'
 import { getProjects } from '@/entities/project/api/get-projects'
-import { Wallet, TrendingUp, Users, Briefcase, Loader2, HandCoins } from 'lucide-react'
+import { Wallet, TrendingUp, Users, Briefcase, Loader2, HandCoins, Download } from 'lucide-react'
 import { RevenueAnalysis } from './RevenueAnalysis'
 import { RecentCrew } from './RecentCrew'
 import { QuickInfoFooter } from './QuickInfoFooter'
 import { ProjectBriefList } from './ProjectBriefList'
+import jsPDF from 'jspdf'
+import html2canvas from 'html2canvas'
 import { VatReserveCard } from '@/widgets/vat-reserve-card/ui/VatReserveCard'
 import { IncomeTaxReserveCard } from '@/widgets/income-tax-reserve-card/ui/IncomeTaxReserveCard'
 import { SafetyNetCard } from '@/widgets/safety-net-card/ui/SafetyNetCard'
@@ -56,6 +58,47 @@ export function BusinessDashboard() {
             params.set('owner', newOwner)
         }
         router.push(`${pathname}?${params.toString()}`, { scroll: false })
+    }
+
+    const handleDownloadPDF = async () => {
+        try {
+            const element = document.getElementById('dashboard-content')
+            if (!element) return
+
+            const canvas = await html2canvas(element, {
+                scale: 2,
+                backgroundColor: '#000000',
+                useCORS: true,
+                allowTaint: true
+            })
+
+            const imgData = canvas.toDataURL('image/png')
+            const pdf = new jsPDF({
+                orientation: 'portrait',
+                unit: 'mm',
+                format: 'a4'
+            })
+
+            const imgWidth = 210 // A4 width in mm
+            const imgHeight = (canvas.height * imgWidth) / canvas.width
+            let heightLeft = imgHeight
+            let position = 0
+
+            pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+            heightLeft -= 297 // A4 height in mm
+
+            while (heightLeft > 0) {
+                position = heightLeft - imgHeight
+                pdf.addPage()
+                pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight)
+                heightLeft -= 297
+            }
+
+            const fileName = `비즈니스대시보드_${new Date().toISOString().split('T')[0]}.pdf`
+            pdf.save(fileName)
+        } catch (error) {
+            console.error('PDF 다운로드 실패:', error)
+        }
     }
 
     useEffect(() => {
@@ -107,11 +150,23 @@ export function BusinessDashboard() {
                     <h2 className="text-2xl font-bold tracking-tight text-white mb-1">비즈니스 대시보드</h2>
                     <p className="text-xs text-slate-500 font-medium">실시간 사업 현황 및 수익성 분석</p>
                 </div>
-                <OwnerToggle value={ownerId} onChange={handleOwnerChange} />
+                <div className="flex items-center gap-3">
+                    <button
+                        onClick={handleDownloadPDF}
+                        className="flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-sm font-semibold transition-colors"
+                        title="현재 대시보드를 PDF로 다운로드합니다"
+                    >
+                        <Download className="h-4 w-4" />
+                        PDF 내보내기
+                    </button>
+                    <OwnerToggle value={ownerId} onChange={handleOwnerChange} />
+                </div>
             </div>
 
-            {/* Summary Cards */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+            <div id="dashboard-content" className="space-y-8">
+
+                {/* Summary Cards */}
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
                 {/* Profit Balance Card (Visible only in 'all' view) */}
                 {ownerId === 'all' ? (
                     <ProfitBalanceCard projects={profitability} />
@@ -299,6 +354,8 @@ export function BusinessDashboard() {
 
             {/* Quick Info Footer */}
             <QuickInfoFooter summary={summary} />
+            </div>
+
         </div>
     )
 }

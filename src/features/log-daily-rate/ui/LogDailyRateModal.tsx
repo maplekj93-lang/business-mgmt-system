@@ -1,13 +1,14 @@
 "use client"
 
 import { useState, useEffect } from 'react';
-import { Plus, Loader2 } from 'lucide-react';
+import { Plus, Loader2, Copy } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/shared/ui/dialog';
 import { Button } from '@/shared/ui/button';
 import { Input } from '@/shared/ui/input';
 import { Label } from '@/shared/ui/label';
 import { createDailyLog } from '@/entities/daily-rate/api/create-daily-log';
 import { updateDailyLog } from '@/entities/daily-rate/api/update-daily-log';
+import { getDailyRateLogs } from '@/entities/daily-rate/api/get-daily-logs';
 import { ClientSelect } from '@/entities/client/ui/ClientSelect';
 import { getCrewProfiles } from '@/entities/crew/api/crew-api';
 import type { CrewPayment, SiteExpense, DailyRateLog, VatType } from '@/entities/daily-rate/model/types';
@@ -43,6 +44,18 @@ export function LogDailyRateModal({ open, onClose, onSuccess, initialData }: Log
     const [expenses, setExpenses] = useState<Omit<SiteExpense, 'id' | 'daily_rate_log_id'>[]>([]);
 
     const [isSubmitting, setIsSubmitting] = useState(false);
+    const DRAFT_KEY = 'daily_rate_draft';
+
+    // 드래프트 저장 (변경 시마다)
+    useEffect(() => {
+        if (open && !initialData) {
+            const draft = {
+                workDate, clientId, siteName, amountGross, vatType,
+                crew, expenses, showCrew, showExpenses
+            };
+            localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+        }
+    }, [workDate, clientId, siteName, amountGross, vatType, crew, expenses, showCrew, showExpenses, open, initialData]);
 
     // Load crew profiles when modal opens
     useEffect(() => {
@@ -57,6 +70,29 @@ export function LogDailyRateModal({ open, onClose, onSuccess, initialData }: Log
                 .finally(() => setCrewLoading(false));
         }
     }, [open]);
+
+    // 드래프트 복구
+    useEffect(() => {
+        if (open && !initialData) {
+            const draft = localStorage.getItem(DRAFT_KEY);
+            if (draft) {
+                try {
+                    const parsed = JSON.parse(draft);
+                    setWorkDate(parsed.workDate);
+                    setClientId(parsed.clientId);
+                    setSiteName(parsed.siteName);
+                    setAmountGross(parsed.amountGross);
+                    setVatType(parsed.vatType);
+                    setCrew(parsed.crew);
+                    setExpenses(parsed.expenses);
+                    setShowCrew(parsed.showCrew);
+                    setShowExpenses(parsed.showExpenses);
+                } catch (e) {
+                    console.error('드래프트 복구 실패:', e);
+                }
+            }
+        }
+    }, []);
 
     // Populate data when in edit mode
     useEffect(() => {
@@ -119,8 +155,8 @@ export function LogDailyRateModal({ open, onClose, onSuccess, initialData }: Log
                 vat_type: vatType,
                 withholding_rate: 0,
                 payment_status: initialData?.payment_status || 'pending',
-                crew_payments: crew.map(c => ({ 
-                    ...c, 
+                crew_payments: crew.map(c => ({
+                    ...c,
                     amount_gross: Number(c.amount_gross),
                     vat_type: c.vat_type || 'none'
                 })),
@@ -136,6 +172,7 @@ export function LogDailyRateModal({ open, onClose, onSuccess, initialData }: Log
 
             if (result.success) {
                 toast.success(initialData ? '기록이 수정되었습니다.' : '새로운 기록이 등록되었습니다.');
+                localStorage.removeItem(DRAFT_KEY); // 저장 후 드래프트 삭제
                 onSuccess();
                 onClose();
             } else {
@@ -149,16 +186,67 @@ export function LogDailyRateModal({ open, onClose, onSuccess, initialData }: Log
         }
     }
 
+    async function handleDuplicateYesterday() {
+        const yesterday = new Date(new Date().setDate(new Date().getDate() - 1))
+            .toISOString().split('T')[0];
+
+        try {
+            const result = await getDailyRateLogs(yesterday);
+            if (result.success && result.data.length > 0) {
+                const lastLog = result.data[0];
+                setWorkDate(new Date().toISOString().split('T')[0]); // 오늘 날짜
+                setClientId(lastLog.client_id || '');
+                setSiteName(lastLog.site_name);
+                setAmountGross(lastLog.amount_gross.toString());
+                setVatType(lastLog.vat_type || 'exclude');
+                setCrew(lastLog.crew_payments?.map(c => ({
+                    crew_name: c.crew_name,
+                    role: c.role,
+                    amount_gross: c.amount_gross,
+                    vat_type: c.vat_type || 'none',
+                    withholding_rate: c.withholding_rate,
+                    paid: false // 복제 시 미지급 상태
+                })) || []);
+                setExpenses(lastLog.site_expenses?.map(e => ({
+                    category: e.category,
+                    amount: e.amount,
+                    memo: e.memo,
+                    included_in_invoice: e.included_in_invoice
+                })) || []);
+                setShowCrew(!!lastLog.crew_payments?.length);
+                setShowExpenses(!!lastLog.site_expenses?.length);
+                toast.success('어제 기록이 복제되었습니다.');
+            } else {
+                toast.info('어제 기록이 없습니다.');
+            }
+        } catch (error) {
+            console.error(error);
+            toast.error('어제 기록 복제 실패');
+        }
+    }
+
     return (
         <Dialog open={open} onOpenChange={(val) => !val && onClose()}>
             <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto bg-zinc-950/90 backdrop-blur-2xl border-white/5 rounded-[2rem] shadow-2xl custom-scrollbar">
-                <DialogHeader className="border-b border-white/5 pb-4">
+                <DialogHeader className="border-b border-white/5 pb-4 flex flex-row items-center justify-between">
                     <DialogTitle className="flex items-center gap-2 text-white text-xl font-black tracking-tight">
                         <div className="p-2 bg-primary/10 rounded-lg">
                             <Plus className="h-5 w-5 text-primary" />
                         </div>
                         {initialData ? '일당 기록 수정' : '현장 일당 기록 추가'}
                     </DialogTitle>
+                    {!initialData && (
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={handleDuplicateYesterday}
+                            className="text-slate-400 hover:text-white hover:bg-white/5 rounded-lg h-9 px-3"
+                            title="어제 기록을 복제해 오늘 기록 작성을 빠르게 합니다"
+                        >
+                            <Copy className="h-4 w-4 mr-1.5" />
+                            <span className="text-xs font-bold">어제 복제</span>
+                        </Button>
+                    )}
                 </DialogHeader>
 
                 <div className="space-y-6 py-4">
@@ -251,6 +339,9 @@ export function LogDailyRateModal({ open, onClose, onSuccess, initialData }: Log
 
                 <DialogFooter className="flex gap-2 border-t border-white/5 pt-6">
                     <Button variant="ghost" onClick={onClose} disabled={isSubmitting} className="flex-1 text-slate-500 hover:text-white hover:bg-white/5 rounded-xl h-12">취소</Button>
+                    <div className="text-xs text-slate-500 flex-1 flex items-center justify-center">
+                        {!initialData && '자동 저장됨'}
+                    </div>
                     <Button onClick={handleSubmit} disabled={isSubmitting || !siteName || !amountGross} className="flex-1 bg-primary hover:bg-primary/90 text-white font-bold rounded-xl h-12 tactile-button">
                         {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : (initialData ? '수정 완료' : '기록 완료')}
                     </Button>
