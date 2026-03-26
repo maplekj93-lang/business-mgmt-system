@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.1] - 2026-03-26
+
+### Added
+- **Phase 4 ERP Schema**: New database tables for business profiles, clients, projects, project incomes, daily rate logs, crew payments, and site expenses with complete RLS policies and seed data.
+- **Income Reconciliation**: Enhanced income matching with dedicated migration for transaction-income linking logic.
+- **Matching Rule Management**: New entity layer and feature module for managing custom categorization rules with visual scenario editors.
+- **Income Matching Widget**: Enhanced matching dialog with improved UX, pending income querying, and match statistics.
+- **Documentation Suite**: Comprehensive Phase 3-4 implementation guides, technical specifications, troubleshooting guides, and research summaries.
+
+### Changed
+- Regenerated TypeScript types from updated Supabase schema.
+- Enhanced MatchIncomeDialog with advanced matching and transaction linking.
+- Updated business dashboard with matching statistics header and rule management routes.
+- Expanded STRUCTURE.md with detailed FSD architecture guidance.
+
+### Fixed
+- Transaction API endpoints (`get-cashflow-stats`, `get-monthly-stats`) for accurate statistical calculations.
+
 ## [0.2.0] - 2026-03-26
 
 ### Added
