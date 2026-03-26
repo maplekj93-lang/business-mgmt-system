@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
 
+## [0.2.2] - 2026-03-26
+
+### Added
+- **Import Engine Improvements**: Enhanced race condition prevention using `import_hash` and `ignoreDuplicates` at the database level.
+- **Advanced Classification**: Implemented sophisticated category suggestion logic based on historical patterns and confidence scoring.
+- **ERP Matching Widgets**: Added new widgets for `DailyRateLogs` and `SiteExpenses` matching in the Phase 5 dashboard.
+
+### Fixed
+- **Logic Bug**: Fixed `skipped` transaction count calculation when import chunks encounter errors.
+- **Test Integrity**: Refactored Supabase mocks in test suites for better stability and chained method support.
+
 ## [0.2.1] - 2026-03-26
 
 ### Added

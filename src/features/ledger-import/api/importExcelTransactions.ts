@@ -61,6 +61,7 @@ export async function importExcelTransactions(
 
         if (error) {
             result.errors.push(`청크 ${i + 1}/${chunks.length} 오류: ${error.message}`);
+            result.skipped += chunk.length;
             continue;
         }
 

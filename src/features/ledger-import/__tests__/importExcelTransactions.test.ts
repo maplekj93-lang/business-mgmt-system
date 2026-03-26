@@ -23,29 +23,27 @@ vi.mock('../lib/utils', () => ({
 describe('importExcelTransactions - Concurrent Import & Race Condition Prevention', () => {
   let mockSupabase: any;
   let mockUpsertCall: any;
+  let query: any;
 
   beforeEach(() => {
-    mockUpsertCall = vi.fn().mockReturnThis();
+    mockUpsertCall = vi.fn();
+
+    query = {
+      upsert: mockUpsertCall,
+      select: vi.fn().mockReturnThis(),
+      update: vi.fn().mockReturnThis(),
+      eq: vi.fn().mockReturnThis(),
+      single: vi.fn().mockReturnThis(),
+      then: vi.fn().mockImplementation(function (onFulfilled) {
+        const result = { data: [], error: null };
+        return Promise.resolve(onFulfilled ? onFulfilled(result) : result);
+      }),
+    };
+
+    mockUpsertCall.mockImplementation(() => query);
 
     mockSupabase = {
-      from: vi.fn().mockImplementation((table: string) => {
-        const query: any = {
-          upsert: vi.fn().mockReturnThis(),
-          select: vi.fn().mockReturnThis(),
-          update: vi.fn().mockReturnThis(),
-          eq: vi.fn().mockReturnThis(),
-          then: vi.fn().mockImplementation(function (onFulfilled) {
-            // Default response
-            const result = { data: [], error: null };
-            return Promise.resolve(onFulfilled ? onFulfilled(result) : result);
-          }),
-        };
-        
-        // Connect shared mock to query.upsert for tests that check its calls
-        query.upsert = mockUpsertCall.mockImplementation(() => query);
-        
-        return query;
-      }),
+      from: vi.fn().mockReturnValue(query),
     };
 
     vi.mocked(createClient).mockReturnValue(mockSupabase);
@@ -219,16 +217,18 @@ describe('importExcelTransactions - Concurrent Import & Race Condition Preventio
         foreign_amount: null,
       };
 
-      mockUpsertCall.mockResolvedValueOnce({
-        data: [{ id: 'tx-1' }],
-        error: null,
+      mockUpsertCall.mockImplementationOnce(() => {
+        query.select.mockResolvedValueOnce({
+          data: [{ id: 'tx-1' }],
+          error: null,
+        });
+        return query;
       });
 
       await importExcelTransactions([row], 'asset-123');
 
       // ✅ 검증: upsert 후 select("id") 호출
-      const selectMock = mockSupabase.from().select;
-      expect(selectMock).toHaveBeenCalledWith('id');
+      expect(query.select).toHaveBeenCalledWith('id');
     });
   });
 
@@ -244,34 +244,22 @@ describe('importExcelTransactions - Concurrent Import & Race Condition Preventio
         foreign_amount: null,
       };
 
-      mockUpsertCall.mockResolvedValueOnce({
-        data: [{ id: 'tx-1' }],
-        error: null,
-      });
-
-      // assets 테이블의 update 체인 설정
-      const eqMock = vi.fn().mockResolvedValue({ error: null });
-      mockSupabase.from.mockImplementation((table: string) => {
-        if (table === 'transactions') {
-          return {
-            upsert: mockUpsertCall,
-            select: vi.fn().mockReturnThis(),
-          };
-        }
-        if (table === 'assets') {
-          return {
-            update: vi.fn().mockReturnValue({ eq: eqMock }),
-            eq: eqMock,
-          };
-        }
-        return {};
+      mockUpsertCall.mockImplementationOnce(() => {
+        query.select.mockResolvedValueOnce({
+          data: [{ id: 'tx-1' }],
+          error: null,
+        });
+        return query;
       });
 
       const result = await importExcelTransactions([row], 'asset-123');
 
-      // ✅ 검증: 성공 시 assets 테이블 업데이트 호출
-      expect(result.inserted).toBe(1);
-      expect(result.errors.length).toBe(0);
+      // ✅ 검증: last_synced_at 업데이트
+      expect(mockSupabase.from).toHaveBeenCalledWith('assets');
+      expect(mockSupabase.from('assets').update).toHaveBeenCalledWith(expect.objectContaining({
+        last_synced_at: expect.any(String),
+      }));
+      expect(mockSupabase.from('assets').eq).toHaveBeenCalledWith('id', 'asset-123');
     });
 
     it('should skip assets.last_synced_at update if import has errors', async () => {
@@ -285,12 +273,13 @@ describe('importExcelTransactions - Concurrent Import & Race Condition Preventio
         foreign_amount: null,
       };
 
-      mockUpsertCall.mockImplementationOnce(() => ({
-        select: vi.fn().mockResolvedValue({
+      mockUpsertCall.mockImplementationOnce(() => {
+        query.select.mockResolvedValueOnce({
           data: null,
-          error: { message: 'Database error' },
-        }),
-      }));
+          error: { message: 'Supabase Error' },
+        });
+        return query;
+      });
 
       const result = await importExcelTransactions([row], 'asset-123');
 
@@ -312,10 +301,12 @@ describe('importExcelTransactions - Concurrent Import & Race Condition Preventio
         foreign_amount: null,
       };
 
-      mockUpsertCall.mockResolvedValueOnce({
-        data: [{ id: 'tx-1' }],
-        error: null,
-      });
+      mockUpsertCall.mockImplementationOnce(() => ({
+        select: vi.fn().mockResolvedValue({
+          data: [{ id: 'tx-1' }],
+          error: null,
+        }),
+      }));
 
       await importExcelTransactions([row], 'asset-456');
 
@@ -339,10 +330,12 @@ describe('importExcelTransactions - Concurrent Import & Race Condition Preventio
         foreign_amount: null,
       };
 
-      mockUpsertCall.mockResolvedValueOnce({
-        data: [{ id: 'tx-1' }],
-        error: null,
-      });
+      mockUpsertCall.mockImplementationOnce(() => ({
+        select: vi.fn().mockResolvedValue({
+          data: [{ id: 'tx-1' }],
+          error: null,
+        }),
+      }));
 
       await importExcelTransactions([row], 'asset-123');
 
@@ -363,10 +356,12 @@ describe('importExcelTransactions - Concurrent Import & Race Condition Preventio
         foreign_amount: 1.23,
       };
 
-      mockUpsertCall.mockResolvedValueOnce({
-        data: [{ id: 'tx-1' }],
-        error: null,
-      });
+      mockUpsertCall.mockImplementationOnce(() => ({
+        select: vi.fn().mockResolvedValue({
+          data: [{ id: 'tx-1' }],
+          error: null,
+        }),
+      }));
 
       await importExcelTransactions([row], 'asset-123');
 
@@ -390,18 +385,20 @@ describe('importExcelTransactions - Concurrent Import & Race Condition Preventio
         foreign_amount: null,
       }));
 
-      mockUpsertCall.mockImplementationOnce(() => ({
-        select: vi.fn().mockResolvedValue({
+      mockUpsertCall.mockImplementationOnce(() => {
+        query.select.mockResolvedValueOnce({
           data: null,
           error: { message: 'Chunk 1 error' },
-        }),
-      }));
-      mockUpsertCall.mockImplementationOnce(() => ({
-        select: vi.fn().mockResolvedValue({
+        });
+        return query;
+      });
+      mockUpsertCall.mockImplementationOnce(() => {
+        query.select.mockResolvedValueOnce({
           data: Array.from({ length: 150 }, (_, i) => ({ id: `tx-${i}` })),
           error: null,
-        }),
-      }));
+        });
+        return query;
+      });
 
       const result = await importExcelTransactions(rows, 'asset-123');
 
@@ -469,9 +466,12 @@ describe('importExcelTransactions - Concurrent Import & Race Condition Preventio
         foreign_amount: null,
       };
 
-      mockUpsertCall.mockResolvedValueOnce({
-        data: [{ id: 'tx-1' }],
-        error: null,
+      mockUpsertCall.mockImplementationOnce(() => {
+        query.select.mockResolvedValueOnce({
+          data: [{ id: 'tx-1' }],
+          error: null,
+        });
+        return query;
       });
 
       const result = await importExcelTransactions([row], 'asset-123');
@@ -504,12 +504,13 @@ describe('importExcelTransactions - Concurrent Import & Race Condition Preventio
         },
       ];
 
-      mockUpsertCall.mockImplementationOnce(() => ({
-        select: vi.fn().mockResolvedValue({
+      mockUpsertCall.mockImplementationOnce(() => {
+        query.select.mockResolvedValueOnce({
           data: [{ id: 'tx-1' }, { id: 'tx-2' }],
           error: null,
-        }),
-      }));
+        });
+        return query;
+      });
 
       const result = await importExcelTransactions(rows, 'asset-123');
 
@@ -528,9 +529,12 @@ describe('importExcelTransactions - Concurrent Import & Race Condition Preventio
         foreign_amount: null,
       };
 
-      mockUpsertCall.mockResolvedValueOnce({
-        data: [{ id: 'tx-1' }],
-        error: null,
+      mockUpsertCall.mockImplementationOnce(() => {
+        query.select.mockResolvedValueOnce({
+          data: [{ id: 'tx-1' }],
+          error: null,
+        });
+        return query;
       });
 
       const result = await importExcelTransactions([row], 'asset-123');
@@ -555,18 +559,20 @@ describe('importExcelTransactions - Concurrent Import & Race Condition Preventio
         foreign_amount: null,
       }));
 
-      mockUpsertCall.mockImplementationOnce(() => ({
-        select: vi.fn().mockResolvedValue({
+      mockUpsertCall.mockImplementationOnce(() => {
+        query.select.mockResolvedValueOnce({
           data: Array.from({ length: 140 }, (_, i) => ({ id: `tx-${i}` })),
           error: null,
-        }),
-      }));
-      mockUpsertCall.mockImplementationOnce(() => ({
-        select: vi.fn().mockResolvedValue({
+        });
+        return query;
+      });
+      mockUpsertCall.mockImplementationOnce(() => {
+        query.select.mockResolvedValueOnce({
           data: Array.from({ length: 145 }, (_, i) => ({ id: `tx-${i}` })),
           error: null,
-        }),
-      }));
+        });
+        return query;
+      });
 
       const result = await importExcelTransactions(rows, 'asset-123');
 
