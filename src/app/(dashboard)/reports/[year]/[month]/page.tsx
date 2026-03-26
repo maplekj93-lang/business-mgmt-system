@@ -32,9 +32,9 @@ export default async function MonthlyReportPage({ params }: ReportPageProps) {
     }
 
     const { profitability, categoryDistribution } = analyticsResult.data
-    const totalRevenue = profitability.reduce((sum, p) => sum + p.total_revenue, 0)
+    const totalRevenue = profitability.reduce((sum, p) => sum + p.revenue, 0)
     const totalProfit = profitability.reduce((sum, p) => sum + p.net_profit, 0)
-    const avgMargin = (profitability.length > 0 && totalRevenue > 0) ? (totalProfit / totalRevenue) * 100 : 0
+    const avgMargin = (profitability.length > 0 && totalRevenue > 0) ? (totalProfit / (totalRevenue / 1.1)) * 100 : 0
 
     return (
         <div className="flex flex-col gap-10 p-4 md:p-8 max-w-7xl mx-auto pb-20 print:p-0">

@@ -6,9 +6,9 @@ import { OwnerType } from '@/shared/constants/business';
 export interface ProjectProfitabilityData {
     id: string;
     name: string;
-    total_revenue: number;
-    crew_labor: number;
-    site_expenses: number;
+    revenue: number;
+    labor_cost: number;
+    expenses: number;
     net_profit: number;
     profit_margin: number;
     owner_id: string;
@@ -61,9 +61,9 @@ export async function getProjectAnalytics(params: {
                 profitability: (profitability as any[] || []).map((p: any) => ({
                     id: p.project_id,
                     name: p.project_name,
-                    total_revenue: Number(p.revenue),
-                    crew_labor: Number(p.labor_cost),
-                    site_expenses: Number(p.expenses),
+                    revenue: Number(p.revenue),
+                    labor_cost: Number(p.labor_cost),
+                    expenses: Number(p.expenses),
                     net_profit: Number(p.net_profit),
                     profit_margin: Number(p.profit_margin),
                     owner_id: p.owner_id as string,

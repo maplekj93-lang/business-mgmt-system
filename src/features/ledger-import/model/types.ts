@@ -31,6 +31,8 @@ export interface ExcelTransactionRow {
     raw_description: string; // [NEW] 원본 거래 설명
     normalized_name?: string; // [NEW] 정규화된 가맹점명
     asset_id: string;
+    currency_code?: string; // [NEW] 통화 코드 (KRW, USD 등)
+    foreign_amount?: number | null; // [NEW] 외화 금액
 }
 
 /** parseExcel() 호출 시 넘기는 옵션 */

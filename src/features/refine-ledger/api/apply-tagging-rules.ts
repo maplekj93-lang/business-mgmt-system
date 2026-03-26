@@ -72,7 +72,13 @@ export async function applyTaggingRules(
       const txAmount = Math.abs(Number(tx.amount));
 
       for (const rule of fixedRules) {
-        if (Math.abs(Number(rule.amount)) !== txAmount) continue;
+        // 금액 검증 (undefined 체크)
+        if (!rule.amount || Math.abs(Number(rule.amount)) !== txAmount) continue;
+
+        // day_of_month와 tolerance_days 필수 확인
+        if (!rule.day_of_month || rule.tolerance_days === undefined || rule.tolerance_days === null) {
+          continue;
+        }
 
         // 날짜 차이 계산 (± tolerance_days)
         // 해당 월의 rule.day_of_month와 비교
@@ -84,7 +90,7 @@ export async function applyTaggingRules(
 
         const isMatch = checkDates.some(targetDate => {
           const diffDays = Math.abs(txDate.getTime() - targetDate.getTime()) / (1000 * 60 * 60 * 24);
-          return diffDays <= rule.tolerance_days;
+          return diffDays <= (rule.tolerance_days ?? 0);
         });
 
         if (isMatch) {

@@ -8,9 +8,11 @@ import { TrendingUp, Loader2 } from 'lucide-react';
 interface ProjectProfitability {
     id: string;
     name: string;
-    total_revenue: number;
-    crew_labor: number;
-    site_expenses: number;
+    revenue: number;
+    labor_cost: number;
+    expenses: number;
+    net_profit: number;
+    profit_margin: number;
     status: 'active' | 'completed' | 'on_hold';
 }
 
@@ -62,30 +64,24 @@ export function ProjectProfitabilityTable({ projects, loading }: ProjectProfitab
                             </TableTableRow>
                         ) : (
                             projects.map((project) => {
-                                const netProfit = calculateProjectNetProfit({
-                                    totalRevenue: project.total_revenue,
-                                    crewLabor: project.crew_labor,
-                                    siteExpenses: project.site_expenses,
-                                });
-                                const totalExpense = project.crew_labor + project.site_expenses;
-                                const margin = calculateProfitMargin(project.total_revenue, netProfit);
-
+                                const totalExpense = project.labor_cost + project.expenses;
+                                
                                 return (
                                     <TableTableRow key={project.id} className="border-white/5 hover:bg-white/5 transition-all">
                                         <TableCell className="text-xs font-bold text-white truncate max-w-[120px]">
                                             {project.name}
                                         </TableCell>
                                         <TableCell className="text-right text-xs font-bold text-slate-300">
-                                            {formatKrw(project.total_revenue)}
+                                            {formatKrw(project.revenue)}
                                         </TableCell>
                                         <TableCell className="text-right text-xs font-bold text-rose-400">
                                             -{formatKrw(totalExpense)}
                                         </TableCell>
                                         <TableCell className="text-right text-xs font-black text-emerald-400">
-                                            {formatKrw(netProfit)}
+                                            {formatKrw(project.net_profit)}
                                         </TableCell>
                                         <TableCell className="text-right text-[10px] font-black text-slate-500">
-                                            {margin}%
+                                            {project.profit_margin}%
                                         </TableCell>
                                     </TableTableRow>
                                 );

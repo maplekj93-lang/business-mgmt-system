@@ -46,6 +46,8 @@ export async function importExcelTransactions(
     );
 
     // ② 청크 분할 후 순차 upsert
+    // 📌 안전성: DB의 UNIQUE(user_id, import_hash) 제약으로 중복 방지
+    // ignoreDuplicates=true로 동시 import 시에도 race condition 방지
     const chunks = chunkArray(preparedRows, CHUNK_SIZE);
 
     for (const [i, chunk] of chunks.entries()) {
@@ -53,7 +55,7 @@ export async function importExcelTransactions(
             .from('transactions')
             .upsert(chunk, {
                 onConflict: 'import_hash',
-                ignoreDuplicates: true,  // 중복 hash → 조용히 무시
+                ignoreDuplicates: true,  // 중복 hash → 자동 스킵 (DB 레벨)
             })
             .select('id');
 

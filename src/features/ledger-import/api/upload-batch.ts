@@ -37,7 +37,7 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[], fo
         // Fetch Rules
         const { data: rules } = await supabase
             .from('mdt_allocation_rules')
-            .select('keyword, category_id')
+            .select('keyword, category_id, is_business')
             .eq('user_id', user.id);
 
         // [NEW] Fetch Assets with Metadata and Manual Mappings
@@ -126,10 +126,13 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[], fo
         // Helper to normalize strings (remove all spaces) for loose matching
         const normalize = (s: string) => s.replace(/\s+/g, '');
 
-        const ruleMap = new Map<string, number>();
+        const ruleMap = new Map<string, { category_id: number; is_business: boolean }>();
         rules?.forEach(r => {
             if (r.category_id !== null) {
-                ruleMap.set(normalize(r.keyword), r.category_id);
+                ruleMap.set(normalize(r.keyword), {
+                    category_id: r.category_id,
+                    is_business: r.is_business || false
+                });
             }
         });
 
@@ -177,9 +180,10 @@ export async function uploadBatchAction(transactions: ValidatedTransaction[], fo
 
             // 2. Try Rule Matching
             if (!categoryId && rawForRule) {
-                for (const [key, catId] of ruleMap.entries()) {
+                for (const [key, rule] of ruleMap.entries()) {
                     if (rawForRule.includes(key)) {
-                        categoryId = catId;
+                        categoryId = rule.category_id;
+                        status = rule.is_business ? 'business_allocated' : 'auto_allocated';
                         break;
                     }
                 }

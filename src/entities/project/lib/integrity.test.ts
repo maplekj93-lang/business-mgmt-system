@@ -6,9 +6,9 @@ describe('project integrity utilities', () => {
         const project: ProjectProfitabilityMinimal = {
             id: '1',
             name: '정상 프로젝트',
-            total_revenue: 1000000,
-            crew_labor: 200000,
-            site_expenses: 50000,
+            revenue: 1000000,
+            labor_cost: 200000,
+            expenses: 50000,
             status: 'completed'
         };
         const result = checkProjectIntegrity(project);
@@ -20,9 +20,9 @@ describe('project integrity utilities', () => {
         const project: ProjectProfitabilityMinimal = {
             id: '2',
             name: '인건비 누락 프로젝트',
-            total_revenue: 1000000,
-            crew_labor: 0,
-            site_expenses: 50000,
+            revenue: 1000000,
+            labor_cost: 0,
+            expenses: 50000,
             status: 'completed'
         };
         const result = checkProjectIntegrity(project);
@@ -35,9 +35,9 @@ describe('project integrity utilities', () => {
         const project: ProjectProfitabilityMinimal = {
             id: '3',
             name: '매출 0원 진행중',
-            total_revenue: 0,
-            crew_labor: 0,
-            site_expenses: 0,
+            revenue: 0,
+            labor_cost: 0,
+            expenses: 0,
             status: 'active'
         };
         const result = checkProjectIntegrity(project);
@@ -50,9 +50,9 @@ describe('project integrity utilities', () => {
         const project: ProjectProfitabilityMinimal = {
             id: '4',
             name: '취소 프로젝트',
-            total_revenue: 0,
-            crew_labor: 0,
-            site_expenses: 0,
+            revenue: 0,
+            labor_cost: 0,
+            expenses: 0,
             status: 'cancelled'
         };
         const result = checkProjectIntegrity(project);

@@ -11,6 +11,14 @@ describe('currency utilities (decimal.js)', () => {
             // 10,000 / 11 = 909.0909... -> 909
             expect(calculateVat(10000)).toBe(909);
         });
+
+        it('영(0)인 경우 0을 리턴해야 함', () => {
+            expect(calculateVat(0)).toBe(0);
+        });
+
+        it('음수 처리 (Gross -110,000 -> VAT -10,000)', () => {
+            expect(calculateVat(-110000)).toBe(-10000);
+        });
     });
 
     describe('calculateNetSupply', () => {
@@ -41,6 +49,15 @@ describe('currency utilities (decimal.js)', () => {
 
         it('매출이 0인 경우 0을 리턴해야 함', () => {
             expect(calculateProfitMargin(0, 500000)).toBe(0);
+        });
+
+        it('손실 발생 시 음수 수익률을 리턴해야 함', () => {
+            // 매출 1,000,000, 수익 -100,000 -> -10.00%
+            expect(calculateProfitMargin(1000000, -100000)).toBe(-10);
+        });
+
+        it('매출보다 수익이 큰 경우도 계산 가능해야 함 (오버슈팅)', () => {
+            expect(calculateProfitMargin(100, 150)).toBe(150);
         });
     });
 });

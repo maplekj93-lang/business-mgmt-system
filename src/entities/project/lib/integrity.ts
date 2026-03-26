@@ -9,9 +9,9 @@ export interface ProjectIntegrityResult {
 export interface ProjectProfitabilityMinimal {
     id: string;
     name: string;
-    total_revenue: number;
-    crew_labor: number;
-    site_expenses: number;
+    revenue: number;
+    labor_cost: number;
+    expenses: number;
     status: ProjectStatus;
 }
 
@@ -26,16 +26,16 @@ export function checkProjectIntegrity(project: ProjectProfitabilityMinimal): Pro
 
     // Rule 1: 완료된 프로젝트인데 매출은 있는데 비용이 0인 경우
     if (project.status === 'completed') {
-        if (project.total_revenue > 0 && project.crew_labor === 0) {
+        if (project.revenue > 0 && project.labor_cost === 0) {
             warnings.push('인건비 데이터가 입력되지 않았습니다.');
         }
-        if (project.total_revenue > 0 && project.site_expenses === 0) {
+        if (project.revenue > 0 && project.expenses === 0) {
             warnings.push('현장 경비 데이터가 입력되지 않았습니다.');
         }
     }
 
     // Rule 2: 진행중 혹은 완료 프로젝트인데 매출이 0원인 경우
-    if (project.total_revenue === 0 && (project.status === 'active' || project.status === 'completed')) {
+    if (project.revenue === 0 && (project.status === 'active' || project.status === 'completed')) {
         warnings.push('매출 데이터가 0원입니다.');
     }
 
